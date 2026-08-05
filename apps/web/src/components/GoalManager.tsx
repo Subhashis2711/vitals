@@ -1,0 +1,213 @@
+"use client";
+
+import { GOAL_STATUSES, type Goal, type LearningTopic, type Project } from "@vitals/shared";
+import { Plus, Search, Target, Trash2 } from "lucide-react";
+import Link from "next/link";
+import { useMemo, useState, type FormEvent } from "react";
+import { toast } from "sonner";
+import { CircularProgress } from "@/components/CircularProgress";
+import { ProjectBadge } from "@/components/ProjectBadge";
+import { ProjectSelect } from "@/components/ProjectSelect";
+import { TopicSelect } from "@/components/TopicSelect";
+import { createGoal, deleteGoal } from "@/lib/api-browser";
+import { cn } from "@/lib/cn";
+
+const STATUS_STYLES: Record<string, string> = {
+  todo: "bg-neutral-500/15 text-neutral-400",
+  in_progress: "bg-amber-500/15 text-amber-400",
+  done: "bg-emerald-500/15 text-emerald-400",
+};
+const STATUS_LABELS: Record<string, string> = {
+  todo: "To do",
+  in_progress: "In progress",
+  done: "Done",
+};
+
+export function GoalManager({
+  initialGoals,
+  projects,
+  topics,
+}: {
+  initialGoals: Goal[];
+  projects: Project[];
+  topics: LearningTopic[];
+}) {
+  const [goals, setGoals] = useState(initialGoals);
+  const [title, setTitle] = useState("");
+  const [targetDate, setTargetDate] = useState("");
+  const [projectId, setProjectId] = useState("");
+  const [topicId, setTopicId] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [filterProjectId, setFilterProjectId] = useState("");
+
+  const projectById = new Map(projects.map((p) => [p.id, p]));
+
+  const visibleGoals = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return goals.filter((g) => {
+      if (statusFilter !== "all" && g.status !== statusFilter) return false;
+      if (filterProjectId && g.projectId !== filterProjectId) return false;
+      if (q && !g.title.toLowerCase().includes(q)) return false;
+      return true;
+    });
+  }, [goals, search, statusFilter, filterProjectId]);
+
+  async function handleCreate(e: FormEvent) {
+    e.preventDefault();
+    if (!title.trim()) return;
+    setSubmitting(true);
+    try {
+      const { goal } = await createGoal({
+        title: title.trim(),
+        targetDate: targetDate || undefined,
+        projectId: projectId || undefined,
+        topicId: topicId || undefined,
+      });
+      setGoals((prev) => [goal, ...prev]);
+      setTitle("");
+      setTargetDate("");
+      setProjectId("");
+      setTopicId("");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Couldn't create goal");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function handleDelete(id: string, goalTitle: string) {
+    setGoals((prev) => prev.filter((g) => g.id !== id));
+    await deleteGoal(id);
+    toast(`Deleted "${goalTitle}"`);
+  }
+
+  return (
+    <div className="space-y-4">
+      <form
+        onSubmit={handleCreate}
+        className="flex flex-wrap gap-2 rounded-2xl border border-neutral-800 bg-neutral-900 p-4"
+      >
+        <input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="New goal..."
+          className="min-w-0 flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-orange-500/60 focus:outline-none focus:ring-2 focus:ring-orange-500/20"
+        />
+        {projects.length > 0 && (
+          <ProjectSelect
+            projects={projects}
+            value={projectId}
+            onChange={setProjectId}
+            className="border-neutral-700 bg-neutral-950"
+          />
+        )}
+        {topics.length > 0 && (
+          <TopicSelect topics={topics} value={topicId} onChange={setTopicId} className="border-neutral-700 bg-neutral-950" />
+        )}
+        <input
+          type="date"
+          value={targetDate}
+          onChange={(e) => setTargetDate(e.target.value)}
+          className="rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-300 focus:border-orange-500/60 focus:outline-none focus:ring-2 focus:ring-orange-500/20"
+        />
+        <button
+          type="submit"
+          disabled={submitting || !title.trim()}
+          className="flex items-center gap-1 rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-orange-600 disabled:opacity-50"
+        >
+          <Plus className="h-4 w-4" />
+          Add
+        </button>
+      </form>
+
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="relative min-w-0 flex-1">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-neutral-500" />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search goals..."
+            className="w-full rounded-lg border border-neutral-800 bg-neutral-900 py-1.5 pl-8 pr-3 text-sm text-neutral-200 placeholder:text-neutral-500 focus:border-orange-500/60 focus:outline-none"
+          />
+        </div>
+        {projects.length > 0 && (
+          <ProjectSelect
+            projects={projects}
+            value={filterProjectId}
+            onChange={setFilterProjectId}
+            placeholder="All projects"
+            className="border-neutral-800 bg-neutral-900 py-1.5 text-sm"
+          />
+        )}
+        <div className="flex flex-wrap gap-1">
+          <button
+            type="button"
+            onClick={() => setStatusFilter("all")}
+            className={cn(
+              "rounded-full px-2.5 py-1 text-xs font-medium transition-colors",
+              statusFilter === "all" ? "bg-orange-500 text-white" : "bg-neutral-900 text-neutral-400 hover:text-neutral-200",
+            )}
+          >
+            All
+          </button>
+          {GOAL_STATUSES.map((s) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => setStatusFilter(s)}
+              className={cn(
+                "rounded-full px-2.5 py-1 text-xs font-medium transition-colors",
+                statusFilter === s ? "bg-orange-500 text-white" : "bg-neutral-900 text-neutral-400 hover:text-neutral-200",
+              )}
+            >
+              {STATUS_LABELS[s]}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        {visibleGoals.map((goal) => (
+          <div key={goal.id} className="group relative rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
+            <Link href={`/goals/${encodeURIComponent(goal.id)}`} className="flex items-center gap-3">
+              <CircularProgress value={goal.progress} />
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="truncate font-medium text-neutral-100">{goal.title}</p>
+                  <span
+                    className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ${STATUS_STYLES[goal.status]}`}
+                  >
+                    {STATUS_LABELS[goal.status]}
+                  </span>
+                  <ProjectBadge project={goal.projectId ? projectById.get(goal.projectId) : undefined} />
+                </div>
+                <p className="mt-1 text-xs text-neutral-500">
+                  {goal.todoCount > 0 ? `${goal.doneTodoCount}/${goal.todoCount} tasks` : "No linked tasks yet"}
+                  {goal.targetDate ? ` · due ${goal.targetDate}` : ""}
+                </p>
+              </div>
+            </Link>
+            <button
+              type="button"
+              onClick={() => handleDelete(goal.id, goal.title)}
+              className="absolute right-3 top-3 text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        ))}
+        {visibleGoals.length === 0 && (
+          <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-neutral-800 py-10 text-sm text-neutral-500 sm:col-span-2">
+            <Target className="h-6 w-6" />
+            {goals.length === 0
+              ? "No goals yet. Each goal carries its own plan — link tasks to it and progress tracks itself."
+              : "No goals match your filters."}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

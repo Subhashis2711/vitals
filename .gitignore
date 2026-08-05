@@ -1,0 +1,26 @@
+node_modules/
+dist/
+build/
+.next/
+.turbo/
+
+# env
+.env
+.env.local
+.env.*.local
+
+# db
+*.db
+*.db-*
+packages/db/local.db*
+
+# local Supabase CLI runtime state (machine-specific, not shared config)
+supabase/.branches/
+supabase/.temp/
+
+# logs
+npm-debug.log*
+*.log
+
+# os
+.DS_Store

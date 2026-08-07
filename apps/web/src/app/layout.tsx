@@ -21,9 +21,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en" className="dark">
       <body className={cn(inter.className, "bg-neutral-950 text-neutral-100 antialiased")}>
         <UIProvider>
-          <div className="flex min-h-screen">
+          <div className="flex min-h-screen flex-col md:flex-row">
             <Sidebar />
-            <main className="min-w-0 flex-1 px-8 py-6">
+            <main className="min-w-0 flex-1 px-4 py-4 sm:px-8 sm:py-6">
               <div className="mx-auto max-w-5xl">{children}</div>
             </main>
           </div>

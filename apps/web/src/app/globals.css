@@ -9,6 +9,15 @@ body {
     ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
+/* Touch devices have no :hover, so anything gated behind
+   group-hover:opacity-100 (row actions like edit/delete across the app)
+   would otherwise be permanently invisible — always show it instead. */
+@media (hover: none) {
+  .group-hover\:opacity-100 {
+    opacity: 1;
+  }
+}
+
 /* Shared rendering for rendered markdown (MarkdownPreview) and the Plain
    text rich editor (NoteEditor's contentEditable) — one set of rules so the
    two surfaces always look the same, and so headings/lists actually look

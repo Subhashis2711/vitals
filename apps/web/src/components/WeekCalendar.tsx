@@ -232,9 +232,9 @@ export function WeekCalendar({
       <p className="text-xs text-neutral-600">Click any empty slot to add a block · click a block to edit.</p>
 
       {draft && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/70 pt-24" onClick={() => setDraft(null)}>
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/70 px-4 pt-16 sm:pt-24" onClick={() => setDraft(null)}>
           <div
-            className="w-full max-w-sm rounded-2xl border border-neutral-800 bg-neutral-900 p-4 shadow-2xl"
+            className="max-h-[85vh] w-full max-w-sm overflow-y-auto rounded-2xl border border-neutral-800 bg-neutral-900 p-4 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-3 flex items-center justify-between">

@@ -1,0 +1,12 @@
+**/node_modules
+**/.next
+**/dist
+.git
+.env
+.env.local
+.env.production
+apps/web/.env.local
+apps/web/.env.production
+supabase/.branches
+supabase/.temp
+*.log

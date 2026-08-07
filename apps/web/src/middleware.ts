@@ -36,6 +36,14 @@ export async function middleware(request: NextRequest) {
   const isPublic = PUBLIC_PATHS.some((path) => request.nextUrl.pathname.startsWith(path));
   if (!user && !isPublic) {
     const url = request.nextUrl.clone();
+    // Behind a reverse proxy (Cloud Run, etc.) nextUrl's host reflects the
+    // container's own bind address, not the public host.
+    const forwardedHost = request.headers.get("x-forwarded-host");
+    if (forwardedHost) {
+      url.protocol = request.headers.get("x-forwarded-proto") ?? "https";
+      url.host = forwardedHost;
+      url.port = "";
+    }
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }

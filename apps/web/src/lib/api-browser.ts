@@ -1,5 +1,6 @@
 import { createClient } from "./supabase/client";
 import { createApiClient } from "./api-core";
+import { getWorkspaceIdFromDocument } from "./workspace-cookie";
 
 // Client Components only — uses the browser Supabase client to read the
 // session. Server Components/page.tsx files must import from lib/api.ts
@@ -10,9 +11,16 @@ async function getAccessToken(): Promise<string | undefined> {
   return data.session?.access_token;
 }
 
-const api = createApiClient(getAccessToken);
+async function getWorkspaceId(): Promise<string | undefined> {
+  return getWorkspaceIdFromDocument();
+}
+
+const api = createApiClient(getAccessToken, getWorkspaceId);
 
 export const {
+  getWorkspaces,
+  createWorkspace,
+  deleteWorkspace,
   getTodos,
   getTodosBySourceNote,
   getTodosByProject,

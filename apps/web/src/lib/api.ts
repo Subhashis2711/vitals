@@ -1,3 +1,5 @@
+import { cookies } from "next/headers";
+import { WORKSPACE_ID_COOKIE } from "./workspace-cookie";
 import { createClient } from "./supabase/server";
 import { createApiClient } from "./api-core";
 
@@ -11,9 +13,17 @@ async function getAccessToken(): Promise<string | undefined> {
   return data.session?.access_token;
 }
 
-const api = createApiClient(getAccessToken);
+async function getWorkspaceId(): Promise<string | undefined> {
+  const cookieStore = await cookies();
+  return cookieStore.get(WORKSPACE_ID_COOKIE)?.value;
+}
+
+const api = createApiClient(getAccessToken, getWorkspaceId);
 
 export const {
+  getWorkspaces,
+  createWorkspace,
+  deleteWorkspace,
   getTodos,
   getTodosBySourceNote,
   getTodosByProject,

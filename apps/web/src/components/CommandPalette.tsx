@@ -11,6 +11,7 @@ import {
   ListTodo,
   PenLine,
   Repeat,
+  Settings,
   StickyNote,
   Target,
   Timer,
@@ -35,6 +36,7 @@ const STATIC_PAGES: { title: string; href: string; icon: LucideIcon }[] = [
   { title: "Habits", href: "/habits", icon: Repeat },
   { title: "Health", href: "/health", icon: HeartPulse },
   { title: "Money", href: "/money", icon: Wallet },
+  { title: "Settings", href: "/settings", icon: Settings },
 ];
 
 export function CommandPalette() {

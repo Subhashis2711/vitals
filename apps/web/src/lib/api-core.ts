@@ -13,6 +13,7 @@ import type {
   CreateSavingsGoalInput,
   CreateTodoInput,
   CreateTransactionInput,
+  CreateWorkspaceInput,
   Goal,
   Habit,
   HabitLog,
@@ -41,6 +42,7 @@ import type {
   UpdateTodoInput,
   UpsertHealthDailyLogInput,
   UpsertJournalEntryInput,
+  Workspace,
 } from "@vitals/shared";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
@@ -50,11 +52,15 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 // browser Supabase client), and a dynamic import gated on `typeof window`
 // does NOT keep next/headers out of the client bundle — Next still traces
 // it statically and throws. So instead this factory takes the token getter
-// as a parameter; lib/api.ts and lib/api-browser.ts each bind one, and every
-// page/component imports from whichever of those two matches where it runs.
-export function createApiClient(getAccessToken: () => Promise<string | undefined>) {
+// (and, likewise, the workspace-id getter) as a parameter; lib/api.ts and
+// lib/api-browser.ts each bind their own, and every page/component imports
+// from whichever of those two matches where it runs.
+export function createApiClient(
+  getAccessToken: () => Promise<string | undefined>,
+  getWorkspaceId: () => Promise<string | undefined>,
+) {
   async function request<T>(path: string, init?: RequestInit): Promise<T> {
-    const token = await getAccessToken();
+    const [token, workspaceId] = await Promise.all([getAccessToken(), getWorkspaceId()]);
     const res = await fetch(`${API_BASE_URL}${path}`, {
       ...init,
       headers: {
@@ -64,6 +70,7 @@ export function createApiClient(getAccessToken: () => Promise<string | undefined
         // and bodyless GETs must not set it).
         ...(init?.body ? { "Content-Type": "application/json" } : {}),
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(workspaceId ? { "X-Workspace-Id": workspaceId } : {}),
         ...init?.headers,
       },
       cache: "no-store",
@@ -76,6 +83,22 @@ export function createApiClient(getAccessToken: () => Promise<string | undefined
   }
 
   return {
+    // --- Workspaces ---
+    // No X-Workspace-Id concept applies to these two — see
+    // apps/api/src/routes/workspaces.ts.
+
+    getWorkspaces() {
+      return request<{ workspaces: Workspace[] }>("/workspaces");
+    },
+
+    createWorkspace(input: CreateWorkspaceInput) {
+      return request<{ workspace: Workspace }>("/workspaces", { method: "POST", body: JSON.stringify(input) });
+    },
+
+    deleteWorkspace(id: string) {
+      return request<{ workspace: Workspace }>(`/workspaces/${encodeURIComponent(id)}`, { method: "DELETE" });
+    },
+
     getTodos() {
       return request<{ todos: Todo[] }>("/todos");
     },

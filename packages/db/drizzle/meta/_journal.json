@@ -64,6 +64,13 @@
       "when": 1787746864855,
       "tag": "0008_brave_leech",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1787753196146,
+      "tag": "0009_wild_master_chief",
+      "breakpoints": true
     }
   ]
 }

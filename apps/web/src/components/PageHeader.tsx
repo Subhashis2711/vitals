@@ -1,9 +1,10 @@
 "use client";
 
 import { Search, Zap } from "lucide-react";
+import type { ReactNode } from "react";
 import { useUI } from "@/lib/ui-context";
 
-export function PageHeader({ title, subtitle }: { title: string; subtitle?: string }) {
+export function PageHeader({ title, subtitle }: { title: ReactNode; subtitle?: string }) {
   const { setPaletteOpen, setCaptureOpen } = useUI();
 
   return (

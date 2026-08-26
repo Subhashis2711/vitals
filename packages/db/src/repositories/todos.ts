@@ -3,41 +3,48 @@ import { and, desc, eq } from "drizzle-orm";
 import { getDb } from "../client";
 import { todos } from "../schema";
 
-export async function listTodos(userId: string) {
+export async function listTodos(userId: string, workspaceId: string) {
   const db = getDb();
-  return db.select().from(todos).where(eq(todos.userId, userId)).orderBy(desc(todos.createdAt));
+  return db
+    .select()
+    .from(todos)
+    .where(and(eq(todos.userId, userId), eq(todos.workspaceId, workspaceId)))
+    .orderBy(desc(todos.createdAt));
 }
 
-export async function getTodoById(id: string, userId: string) {
+export async function getTodoById(id: string, userId: string, workspaceId: string) {
   const db = getDb();
-  const [row] = await db.select().from(todos).where(and(eq(todos.id, id), eq(todos.userId, userId)));
+  const [row] = await db
+    .select()
+    .from(todos)
+    .where(and(eq(todos.id, id), eq(todos.userId, userId), eq(todos.workspaceId, workspaceId)));
   return row ?? null;
 }
 
-export async function listTodosBySourceNoteId(sourceNoteId: string, userId: string) {
+export async function listTodosBySourceNoteId(sourceNoteId: string, userId: string, workspaceId: string) {
   const db = getDb();
   return db
     .select()
     .from(todos)
-    .where(and(eq(todos.sourceNoteId, sourceNoteId), eq(todos.userId, userId)))
+    .where(and(eq(todos.sourceNoteId, sourceNoteId), eq(todos.userId, userId), eq(todos.workspaceId, workspaceId)))
     .orderBy(desc(todos.createdAt));
 }
 
-export async function listTodosByProjectId(projectId: string, userId: string) {
+export async function listTodosByProjectId(projectId: string, userId: string, workspaceId: string) {
   const db = getDb();
   return db
     .select()
     .from(todos)
-    .where(and(eq(todos.projectId, projectId), eq(todos.userId, userId)))
+    .where(and(eq(todos.projectId, projectId), eq(todos.userId, userId), eq(todos.workspaceId, workspaceId)))
     .orderBy(desc(todos.createdAt));
 }
 
-async function nextPositionForStatus(status: TodoStatus, userId: string): Promise<number> {
+async function nextPositionForStatus(status: TodoStatus, userId: string, workspaceId: string): Promise<number> {
   const db = getDb();
   const [row] = await db
     .select({ position: todos.position })
     .from(todos)
-    .where(and(eq(todos.status, status), eq(todos.userId, userId)))
+    .where(and(eq(todos.status, status), eq(todos.userId, userId), eq(todos.workspaceId, workspaceId)))
     .orderBy(desc(todos.position))
     .limit(1);
   return row ? row.position + 1 : 0;
@@ -74,14 +81,15 @@ export function nextOccurrence(from: Date, freq: RecurrenceFreq, daysOfWeek?: nu
   return clampToUTCMonth(from.getUTCFullYear() + 1, from.getUTCMonth(), from.getUTCDate());
 }
 
-export async function createTodo(input: CreateTodoInput, userId: string) {
+export async function createTodo(input: CreateTodoInput, userId: string, workspaceId: string) {
   const db = getDb();
   const status = input.status ?? "todo";
-  const position = await nextPositionForStatus(status, userId);
+  const position = await nextPositionForStatus(status, userId, workspaceId);
   const [row] = await db
     .insert(todos)
     .values({
       userId,
+      workspaceId,
       title: input.title,
       description: input.description ?? null,
       status,
@@ -102,7 +110,7 @@ export async function createTodo(input: CreateTodoInput, userId: string) {
 // Returns the updated row, plus `nextTodo` when completing a recurring todo
 // spawned its next occurrence as a brand-new row (see nextOccurrence above)
 // — the original stays marked done so completion history is preserved.
-export async function updateTodo(id: string, input: UpdateTodoInput, userId: string) {
+export async function updateTodo(id: string, input: UpdateTodoInput, userId: string, workspaceId: string) {
   const db = getDb();
 
   // Moving to a different status column: drop it at the end of that column
@@ -111,9 +119,12 @@ export async function updateTodo(id: string, input: UpdateTodoInput, userId: str
   let positionPatch: { position: number } | Record<string, never> = {};
   let existing: typeof todos.$inferSelect | undefined;
   if (input.status !== undefined) {
-    [existing] = await db.select().from(todos).where(and(eq(todos.id, id), eq(todos.userId, userId)));
+    [existing] = await db
+      .select()
+      .from(todos)
+      .where(and(eq(todos.id, id), eq(todos.userId, userId), eq(todos.workspaceId, workspaceId)));
     if (existing && existing.status !== input.status) {
-      positionPatch = { position: await nextPositionForStatus(input.status, userId) };
+      positionPatch = { position: await nextPositionForStatus(input.status, userId, workspaceId) };
     }
   }
 
@@ -134,7 +145,7 @@ export async function updateTodo(id: string, input: UpdateTodoInput, userId: str
       ...positionPatch,
       updatedAt: new Date(),
     })
-    .where(and(eq(todos.id, id), eq(todos.userId, userId)))
+    .where(and(eq(todos.id, id), eq(todos.userId, userId), eq(todos.workspaceId, workspaceId)))
     .returning();
 
   if (!row) return null;
@@ -142,11 +153,12 @@ export async function updateTodo(id: string, input: UpdateTodoInput, userId: str
   let nextTodo = null;
   if (input.status === "done" && existing?.recurrenceFreq) {
     const nextDueDate = nextOccurrence(row.dueDate ?? new Date(), existing.recurrenceFreq, existing.recurrenceDaysOfWeek);
-    const position = await nextPositionForStatus("todo", userId);
+    const position = await nextPositionForStatus("todo", userId, workspaceId);
     [nextTodo] = await db
       .insert(todos)
       .values({
         userId,
+        workspaceId,
         title: row.title,
         description: row.description,
         status: "todo",
@@ -169,10 +181,16 @@ export async function updateTodo(id: string, input: UpdateTodoInput, userId: str
 // Swaps the `position` of two todos — powers the up/down reorder controls.
 // The caller (frontend) decides which two ids are "adjacent" based on what's
 // currently displayed, so this stays a dumb, predictable swap.
-export async function swapTodoPositions(firstId: string, secondId: string, userId: string) {
+export async function swapTodoPositions(firstId: string, secondId: string, userId: string, workspaceId: string) {
   const db = getDb();
-  const [a] = await db.select().from(todos).where(and(eq(todos.id, firstId), eq(todos.userId, userId)));
-  const [b] = await db.select().from(todos).where(and(eq(todos.id, secondId), eq(todos.userId, userId)));
+  const [a] = await db
+    .select()
+    .from(todos)
+    .where(and(eq(todos.id, firstId), eq(todos.userId, userId), eq(todos.workspaceId, workspaceId)));
+  const [b] = await db
+    .select()
+    .from(todos)
+    .where(and(eq(todos.id, secondId), eq(todos.userId, userId), eq(todos.workspaceId, workspaceId)));
   if (!a || !b) return null;
 
   const [updatedA] = await db
@@ -188,11 +206,11 @@ export async function swapTodoPositions(firstId: string, secondId: string, userI
   return [updatedA, updatedB] as const;
 }
 
-export async function deleteTodo(id: string, userId: string) {
+export async function deleteTodo(id: string, userId: string, workspaceId: string) {
   const db = getDb();
   const [row] = await db
     .delete(todos)
-    .where(and(eq(todos.id, id), eq(todos.userId, userId)))
+    .where(and(eq(todos.id, id), eq(todos.userId, userId), eq(todos.workspaceId, workspaceId)))
     .returning();
   return row ?? null;
 }

@@ -450,3 +450,22 @@ export const createPomodoroSessionInputSchema = z.object({
   completedAt: z.string(),
 });
 export type CreatePomodoroSessionInput = z.infer<typeof createPomodoroSessionInputSchema>;
+
+// --- Workspaces ---
+// Fully isolated, private-only contexts a user switches between (see
+// packages/db/src/schema.ts). Ids are plain uuids, not GID-encoded — same
+// precedent as habits/calendarEvents, since workspaces are never referenced
+// by other resources' GID-bearing fields.
+
+export const workspaceSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  position: z.number(),
+  createdAt: z.string(),
+});
+export type Workspace = z.infer<typeof workspaceSchema>;
+
+export const createWorkspaceInputSchema = z.object({
+  name: z.string().min(1),
+});
+export type CreateWorkspaceInput = z.infer<typeof createWorkspaceInputSchema>;

@@ -10,27 +10,27 @@ export async function calendarRoutes(app: FastifyInstance) {
     if (dates.length === 0) {
       return reply.code(400).send({ error: "dates query param is required (comma-separated YYYY-MM-DD)" });
     }
-    const events = await calendarRepo.listCalendarEventsByDates(dates, req.userId);
+    const events = await calendarRepo.listCalendarEventsByDates(dates, req.userId, req.workspaceId);
     return { events };
   });
 
   app.post("/", async (req, reply) => {
     const parsed = createCalendarEventInputSchema.safeParse(req.body);
     if (!parsed.success) return reply.code(400).send({ error: parsed.error.flatten() });
-    const event = await calendarRepo.createCalendarEvent(parsed.data, req.userId);
+    const event = await calendarRepo.createCalendarEvent(parsed.data, req.userId, req.workspaceId);
     return reply.code(201).send({ event });
   });
 
   app.patch<{ Params: { id: string } }>("/:id", async (req, reply) => {
     const parsed = updateCalendarEventInputSchema.safeParse(req.body);
     if (!parsed.success) return reply.code(400).send({ error: parsed.error.flatten() });
-    const event = await calendarRepo.updateCalendarEvent(req.params.id, parsed.data, req.userId);
+    const event = await calendarRepo.updateCalendarEvent(req.params.id, parsed.data, req.userId, req.workspaceId);
     if (!event) return reply.code(404).send({ error: "Event not found" });
     return { event };
   });
 
   app.delete<{ Params: { id: string } }>("/:id", async (req, reply) => {
-    const event = await calendarRepo.deleteCalendarEvent(req.params.id, req.userId);
+    const event = await calendarRepo.deleteCalendarEvent(req.params.id, req.userId, req.workspaceId);
     if (!event) return reply.code(404).send({ error: "Event not found" });
     return { event };
   });

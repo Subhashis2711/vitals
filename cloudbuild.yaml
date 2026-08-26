@@ -1,0 +1,31 @@
+# Builds the two Cloud Run images from the monorepo root. Image names and the
+# public values embedded in the Next.js bundle are passed at submission time;
+# see README.md for the exact command.
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -f
+      - apps/api/Dockerfile
+      - -t
+      - ${_API_IMAGE}
+      - .
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -f
+      - apps/web/Dockerfile
+      - --build-arg
+      - NEXT_PUBLIC_API_URL=${_NEXT_PUBLIC_API_URL}
+      - --build-arg
+      - NEXT_PUBLIC_SUPABASE_URL=${_NEXT_PUBLIC_SUPABASE_URL}
+      - --build-arg
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${_NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - -t
+      - ${_WEB_IMAGE}
+      - .
+images:
+  - ${_API_IMAGE}
+  - ${_WEB_IMAGE}
+options:
+  logging: CLOUD_LOGGING_ONLY

@@ -76,6 +76,16 @@ Fill in `GEMINI_API_KEY`, `DATABASE_URL` (`postgresql://postgres:postgres@127.0.
 npm run db:migrate
 ```
 
+To discard local test data and rebuild the local Supabase database from every
+checked-in migration, use this instead:
+
+```bash
+supabase db reset
+```
+
+`supabase db reset` is for local development only. It deletes the local
+database before replaying the migrations.
+
 ### 5. Run the app
 
 ```bash
@@ -84,9 +94,68 @@ npm run dev
 
 Starts both the API (http://localhost:4000) and the web app (http://localhost:3000). Open http://localhost:3000 and sign in with Google.
 
-## Deploying
+## Production migrations and deployment
 
-Not yet documented here — production target is Vercel (frontend) + Render (API) + a hosted Supabase project (database/auth), all free-tier.
+Production runs on Cloud Run in Google Cloud project `oscas-dev-second-brain`,
+region `asia-south1`. The services are `vitals-api` and `vitals-web`; images
+are stored in the `vitals` Artifact Registry repository. Supabase remains the
+hosted database and authentication provider.
+
+### Run a production migration
+
+1. Review the new SQL in `packages/db/drizzle/` and make a Supabase database
+   backup before applying it.
+2. From a secure machine, set `DATABASE_URL` in the root `.env` to the hosted
+   Supabase connection string. Do not commit this file.
+3. Apply the migrations once:
+
+   ```bash
+   npm run db:migrate
+   ```
+
+4. Verify the application can read and write the changed data. Never run
+   `supabase db reset` against production.
+
+### Deploy Cloud Run
+
+These commands build both images with Cloud Build, deploy the API first, then
+deploy the web app. `NEXT_PUBLIC_*` values are embedded at web build time, so
+use the production Supabase URL and anon key rather than local values.
+
+```bash
+export PROJECT_ID=oscas-dev-second-brain
+export REGION=asia-south1
+export REPOSITORY=vitals
+export TAG=$(git rev-parse --short HEAD)
+export API_IMAGE="$REGION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/vitals-api:$TAG"
+export WEB_IMAGE="$REGION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/vitals-web:$TAG"
+export NEXT_PUBLIC_API_URL=https://vitals-api-kww4rwnlqa-el.a.run.app
+export NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
+export NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_PRODUCTION_ANON_KEY
+
+gcloud builds submit \
+  --project "$PROJECT_ID" \
+  --config cloudbuild.yaml \
+  --substitutions "_API_IMAGE=$API_IMAGE,_WEB_IMAGE=$WEB_IMAGE,_NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL,_NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL,_NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY" \
+  .
+
+gcloud run deploy vitals-api \
+  --project "$PROJECT_ID" \
+  --region "$REGION" \
+  --image "$API_IMAGE"
+
+gcloud run deploy vitals-web \
+  --project "$PROJECT_ID" \
+  --region "$REGION" \
+  --image "$WEB_IMAGE"
+```
+
+Cloud Run retains the existing API service configuration, including its secret
+environment variables and `WEB_ORIGIN`, when deploying a new image. If either
+service configuration changes, update it deliberately with `gcloud run
+services update` and then verify Google OAuth redirect URLs and the API CORS
+allowlist. Finish by checking `/health`, signing in, and creating data in a
+non-production workspace.
 
 ## What's intentionally not built yet
 

@@ -21,7 +21,7 @@ function resolveDomainId(domain: NoteDomain, domainId: string | null | undefined
 export async function notesRoutes(app: FastifyInstance) {
   app.get<{ Querystring: { domain?: string; domainId?: string } }>("/", async (req, reply) => {
     if (!req.query.domain) {
-      return { notes: (await notesRepo.listNotes(req.userId)).map(serializeNote) };
+      return { notes: (await notesRepo.listNotes(req.userId, req.workspaceId)).map(serializeNote) };
     }
     const domain = req.query.domain as NoteDomain;
     let domainId: string | null;
@@ -30,13 +30,13 @@ export async function notesRoutes(app: FastifyInstance) {
     } catch (err) {
       return reply.code(400).send({ error: err instanceof Error ? err.message : "Invalid domainId" });
     }
-    const notes = await notesRepo.listNotesByDomain(domain, req.userId, domainId ?? undefined);
+    const notes = await notesRepo.listNotesByDomain(domain, req.userId, req.workspaceId, domainId ?? undefined);
     return { notes: notes.map(serializeNote) };
   });
 
   app.get<{ Params: { id: string } }>("/:id", async (req, reply) => {
     const { id } = fromGid(req.params.id);
-    const note = await notesRepo.getNoteById(id, req.userId);
+    const note = await notesRepo.getNoteById(id, req.userId, req.workspaceId);
     if (!note) return reply.code(404).send({ error: "Note not found" });
     return { note: serializeNote(note) };
   });
@@ -51,7 +51,7 @@ export async function notesRoutes(app: FastifyInstance) {
     } catch (err) {
       return reply.code(400).send({ error: err instanceof Error ? err.message : "Invalid domainId" });
     }
-    const note = await notesRepo.createNote({ ...parsed.data, domain, domainId }, req.userId);
+    const note = await notesRepo.createNote({ ...parsed.data, domain, domainId }, req.userId, req.workspaceId);
     return reply.code(201).send({ note: serializeNote(note) });
   });
 
@@ -62,7 +62,7 @@ export async function notesRoutes(app: FastifyInstance) {
 
     let domainId: string | null | undefined = parsed.data.domainId;
     if (parsed.data.domainId !== undefined) {
-      const domain = parsed.data.domain ?? (await notesRepo.getNoteById(id, req.userId))?.domain ?? "project";
+      const domain = parsed.data.domain ?? (await notesRepo.getNoteById(id, req.userId, req.workspaceId))?.domain ?? "project";
       try {
         domainId = resolveDomainId(domain, parsed.data.domainId);
       } catch (err) {
@@ -70,14 +70,14 @@ export async function notesRoutes(app: FastifyInstance) {
       }
     }
 
-    const note = await notesRepo.updateNote(id, { ...parsed.data, domainId }, req.userId);
+    const note = await notesRepo.updateNote(id, { ...parsed.data, domainId }, req.userId, req.workspaceId);
     if (!note) return reply.code(404).send({ error: "Note not found" });
     return { note: serializeNote(note) };
   });
 
   app.delete<{ Params: { id: string } }>("/:id", async (req, reply) => {
     const { id } = fromGid(req.params.id);
-    const note = await notesRepo.deleteNote(id, req.userId);
+    const note = await notesRepo.deleteNote(id, req.userId, req.workspaceId);
     if (!note) return reply.code(404).send({ error: "Note not found" });
     return { note: serializeNote(note) };
   });
@@ -108,6 +108,7 @@ export async function notesRoutes(app: FastifyInstance) {
         tags: extraction.tags,
       },
       req.userId,
+      req.workspaceId,
     );
 
     const todos = await Promise.all(
@@ -119,6 +120,7 @@ export async function notesRoutes(app: FastifyInstance) {
             sourceNoteId: note.id,
           },
           req.userId,
+          req.workspaceId,
         ),
       ),
     );

@@ -3,45 +3,53 @@ import { and, desc, eq } from "drizzle-orm";
 import { getDb } from "../client";
 import { notes } from "../schema";
 
-export async function listNotes(userId: string) {
+export async function listNotes(userId: string, workspaceId: string) {
   const db = getDb();
-  return db.select().from(notes).where(eq(notes.userId, userId)).orderBy(desc(notes.createdAt));
+  return db
+    .select()
+    .from(notes)
+    .where(and(eq(notes.userId, userId), eq(notes.workspaceId, workspaceId)))
+    .orderBy(desc(notes.createdAt));
 }
 
-export async function getNoteById(id: string, userId: string) {
+export async function getNoteById(id: string, userId: string, workspaceId: string) {
   const db = getDb();
-  const [row] = await db.select().from(notes).where(and(eq(notes.id, id), eq(notes.userId, userId)));
+  const [row] = await db
+    .select()
+    .from(notes)
+    .where(and(eq(notes.id, id), eq(notes.userId, userId), eq(notes.workspaceId, workspaceId)));
   return row ?? null;
 }
 
 // domainId is required for "project"/"learning" (scopes to that parent);
 // omitted for "journal" (domainId is unused for journal notes — see the
 // `journal` table).
-export async function listNotesByDomain(domain: NoteDomain, userId: string, domainId?: string) {
+export async function listNotesByDomain(domain: NoteDomain, userId: string, workspaceId: string, domainId?: string) {
   const db = getDb();
   const where = domainId
-    ? and(eq(notes.domain, domain), eq(notes.domainId, domainId), eq(notes.userId, userId))
-    : and(eq(notes.domain, domain), eq(notes.userId, userId));
+    ? and(eq(notes.domain, domain), eq(notes.domainId, domainId), eq(notes.userId, userId), eq(notes.workspaceId, workspaceId))
+    : and(eq(notes.domain, domain), eq(notes.userId, userId), eq(notes.workspaceId, workspaceId));
   return db.select().from(notes).where(where).orderBy(desc(notes.createdAt));
 }
 
 // Cleans up notes left pointing at a project via domainId — domainId has no
 // DB-level FK (see schema.ts comment), so this must be called explicitly by
 // deleteProject.
-export async function deleteNotesByDomain(domain: NoteDomain, domainId: string, userId: string) {
+export async function deleteNotesByDomain(domain: NoteDomain, domainId: string, userId: string, workspaceId: string) {
   const db = getDb();
   return db
     .delete(notes)
-    .where(and(eq(notes.domain, domain), eq(notes.domainId, domainId), eq(notes.userId, userId)))
+    .where(and(eq(notes.domain, domain), eq(notes.domainId, domainId), eq(notes.userId, userId), eq(notes.workspaceId, workspaceId)))
     .returning();
 }
 
-export async function createNote(input: CreateNoteInput, userId: string) {
+export async function createNote(input: CreateNoteInput, userId: string, workspaceId: string) {
   const db = getDb();
   const [row] = await db
     .insert(notes)
     .values({
       userId,
+      workspaceId,
       title: input.title ?? null,
       content: input.content,
       rawContent: input.rawContent ?? input.content,
@@ -56,7 +64,7 @@ export async function createNote(input: CreateNoteInput, userId: string) {
   return row;
 }
 
-export async function updateNote(id: string, input: UpdateNoteInput, userId: string) {
+export async function updateNote(id: string, input: UpdateNoteInput, userId: string, workspaceId: string) {
   const db = getDb();
   const [row] = await db
     .update(notes)
@@ -72,16 +80,16 @@ export async function updateNote(id: string, input: UpdateNoteInput, userId: str
       ...(input.tags !== undefined ? { tags: input.tags } : {}),
       updatedAt: new Date(),
     })
-    .where(and(eq(notes.id, id), eq(notes.userId, userId)))
+    .where(and(eq(notes.id, id), eq(notes.userId, userId), eq(notes.workspaceId, workspaceId)))
     .returning();
   return row ?? null;
 }
 
-export async function deleteNote(id: string, userId: string) {
+export async function deleteNote(id: string, userId: string, workspaceId: string) {
   const db = getDb();
   const [row] = await db
     .delete(notes)
-    .where(and(eq(notes.id, id), eq(notes.userId, userId)))
+    .where(and(eq(notes.id, id), eq(notes.userId, userId), eq(notes.workspaceId, workspaceId)))
     .returning();
   return row ?? null;
 }

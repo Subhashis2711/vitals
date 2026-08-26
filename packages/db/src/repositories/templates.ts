@@ -10,23 +10,31 @@ export interface CreateTemplateInput {
   fields?: Record<string, unknown>;
 }
 
-export async function listTemplates(userId: string) {
+export async function listTemplates(userId: string, workspaceId: string) {
   const db = getDb();
-  return db.select().from(templates).where(eq(templates.userId, userId)).orderBy(desc(templates.createdAt));
+  return db
+    .select()
+    .from(templates)
+    .where(and(eq(templates.userId, userId), eq(templates.workspaceId, workspaceId)))
+    .orderBy(desc(templates.createdAt));
 }
 
-export async function getTemplateById(id: string, userId: string) {
+export async function getTemplateById(id: string, userId: string, workspaceId: string) {
   const db = getDb();
-  const [row] = await db.select().from(templates).where(and(eq(templates.id, id), eq(templates.userId, userId)));
+  const [row] = await db
+    .select()
+    .from(templates)
+    .where(and(eq(templates.id, id), eq(templates.userId, userId), eq(templates.workspaceId, workspaceId)));
   return row ?? null;
 }
 
-export async function createTemplate(input: CreateTemplateInput, userId: string) {
+export async function createTemplate(input: CreateTemplateInput, userId: string, workspaceId: string) {
   const db = getDb();
   const [row] = await db
     .insert(templates)
     .values({
       userId,
+      workspaceId,
       name: input.name,
       type: input.type,
       promptUsed: input.promptUsed,

@@ -3,21 +3,22 @@ import { and, eq, inArray } from "drizzle-orm";
 import { getDb } from "../client";
 import { calendarEvents } from "../schema";
 
-export async function listCalendarEventsByDates(dates: string[], userId: string) {
+export async function listCalendarEventsByDates(dates: string[], userId: string, workspaceId: string) {
   if (dates.length === 0) return [];
   const db = getDb();
   return db
     .select()
     .from(calendarEvents)
-    .where(and(inArray(calendarEvents.date, dates), eq(calendarEvents.userId, userId)));
+    .where(and(inArray(calendarEvents.date, dates), eq(calendarEvents.userId, userId), eq(calendarEvents.workspaceId, workspaceId)));
 }
 
-export async function createCalendarEvent(input: CreateCalendarEventInput, userId: string) {
+export async function createCalendarEvent(input: CreateCalendarEventInput, userId: string, workspaceId: string) {
   const db = getDb();
   const [row] = await db
     .insert(calendarEvents)
     .values({
       userId,
+      workspaceId,
       title: input.title,
       date: input.date,
       startTime: input.startTime,
@@ -29,7 +30,7 @@ export async function createCalendarEvent(input: CreateCalendarEventInput, userI
   return row;
 }
 
-export async function updateCalendarEvent(id: string, input: UpdateCalendarEventInput, userId: string) {
+export async function updateCalendarEvent(id: string, input: UpdateCalendarEventInput, userId: string, workspaceId: string) {
   const db = getDb();
   const [row] = await db
     .update(calendarEvents)
@@ -41,16 +42,16 @@ export async function updateCalendarEvent(id: string, input: UpdateCalendarEvent
       ...(input.color !== undefined ? { color: input.color } : {}),
       ...(input.todoId !== undefined ? { todoId: input.todoId } : {}),
     })
-    .where(and(eq(calendarEvents.id, id), eq(calendarEvents.userId, userId)))
+    .where(and(eq(calendarEvents.id, id), eq(calendarEvents.userId, userId), eq(calendarEvents.workspaceId, workspaceId)))
     .returning();
   return row ?? null;
 }
 
-export async function deleteCalendarEvent(id: string, userId: string) {
+export async function deleteCalendarEvent(id: string, userId: string, workspaceId: string) {
   const db = getDb();
   const [row] = await db
     .delete(calendarEvents)
-    .where(and(eq(calendarEvents.id, id), eq(calendarEvents.userId, userId)))
+    .where(and(eq(calendarEvents.id, id), eq(calendarEvents.userId, userId), eq(calendarEvents.workspaceId, workspaceId)))
     .returning();
   return row ?? null;
 }

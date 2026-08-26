@@ -39,6 +39,25 @@ export const authUsers = authSchema.table("users", {
   id: uuid("id").primaryKey(),
 });
 
+// A private, isolated context per user — "Personal", "Work", etc. Every
+// other table's rows belong to exactly one workspace (workspaceId below);
+// workspaces themselves are never shared between users (see the "private
+// only" decision in the workspace-switcher feature), so validating a
+// workspace belongs to the requesting user is enough to fully isolate its
+// data — see apps/api/src/plugins/workspace.ts.
+export const workspaces = pgTable("workspaces", {
+  id: uuid("id")
+    .primaryKey()
+    .$defaultFn(() => randomUUID()),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => authUsers.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  // Manual ordering for the workspace switcher — lower shows first.
+  position: integer("position").notNull().default(0),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const projects = pgTable("projects", {
   id: uuid("id")
     .primaryKey()
@@ -46,6 +65,9 @@ export const projects = pgTable("projects", {
   userId: uuid("user_id")
     .notNull()
     .references(() => authUsers.id, { onDelete: "cascade" }),
+  workspaceId: uuid("workspace_id")
+    .notNull()
+    .references(() => workspaces.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   description: text("description"),
   color: text("color"),
@@ -64,6 +86,9 @@ export const goals = pgTable("goals", {
   userId: uuid("user_id")
     .notNull()
     .references(() => authUsers.id, { onDelete: "cascade" }),
+  workspaceId: uuid("workspace_id")
+    .notNull()
+    .references(() => workspaces.id, { onDelete: "cascade" }),
   title: text("title").notNull(),
   description: text("description"),
   status: goalStatusEnum("status").notNull().default("todo"),
@@ -95,6 +120,9 @@ export const notes = pgTable("notes", {
   userId: uuid("user_id")
     .notNull()
     .references(() => authUsers.id, { onDelete: "cascade" }),
+  workspaceId: uuid("workspace_id")
+    .notNull()
+    .references(() => workspaces.id, { onDelete: "cascade" }),
   title: text("title"),
   content: text("content").notNull(),
   rawContent: text("raw_content").notNull(),
@@ -119,6 +147,9 @@ export const todos = pgTable("todos", {
   userId: uuid("user_id")
     .notNull()
     .references(() => authUsers.id, { onDelete: "cascade" }),
+  workspaceId: uuid("workspace_id")
+    .notNull()
+    .references(() => workspaces.id, { onDelete: "cascade" }),
   title: text("title").notNull(),
   description: text("description"),
   status: todoStatusEnum("status").notNull().default("todo"),
@@ -150,6 +181,9 @@ export const templates = pgTable("templates", {
   userId: uuid("user_id")
     .notNull()
     .references(() => authUsers.id, { onDelete: "cascade" }),
+  workspaceId: uuid("workspace_id")
+    .notNull()
+    .references(() => workspaces.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   type: templateTypeEnum("type").notNull(),
   promptUsed: text("prompt_used").notNull(),
@@ -164,6 +198,9 @@ export const habits = pgTable("habits", {
   userId: uuid("user_id")
     .notNull()
     .references(() => authUsers.id, { onDelete: "cascade" }),
+  workspaceId: uuid("workspace_id")
+    .notNull()
+    .references(() => workspaces.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   description: text("description"),
   color: text("color"),
@@ -188,6 +225,9 @@ export const habitLogs = pgTable(
     userId: uuid("user_id")
       .notNull()
       .references(() => authUsers.id, { onDelete: "cascade" }),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
     habitId: uuid("habit_id")
       .notNull()
       .references(() => habits.id, { onDelete: "cascade" }),
@@ -209,6 +249,9 @@ export const calendarEvents = pgTable("calendar_events", {
   userId: uuid("user_id")
     .notNull()
     .references(() => authUsers.id, { onDelete: "cascade" }),
+  workspaceId: uuid("workspace_id")
+    .notNull()
+    .references(() => workspaces.id, { onDelete: "cascade" }),
   title: text("title").notNull(),
   date: text("date").notNull(),
   startTime: text("start_time").notNull(),
@@ -225,6 +268,9 @@ export const learningTopics = pgTable("learning_topics", {
   userId: uuid("user_id")
     .notNull()
     .references(() => authUsers.id, { onDelete: "cascade" }),
+  workspaceId: uuid("workspace_id")
+    .notNull()
+    .references(() => workspaces.id, { onDelete: "cascade" }),
   title: text("title").notNull(),
   lastTouchedAt: timestamp("last_touched_at", { withTimezone: true }).notNull().defaultNow(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -241,6 +287,9 @@ export const learningResources = pgTable("learning_resources", {
   userId: uuid("user_id")
     .notNull()
     .references(() => authUsers.id, { onDelete: "cascade" }),
+  workspaceId: uuid("workspace_id")
+    .notNull()
+    .references(() => workspaces.id, { onDelete: "cascade" }),
   topicId: uuid("topic_id")
     .notNull()
     .references(() => learningTopics.id, { onDelete: "cascade" }),
@@ -262,6 +311,9 @@ export const journal = pgTable(
     userId: uuid("user_id")
       .notNull()
       .references(() => authUsers.id, { onDelete: "cascade" }),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
     date: text("date").notNull(),
     noteId: uuid("note_id")
       .notNull()
@@ -269,9 +321,9 @@ export const journal = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => ({
-    // Was unique on date alone — two different users logging the same
-    // calendar day would otherwise collide.
-    dateIdx: uniqueIndex("journal_user_id_date_idx").on(table.userId, table.date),
+    // Scoped per workspace, not per user — the same user could otherwise
+    // collide across two of their own workspaces journaling the same day.
+    dateIdx: uniqueIndex("journal_workspace_id_date_idx").on(table.workspaceId, table.date),
   }),
 );
 
@@ -286,6 +338,9 @@ export const healthDailyLogs = pgTable(
     userId: uuid("user_id")
       .notNull()
       .references(() => authUsers.id, { onDelete: "cascade" }),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
     date: text("date").notNull(),
     steps: integer("steps"),
     sleepHours: doublePrecision("sleep_hours"),
@@ -295,9 +350,8 @@ export const healthDailyLogs = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => ({
-    // Was unique on date alone — two different users logging the same
-    // calendar day would otherwise collide.
-    dateIdx: uniqueIndex("health_daily_logs_user_id_date_idx").on(table.userId, table.date),
+    // Scoped per workspace, not per user — see journal's dateIdx above.
+    dateIdx: uniqueIndex("health_daily_logs_workspace_id_date_idx").on(table.workspaceId, table.date),
   }),
 );
 
@@ -308,6 +362,9 @@ export const healthActivityLogs = pgTable("health_activity_logs", {
   userId: uuid("user_id")
     .notNull()
     .references(() => authUsers.id, { onDelete: "cascade" }),
+  workspaceId: uuid("workspace_id")
+    .notNull()
+    .references(() => workspaces.id, { onDelete: "cascade" }),
   date: text("date").notNull(),
   sport: text("sport").notNull(),
   durationMin: integer("duration_min").notNull(),
@@ -322,6 +379,9 @@ export const transactions = pgTable("transactions", {
   userId: uuid("user_id")
     .notNull()
     .references(() => authUsers.id, { onDelete: "cascade" }),
+  workspaceId: uuid("workspace_id")
+    .notNull()
+    .references(() => workspaces.id, { onDelete: "cascade" }),
   description: text("description").notNull(),
   amount: doublePrecision("amount").notNull(),
   category: text("category"),
@@ -341,6 +401,9 @@ export const pomodoroSessions = pgTable("pomodoro_sessions", {
   userId: uuid("user_id")
     .notNull()
     .references(() => authUsers.id, { onDelete: "cascade" }),
+  workspaceId: uuid("workspace_id")
+    .notNull()
+    .references(() => workspaces.id, { onDelete: "cascade" }),
   todoId: uuid("todo_id").references(() => todos.id, { onDelete: "set null" }),
   label: text("label"),
   durationMin: integer("duration_min").notNull(),
@@ -356,6 +419,9 @@ export const savingsGoals = pgTable("savings_goals", {
   userId: uuid("user_id")
     .notNull()
     .references(() => authUsers.id, { onDelete: "cascade" }),
+  workspaceId: uuid("workspace_id")
+    .notNull()
+    .references(() => workspaces.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   targetAmount: doublePrecision("target_amount").notNull(),
   currentAmount: doublePrecision("current_amount").notNull().default(0),

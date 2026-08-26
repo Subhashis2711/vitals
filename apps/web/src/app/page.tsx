@@ -1,6 +1,7 @@
 import { Flame, Folder, ListTodo, StickyNote } from "lucide-react";
 import Link from "next/link";
 import { ContentTypeIcon } from "@/components/ContentTypeIcon";
+import { Greeting } from "@/components/Greeting";
 import { HabitsTodayMini } from "@/components/HabitsTodayMini";
 import { PageHeader } from "@/components/PageHeader";
 import { ProjectBadge } from "@/components/ProjectBadge";
@@ -19,13 +20,6 @@ function timeAgo(iso: string): string {
   if (hours < 24) return `${hours}h ago`;
   const days = Math.floor(hours / 24);
   return `${days}d ago`;
-}
-
-function greeting(): string {
-  const hour = new Date().getHours();
-  if (hour < 12) return "Good morning";
-  if (hour < 18) return "Good afternoon";
-  return "Good evening";
 }
 
 export default async function DashboardPage() {
@@ -65,7 +59,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title={greeting()} subtitle={`Here's what your second brain remembers · ${friendlyDate()}`} />
+      <PageHeader title={<Greeting />} subtitle={`Here's what your second brain remembers · ${friendlyDate()}`} />
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <StatCard label="Total notes" value={String(notes.length)} icon={StickyNote} accent="cyan" />

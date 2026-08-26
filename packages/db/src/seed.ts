@@ -2,6 +2,7 @@ import { closeDb } from "./client";
 import * as notesRepo from "./repositories/notes";
 import * as templatesRepo from "./repositories/templates";
 import * as todosRepo from "./repositories/todos";
+import * as workspacesRepo from "./repositories/workspaces";
 
 // Seeding now writes rows owned by a real person, so it needs their actual
 // Supabase auth.users id (every table FKs to auth.users — see schema.ts) —
@@ -17,6 +18,8 @@ function requireSeedUserId(): string {
 const userId = requireSeedUserId();
 
 async function main() {
+  const workspace = await workspacesRepo.getOrCreateDefaultWorkspace(userId);
+
   const note = await notesRepo.createNote({
     title: "Why local-first apps matter",
     content:
@@ -27,7 +30,7 @@ async function main() {
     sourceUrl: "https://www.inkandswitch.com/local-first/",
     aiSummary: "Local-first apps prioritize on-device data and offline speed over network round-trips.",
     tags: ["architecture", "offline"],
-  }, userId);
+  }, userId, workspace.id);
 
   await todosRepo.createTodo({
     title: "Read the full local-first essay",
@@ -36,7 +39,7 @@ async function main() {
     source: "ai_extracted",
     sourceNoteId: note.id,
     tags: ["reading"],
-  }, userId);
+  }, userId, workspace.id);
 
   await todosRepo.createTodo({
     title: "Set up nightly database backups",
@@ -44,7 +47,7 @@ async function main() {
     status: "in_progress",
     source: "manual",
     tags: ["infra"],
-  }, userId);
+  }, userId, workspace.id);
 
   await templatesRepo.createTemplate({
     name: "Meeting notes",
@@ -55,7 +58,7 @@ async function main() {
       decisions: { type: "string[]" },
       actionItems: { type: "string[]" },
     },
-  }, userId);
+  }, userId, workspace.id);
 
   console.log("Seed complete.");
 }

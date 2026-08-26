@@ -9,23 +9,31 @@ function todayDate(): string {
   return new Date().toLocaleDateString("en-CA");
 }
 
-export async function listHabits(userId: string) {
+export async function listHabits(userId: string, workspaceId: string) {
   const db = getDb();
-  return db.select().from(habits).where(eq(habits.userId, userId)).orderBy(desc(habits.createdAt));
+  return db
+    .select()
+    .from(habits)
+    .where(and(eq(habits.userId, userId), eq(habits.workspaceId, workspaceId)))
+    .orderBy(desc(habits.createdAt));
 }
 
-export async function getHabitById(id: string, userId: string) {
+export async function getHabitById(id: string, userId: string, workspaceId: string) {
   const db = getDb();
-  const [row] = await db.select().from(habits).where(and(eq(habits.id, id), eq(habits.userId, userId)));
+  const [row] = await db
+    .select()
+    .from(habits)
+    .where(and(eq(habits.id, id), eq(habits.userId, userId), eq(habits.workspaceId, workspaceId)));
   return row ?? null;
 }
 
-export async function createHabit(input: CreateHabitInput, userId: string) {
+export async function createHabit(input: CreateHabitInput, userId: string, workspaceId: string) {
   const db = getDb();
   const [row] = await db
     .insert(habits)
     .values({
       userId,
+      workspaceId,
       name: input.name,
       description: input.description ?? null,
       color: input.color ?? null,
@@ -36,37 +44,44 @@ export async function createHabit(input: CreateHabitInput, userId: string) {
   return row;
 }
 
-export async function deleteHabit(id: string, userId: string) {
+export async function deleteHabit(id: string, userId: string, workspaceId: string) {
   const db = getDb();
   const [row] = await db
     .delete(habits)
-    .where(and(eq(habits.id, id), eq(habits.userId, userId)))
+    .where(and(eq(habits.id, id), eq(habits.userId, userId), eq(habits.workspaceId, workspaceId)))
     .returning();
   return row ?? null;
 }
 
-export async function listHabitLogsSince(sinceDate: string, userId: string) {
+export async function listHabitLogsSince(sinceDate: string, userId: string, workspaceId: string) {
   const db = getDb();
   return db
     .select()
     .from(habitLogs)
-    .where(and(gte(habitLogs.date, sinceDate), eq(habitLogs.userId, userId)));
+    .where(and(gte(habitLogs.date, sinceDate), eq(habitLogs.userId, userId), eq(habitLogs.workspaceId, workspaceId)));
 }
 
-export async function toggleHabitLog(habitId: string, userId: string, date?: string) {
+export async function toggleHabitLog(habitId: string, userId: string, workspaceId: string, date?: string) {
   const db = getDb();
   const targetDate = date ?? todayDate();
 
   const [existing] = await db
     .select()
     .from(habitLogs)
-    .where(and(eq(habitLogs.habitId, habitId), eq(habitLogs.date, targetDate), eq(habitLogs.userId, userId)));
+    .where(
+      and(
+        eq(habitLogs.habitId, habitId),
+        eq(habitLogs.date, targetDate),
+        eq(habitLogs.userId, userId),
+        eq(habitLogs.workspaceId, workspaceId),
+      ),
+    );
 
   if (existing) {
     await db.delete(habitLogs).where(eq(habitLogs.id, existing.id));
     return { logged: false as const, log: null };
   }
 
-  const [row] = await db.insert(habitLogs).values({ userId, habitId, date: targetDate }).returning();
+  const [row] = await db.insert(habitLogs).values({ userId, workspaceId, habitId, date: targetDate }).returning();
   return { logged: true as const, log: row };
 }

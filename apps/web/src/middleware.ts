@@ -43,14 +43,15 @@ export async function middleware(request: NextRequest) {
       const proto = request.headers.get("x-forwarded-proto") ?? "https";
       url.protocol = proto;
       // `host` (not `hostname`) — forwardedHost may carry its own ":port"
-      // (e.g. Next's own dev server sets "localhost:3000", which is the
-      // real port the browser is using and must be kept). But behind an
-      // https-terminating proxy (Cloud Run, etc.) forwardedHost instead
-      // carries the *container's* internal port (e.g. ":8080" from
-      // PORT=8080) — https traffic always arrives on the implicit 443, so
-      // that port is never real and must be stripped or the redirect ends
-      // up pointing at a port the public host doesn't expose.
-      url.host = proto === "https" ? forwardedHost.split(":")[0] : forwardedHost;
+      // (e.g. Next's own dev server sets "localhost:3000", the real port
+      // the browser is using). Assigning `.host` only *sets* a port when
+      // the string itself has one — it does NOT clear a pre-existing port
+      // on `url`, so behind an https-terminating proxy (Cloud Run, etc.)
+      // `url`'s original internal port (from PORT=8080) silently survives
+      // unless cleared explicitly. https traffic always arrives on the
+      // implicit 443, so that inherited port is never real.
+      url.host = forwardedHost;
+      if (proto === "https") url.port = "";
     }
     url.pathname = "/login";
     return NextResponse.redirect(url);

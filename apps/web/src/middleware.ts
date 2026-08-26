@@ -40,12 +40,17 @@ export async function middleware(request: NextRequest) {
     // container's own bind address, not the public host.
     const forwardedHost = request.headers.get("x-forwarded-host");
     if (forwardedHost) {
-      // `host` (not `hostname`) — forwardedHost may already carry its own
-      // ":port" (e.g. Next's own dev server sets "localhost:3000"), and the
-      // `host` setter applies both pieces together. Setting `.port` after
-      // this would just re-clear whatever port `.host` just set.
-      url.protocol = request.headers.get("x-forwarded-proto") ?? "https";
-      url.host = forwardedHost;
+      const proto = request.headers.get("x-forwarded-proto") ?? "https";
+      url.protocol = proto;
+      // `host` (not `hostname`) — forwardedHost may carry its own ":port"
+      // (e.g. Next's own dev server sets "localhost:3000", which is the
+      // real port the browser is using and must be kept). But behind an
+      // https-terminating proxy (Cloud Run, etc.) forwardedHost instead
+      // carries the *container's* internal port (e.g. ":8080" from
+      // PORT=8080) — https traffic always arrives on the implicit 443, so
+      // that port is never real and must be stripped or the redirect ends
+      // up pointing at a port the public host doesn't expose.
+      url.host = proto === "https" ? forwardedHost.split(":")[0] : forwardedHost;
     }
     url.pathname = "/login";
     return NextResponse.redirect(url);

@@ -93,18 +93,18 @@ export function WorkspaceSwitcher({ compact }: { compact?: boolean }) {
         className={cn(
           "flex items-center gap-1 rounded-md text-left transition-colors",
           compact
-            ? "-ml-0.5 px-0.5 py-0 text-[11px] text-neutral-500 hover:text-neutral-300"
-            : "w-full justify-between gap-2 px-2.5 py-1.5 text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-neutral-100",
+            ? "-ml-0.5 px-0.5 py-0 text-[11px] text-neutral-600 dark:text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
+            : "w-full justify-between gap-2 px-2.5 py-1.5 text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-neutral-100",
         )}
       >
         <span className="min-w-0 truncate">{active?.name ?? "Workspace"}</span>
-        <ChevronsUpDown className={cn("shrink-0", compact ? "h-3 w-3 text-neutral-600" : "h-3.5 w-3.5")} />
+        <ChevronsUpDown className={cn("shrink-0", compact ? "h-3 w-3 text-neutral-400 dark:text-neutral-600" : "h-3.5 w-3.5")} />
       </button>
 
       {expanded && (
-        <div className="mt-1 space-y-0.5 rounded-lg border border-neutral-800 bg-neutral-950/60 p-1.5">
+        <div className="mt-1 space-y-0.5 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-neutral-100/60 dark:bg-neutral-950/60 p-1.5">
           {workspaces.map((w) => (
-            <div key={w.id} className="flex items-center gap-0.5 rounded-lg text-sm text-neutral-200 transition-colors hover:bg-neutral-800">
+            <div key={w.id} className="flex items-center gap-0.5 rounded-lg text-sm text-neutral-800 dark:text-neutral-200 transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800">
               <button
                 type="button"
                 onClick={() => switchTo(w.id)}
@@ -120,7 +120,7 @@ export function WorkspaceSwitcher({ compact }: { compact?: boolean }) {
                   disabled={Boolean(deletingId)}
                   aria-label={`Delete ${w.name}`}
                   title={`Delete ${w.name}`}
-                  className="mr-1 rounded p-1.5 text-neutral-500 transition-colors hover:bg-red-500/15 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="mr-1 rounded p-1.5 text-neutral-600 dark:text-neutral-500 transition-colors hover:bg-red-500/15 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>
@@ -135,7 +135,7 @@ export function WorkspaceSwitcher({ compact }: { compact?: boolean }) {
                 onChange={(e) => setNewName(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleCreate()}
                 placeholder="Workspace name"
-                className="w-full rounded-lg border border-neutral-700 bg-neutral-900 px-2.5 py-1.5 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
+                className="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-2.5 py-1.5 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
               />
               <button
                 type="button"
@@ -149,7 +149,7 @@ export function WorkspaceSwitcher({ compact }: { compact?: boolean }) {
             <button
               type="button"
               onClick={() => setCreating(true)}
-              className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-sm text-neutral-400 transition-colors hover:bg-neutral-800 hover:text-neutral-100"
+              className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-sm text-neutral-500 dark:text-neutral-400 transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-neutral-100"
             >
               <Plus className="h-3.5 w-3.5" />
               New workspace

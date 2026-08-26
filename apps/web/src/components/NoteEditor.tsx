@@ -97,7 +97,7 @@ function SegmentedToggle<T extends string>({
   onChange: (value: T) => void;
 }) {
   return (
-    <div className="inline-flex rounded-lg border border-neutral-700 bg-neutral-950 p-0.5">
+    <div className="inline-flex rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 p-0.5">
       {options.map((opt) => (
         <button
           key={opt.value}
@@ -105,7 +105,7 @@ function SegmentedToggle<T extends string>({
           onClick={() => onChange(opt.value)}
           className={cn(
             "rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
-            value === opt.value ? "bg-cyan-400 text-white" : "text-neutral-400 hover:text-neutral-200",
+            value === opt.value ? "bg-cyan-400 text-white" : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200",
           )}
         >
           {opt.label}
@@ -137,7 +137,7 @@ function ToolbarButton({
       title={label}
       className={cn(
         "flex h-7 w-7 items-center justify-center rounded-md transition-colors",
-        active ? "bg-cyan-400/20 text-cyan-300" : "text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100",
+        active ? "bg-cyan-400/20 text-cyan-600 dark:text-cyan-300" : "text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-neutral-100",
       )}
     >
       <Icon className="h-3.5 w-3.5" />
@@ -146,7 +146,7 @@ function ToolbarButton({
 }
 
 function ToolbarDivider() {
-  return <div className="mx-0.5 h-5 w-px bg-neutral-800" />;
+  return <div className="mx-0.5 h-5 w-px bg-neutral-100 dark:bg-neutral-800" />;
 }
 
 interface NoteEditorProps {
@@ -372,7 +372,7 @@ export function NoteEditor({ mode, projects, note, initialLinkedTodos, onSaved, 
 
   return (
     <div className="space-y-4">
-      <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-neutral-800 bg-neutral-900 p-5">
+      <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-5">
         <Field label="Title">
           <input
             value={title}
@@ -451,33 +451,33 @@ export function NoteEditor({ mode, projects, note, initialLinkedTodos, onSaved, 
           </div>
 
           {format === "plain" ? (
-            <div className="overflow-hidden rounded-xl border border-neutral-700/80 shadow-inner shadow-black/20">
-              <div className="flex flex-wrap items-center gap-0.5 border-b border-neutral-800 bg-neutral-900 px-2 py-1.5">
+            <div className="overflow-hidden rounded-xl border border-neutral-300/80 dark:border-neutral-700/80 shadow-inner shadow-black/20">
+              <div className="flex flex-wrap items-center gap-0.5 border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-2 py-1.5">
                 <select
                   value={fontFamily}
                   onChange={(e) => setFontFamily(e.target.value as FontFamily)}
                   title="Font family"
-                  className="rounded-md border border-neutral-700 bg-neutral-950 px-2 py-1 text-xs text-neutral-300 focus:border-cyan-400/60 focus:outline-none"
+                  className="rounded-md border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-2 py-1 text-xs text-neutral-700 dark:text-neutral-300 focus:border-cyan-400/60 focus:outline-none"
                 >
                   <option value="sans">Sans</option>
                   <option value="serif">Serif</option>
                   <option value="mono">Mono</option>
                 </select>
 
-                <div className="ml-1 flex items-center gap-0.5 rounded-md border border-neutral-700 bg-neutral-950 px-0.5">
+                <div className="ml-1 flex items-center gap-0.5 rounded-md border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-0.5">
                   <button
                     type="button"
                     onClick={() => setFontSize((s) => Math.max(MIN_FONT_SIZE, s - 1))}
-                    className="flex h-6 w-6 items-center justify-center text-neutral-400 hover:text-neutral-100"
+                    className="flex h-6 w-6 items-center justify-center text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
                     title="Decrease font size"
                   >
                     <Minus className="h-3 w-3" />
                   </button>
-                  <span className="w-6 text-center text-xs text-neutral-300">{fontSize}</span>
+                  <span className="w-6 text-center text-xs text-neutral-700 dark:text-neutral-300">{fontSize}</span>
                   <button
                     type="button"
                     onClick={() => setFontSize((s) => Math.min(MAX_FONT_SIZE, s + 1))}
-                    className="flex h-6 w-6 items-center justify-center text-neutral-400 hover:text-neutral-100"
+                    className="flex h-6 w-6 items-center justify-center text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
                     title="Increase font size"
                   >
                     <Plus className="h-3 w-3" />
@@ -493,7 +493,7 @@ export function NoteEditor({ mode, projects, note, initialLinkedTodos, onSaved, 
                     execFormat("formatBlock", e.target.value);
                   }}
                   title="Text style"
-                  className="rounded-md border border-neutral-700 bg-neutral-950 px-2 py-1 text-xs text-neutral-300 focus:border-cyan-400/60 focus:outline-none"
+                  className="rounded-md border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-2 py-1 text-xs text-neutral-700 dark:text-neutral-300 focus:border-cyan-400/60 focus:outline-none"
                 >
                   <option value="P">Paragraph</option>
                   <option value="H1">Heading 1</option>
@@ -543,8 +543,8 @@ export function NoteEditor({ mode, projects, note, initialLinkedTodos, onSaved, 
                 data-placeholder="Write your note..."
                 style={{ fontSize }}
                 className={cn(
-                  "rich-text min-h-[19.5rem] w-full overflow-y-auto bg-neutral-950 px-3.5 py-2.5 leading-relaxed text-neutral-100 focus:outline-none",
-                  "empty:before:text-neutral-500 empty:before:content-[attr(data-placeholder)]",
+                  "rich-text min-h-[19.5rem] w-full overflow-y-auto bg-neutral-50 dark:bg-neutral-950 px-3.5 py-2.5 leading-relaxed text-neutral-900 dark:text-neutral-100 focus:outline-none",
+                  "empty:before:text-neutral-600 dark:text-neutral-500 empty:before:content-[attr(data-placeholder)]",
                   FONT_FAMILY_CLASS[fontFamily],
                 )}
               />
@@ -558,7 +558,7 @@ export function NoteEditor({ mode, projects, note, initialLinkedTodos, onSaved, 
               className={cn(fieldInputClass, "font-mono leading-relaxed")}
             />
           ) : (
-            <div className="min-h-[20rem] rounded-xl border border-neutral-700/80 bg-neutral-950 px-4 py-3 shadow-inner shadow-black/20">
+            <div className="min-h-[20rem] rounded-xl border border-neutral-300/80 dark:border-neutral-700/80 bg-neutral-50 dark:bg-neutral-950 px-4 py-3 shadow-inner shadow-black/20">
               <MarkdownPreview content={content || "*Nothing to preview yet.*"} />
             </div>
           )}
@@ -569,7 +569,7 @@ export function NoteEditor({ mode, projects, note, initialLinkedTodos, onSaved, 
                 type="button"
                 onClick={handleStrip}
                 disabled={stripping || !content.trim()}
-                className="flex items-center gap-1 text-xs text-neutral-500 hover:text-cyan-300 disabled:opacity-50"
+                className="flex items-center gap-1 text-xs text-neutral-600 dark:text-neutral-500 hover:text-cyan-600 dark:text-cyan-300 disabled:opacity-50"
                 title="Deterministically strip markdown syntax (no AI) and switch to Plain text"
               >
                 {stripping ? <Loader2 className="h-3 w-3 animate-spin" /> : <Eraser className="h-3 w-3" />}
@@ -581,7 +581,7 @@ export function NoteEditor({ mode, projects, note, initialLinkedTodos, onSaved, 
                 type="button"
                 onClick={handleFormat}
                 disabled={formatting || !hasContent(content)}
-                className="flex items-center gap-1 text-xs text-neutral-500 hover:text-cyan-300 disabled:opacity-50"
+                className="flex items-center gap-1 text-xs text-neutral-600 dark:text-neutral-500 hover:text-cyan-600 dark:text-cyan-300 disabled:opacity-50"
                 title="Ask Gemini to infer markdown structure and switch to Markdown"
               >
                 {formatting ? <Loader2 className="h-3 w-3 animate-spin" /> : <Wand2 className="h-3 w-3" />}
@@ -592,7 +592,7 @@ export function NoteEditor({ mode, projects, note, initialLinkedTodos, onSaved, 
               type="button"
               onClick={handleExport}
               disabled={!hasContent(content)}
-              className="flex items-center gap-1 text-xs text-neutral-500 hover:text-cyan-300 disabled:opacity-50"
+              className="flex items-center gap-1 text-xs text-neutral-600 dark:text-neutral-500 hover:text-cyan-600 dark:text-cyan-300 disabled:opacity-50"
               title="Download the current content as a .md file"
             >
               <Download className="h-3 w-3" />
@@ -615,7 +615,7 @@ export function NoteEditor({ mode, projects, note, initialLinkedTodos, onSaved, 
               <button
                 type="button"
                 onClick={onCancel}
-                className="rounded-lg border border-neutral-700 px-4 py-2 text-sm font-medium text-neutral-300 transition-colors hover:bg-neutral-800"
+                className="rounded-lg border border-neutral-300 dark:border-neutral-700 px-4 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-300 transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800"
               >
                 Cancel
               </button>
@@ -625,7 +625,7 @@ export function NoteEditor({ mode, projects, note, initialLinkedTodos, onSaved, 
             <button
               type="button"
               onClick={handleDeleteNote}
-              className="flex items-center gap-1 text-xs text-neutral-500 hover:text-red-400"
+              className="flex items-center gap-1 text-xs text-neutral-600 dark:text-neutral-500 hover:text-red-400"
             >
               <Trash2 className="h-3.5 w-3.5" />
               Delete note
@@ -635,8 +635,8 @@ export function NoteEditor({ mode, projects, note, initialLinkedTodos, onSaved, 
       </form>
 
       {mode === "edit" && note && (
-        <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
-          <h3 className="mb-3 text-sm font-semibold text-neutral-200">Linked todos</h3>
+        <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4">
+          <h3 className="mb-3 text-sm font-semibold text-neutral-800 dark:text-neutral-200">Linked todos</h3>
           <form onSubmit={handleAddTodo} className="mb-3 flex gap-2">
             <input
               value={newTodoTitle}
@@ -656,28 +656,28 @@ export function NoteEditor({ mode, projects, note, initialLinkedTodos, onSaved, 
             {todos.map((todo) => (
               <li
                 key={todo.id}
-                className="group flex items-center gap-2 rounded-lg border border-neutral-800 bg-neutral-950/60 p-2 text-sm"
+                className="group flex items-center gap-2 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-neutral-100/60 dark:bg-neutral-950/60 p-2 text-sm"
               >
-                <button type="button" onClick={() => toggleTodo(todo)} className="text-neutral-500 hover:text-cyan-300">
+                <button type="button" onClick={() => toggleTodo(todo)} className="text-neutral-600 dark:text-neutral-500 hover:text-cyan-600 dark:text-cyan-300">
                   {todo.status === "done" ? (
                     <CheckCircle2 className="h-4 w-4 text-emerald-500" />
                   ) : (
                     <Circle className="h-4 w-4" />
                   )}
                 </button>
-                <span className={cn("flex-1 text-neutral-200", todo.status === "done" && "text-neutral-500 line-through")}>
+                <span className={cn("flex-1 text-neutral-800 dark:text-neutral-200", todo.status === "done" && "text-neutral-600 dark:text-neutral-500 line-through")}>
                   {todo.title}
                 </span>
                 <button
                   type="button"
                   onClick={() => handleDeleteTodo(todo.id)}
-                  className="text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+                  className="text-neutral-400 dark:text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>
               </li>
             ))}
-            {todos.length === 0 && <li className="text-xs text-neutral-500">No todos linked to this note yet.</li>}
+            {todos.length === 0 && <li className="text-xs text-neutral-600 dark:text-neutral-500">No todos linked to this note yet.</li>}
           </ul>
         </div>
       )}

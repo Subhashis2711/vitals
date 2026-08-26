@@ -1,7 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 
 const ACCENTS = {
-  cyan: "bg-cyan-400/15 text-cyan-300",
+  cyan: "bg-cyan-400/15 text-cyan-600 dark:text-cyan-300",
   emerald: "bg-emerald-500/15 text-emerald-400",
   amber: "bg-amber-500/15 text-amber-400",
   blue: "bg-blue-500/15 text-blue-400",
@@ -19,13 +19,13 @@ export function StatCard({
   accent?: keyof typeof ACCENTS;
 }) {
   return (
-    <div className="flex items-center gap-3 rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
+    <div className="flex items-center gap-3 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4">
       <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${ACCENTS[accent]}`}>
         <Icon className="h-5 w-5" />
       </span>
       <div className="min-w-0">
-        <p className="truncate text-xs font-medium text-neutral-500">{label}</p>
-        <p className="text-lg font-semibold text-neutral-100">{value}</p>
+        <p className="truncate text-xs font-medium text-neutral-600 dark:text-neutral-500">{label}</p>
+        <p className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">{value}</p>
       </div>
     </div>
   );

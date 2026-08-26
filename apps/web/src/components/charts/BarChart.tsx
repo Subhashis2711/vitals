@@ -22,7 +22,7 @@ export function BarChart({
       </div>
       <div className="mt-1 flex gap-1.5">
         {data.map((d, i) => (
-          <span key={i} className="flex-1 text-center text-[9px] text-neutral-600">
+          <span key={i} className="flex-1 text-center text-[9px] text-neutral-400 dark:text-neutral-600">
             {d.label}
           </span>
         ))}

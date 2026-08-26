@@ -41,8 +41,8 @@ export function QuickCapture() {
   }
 
   return (
-    <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
-      <h2 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-neutral-200">
+    <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4">
+      <h2 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-neutral-800 dark:text-neutral-200">
         <Sparkles className="h-4 w-4 text-amber-400" />
         Quick capture
       </h2>
@@ -52,15 +52,15 @@ export function QuickCapture() {
           onChange={(e) => setRawContent(e.target.value)}
           placeholder="Paste an article, a thought, a URL..."
           rows={4}
-          className="w-full rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 transition-colors focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+          className="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 transition-colors focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
         />
         <div className="relative">
-          <Link2 className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+          <Link2 className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-600 dark:text-neutral-500" />
           <input
             value={sourceUrl}
             onChange={(e) => setSourceUrl(e.target.value)}
             placeholder="Source URL (optional)"
-            className="w-full rounded-lg border border-neutral-700 bg-neutral-950 py-2 pl-9 pr-3 text-sm text-neutral-100 placeholder:text-neutral-500 transition-colors focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+            className="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 py-2 pl-9 pr-3 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 transition-colors focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
           />
         </div>
         <button
@@ -80,9 +80,9 @@ export function QuickCapture() {
               <ContentTypeIcon type={result.note.contentType} className="h-3 w-3" />
               {result.note.contentType}
             </span>
-            <span className="font-semibold text-neutral-100">{result.note.title}</span>
+            <span className="font-semibold text-neutral-900 dark:text-neutral-100">{result.note.title}</span>
           </div>
-          {result.note.aiSummary && <p className="mt-2 text-neutral-300">{result.note.aiSummary}</p>}
+          {result.note.aiSummary && <p className="mt-2 text-neutral-700 dark:text-neutral-300">{result.note.aiSummary}</p>}
           {result.note.tags.length > 0 && (
             <div className="mt-2 flex flex-wrap gap-1">
               {result.note.tags.map((tag) => (
@@ -94,8 +94,8 @@ export function QuickCapture() {
           )}
           {result.todos.length > 0 && (
             <div className="mt-3">
-              <p className="text-xs font-semibold text-neutral-500">Extracted todos</p>
-              <ul className="mt-1 list-inside list-disc text-neutral-300">
+              <p className="text-xs font-semibold text-neutral-600 dark:text-neutral-500">Extracted todos</p>
+              <ul className="mt-1 list-inside list-disc text-neutral-700 dark:text-neutral-300">
                 {result.todos.map((todo) => (
                   <li key={todo.id}>{todo.title}</li>
                 ))}

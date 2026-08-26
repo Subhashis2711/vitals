@@ -103,12 +103,12 @@ export function EditableTodoList({
         return (
           <li
             key={todo.id}
-            className="group flex items-center gap-2 rounded-lg border border-neutral-800 bg-neutral-950/60 p-2 text-sm"
+            className="group flex items-center gap-2 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-neutral-100/60 dark:bg-neutral-950/60 p-2 text-sm"
           >
             <button
               type="button"
               onClick={() => toggleTodo(todo)}
-              className="shrink-0 text-neutral-500 hover:text-cyan-300"
+              className="shrink-0 text-neutral-600 dark:text-neutral-500 hover:text-cyan-600 dark:text-cyan-300"
             >
               {todo.status === "done" ? (
                 <CheckCircle2 className="h-4 w-4 text-emerald-500" />
@@ -125,15 +125,15 @@ export function EditableTodoList({
                   onBlur={commitEdit}
                   onKeyDown={handleEditKeyDown}
                   autoFocus
-                  className="w-full rounded border border-cyan-400/60 bg-neutral-900 px-1.5 py-0.5 text-sm text-neutral-100 focus:outline-none"
+                  className="w-full rounded border border-cyan-400/60 bg-white dark:bg-neutral-900 px-1.5 py-0.5 text-sm text-neutral-900 dark:text-neutral-100 focus:outline-none"
                 />
               ) : (
                 <p
                   onDoubleClick={() => startEditing(todo)}
                   title="Double-click to rename"
                   className={cn(
-                    "cursor-text truncate text-neutral-200",
-                    todo.status === "done" && "text-neutral-500 line-through",
+                    "cursor-text truncate text-neutral-800 dark:text-neutral-200",
+                    todo.status === "done" && "text-neutral-600 dark:text-neutral-500 line-through",
                   )}
                 >
                   {todo.title}
@@ -145,7 +145,7 @@ export function EditableTodoList({
                 type="button"
                 onClick={() => move(todo, "up")}
                 disabled={i === 0}
-                className="-m-1.5 p-1.5 text-neutral-600 hover:text-cyan-300 disabled:pointer-events-none disabled:opacity-30"
+                className="-m-1.5 p-1.5 text-neutral-400 dark:text-neutral-600 hover:text-cyan-600 dark:text-cyan-300 disabled:pointer-events-none disabled:opacity-30"
                 title="Move up"
               >
                 <ChevronUp className="h-3.5 w-3.5" />
@@ -154,7 +154,7 @@ export function EditableTodoList({
                 type="button"
                 onClick={() => move(todo, "down")}
                 disabled={i === sorted.length - 1}
-                className="-m-1.5 p-1.5 text-neutral-600 hover:text-cyan-300 disabled:pointer-events-none disabled:opacity-30"
+                className="-m-1.5 p-1.5 text-neutral-400 dark:text-neutral-600 hover:text-cyan-600 dark:text-cyan-300 disabled:pointer-events-none disabled:opacity-30"
                 title="Move down"
               >
                 <ChevronDown className="h-3.5 w-3.5" />
@@ -163,14 +163,14 @@ export function EditableTodoList({
             <button
               type="button"
               onClick={() => handleDelete(todo.id)}
-              className="-m-1.5 shrink-0 p-1.5 text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+              className="-m-1.5 shrink-0 p-1.5 text-neutral-400 dark:text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
             >
               <Trash2 className="h-3.5 w-3.5" />
             </button>
           </li>
         );
       })}
-      {sorted.length === 0 && <li className="text-xs text-neutral-500">{emptyMessage}</li>}
+      {sorted.length === 0 && <li className="text-xs text-neutral-600 dark:text-neutral-500">{emptyMessage}</li>}
     </ul>
   );
 }

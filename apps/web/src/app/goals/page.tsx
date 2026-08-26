@@ -8,7 +8,7 @@ export default async function GoalsPage() {
   return (
     <div>
       <PageHeader title="Goals" subtitle={friendlyDate()} />
-      <p className="mb-4 text-sm text-neutral-500">Each goal carries its own plan — link tasks to it and progress tracks itself.</p>
+      <p className="mb-4 text-sm text-neutral-600 dark:text-neutral-500">Each goal carries its own plan — link tasks to it and progress tracks itself.</p>
       <GoalManager initialGoals={goals} projects={projects} topics={topics} />
     </div>
   );

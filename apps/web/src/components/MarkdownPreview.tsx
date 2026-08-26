@@ -6,7 +6,7 @@ import remarkGfm from "remark-gfm";
 
 export function MarkdownPreview({ content, className }: { content: string; className?: string }) {
   return (
-    <div className={`rich-text text-sm leading-relaxed text-neutral-300 ${className ?? ""}`}>
+    <div className={`rich-text text-sm leading-relaxed text-neutral-700 dark:text-neutral-300 ${className ?? ""}`}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw]}

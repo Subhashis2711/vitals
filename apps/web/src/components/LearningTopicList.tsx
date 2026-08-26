@@ -46,7 +46,7 @@ export function LearningTopicList({ initialTopics }: { initialTopics: LearningTo
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="New learning topic..."
-          className="min-w-0 flex-1 rounded-lg border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+          className="min-w-0 flex-1 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
         />
         <button
           type="submit"
@@ -59,25 +59,25 @@ export function LearningTopicList({ initialTopics }: { initialTopics: LearningTo
       </form>
 
       <div className="relative">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-neutral-500" />
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-neutral-600 dark:text-neutral-500" />
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search topics..."
-          className="w-full rounded-lg border border-neutral-800 bg-neutral-900 py-1.5 pl-8 pr-3 text-sm text-neutral-200 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
+          className="w-full rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 py-1.5 pl-8 pr-3 text-sm text-neutral-800 dark:text-neutral-200 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
         />
       </div>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {visibleTopics.map((topic) => (
-          <div key={topic.id} className="group relative rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
+          <div key={topic.id} className="group relative rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4">
             <Link href={`/learning/${encodeURIComponent(topic.id)}`} className="flex items-center gap-3">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-400/15 text-cyan-300">
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-400/15 text-cyan-600 dark:text-cyan-300">
                 <BookOpen className="h-4 w-4" />
               </span>
               <div className="min-w-0">
-                <p className="truncate font-medium text-neutral-100">{topic.title}</p>
-                <p className="text-xs text-neutral-500">
+                <p className="truncate font-medium text-neutral-900 dark:text-neutral-100">{topic.title}</p>
+                <p className="text-xs text-neutral-600 dark:text-neutral-500">
                   last touched {new Date(topic.lastTouchedAt).toLocaleDateString()}
                 </p>
               </div>
@@ -85,14 +85,14 @@ export function LearningTopicList({ initialTopics }: { initialTopics: LearningTo
             <button
               type="button"
               onClick={() => handleDelete(topic.id, topic.title)}
-              className="absolute right-1.5 top-1.5 p-1.5 text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+              className="absolute right-1.5 top-1.5 p-1.5 text-neutral-400 dark:text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
             >
               <Trash2 className="h-3.5 w-3.5" />
             </button>
           </div>
         ))}
         {visibleTopics.length === 0 && (
-          <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-neutral-800 py-10 text-sm text-neutral-500 sm:col-span-2">
+          <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-neutral-200 dark:border-neutral-800 py-10 text-sm text-neutral-600 dark:text-neutral-500 sm:col-span-2">
             <BookOpen className="h-6 w-6" />
             {topics.length === 0 ? "No topics yet." : "No topics match your search."}
           </div>

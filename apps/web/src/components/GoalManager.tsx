@@ -13,7 +13,7 @@ import { deleteGoal } from "@/lib/api-browser";
 import { cn } from "@/lib/cn";
 
 const STATUS_STYLES: Record<string, string> = {
-  todo: "bg-neutral-500/15 text-neutral-400",
+  todo: "bg-neutral-400/15 dark:bg-neutral-500/15 text-neutral-500 dark:text-neutral-400",
   in_progress: "bg-amber-500/15 text-amber-400",
   done: "bg-emerald-500/15 text-emerald-400",
 };
@@ -70,12 +70,12 @@ export function GoalManager({
 
       <div className="flex flex-wrap items-center gap-2">
         <div className="relative min-w-0 flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-neutral-500" />
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-neutral-600 dark:text-neutral-500" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search goals..."
-            className="w-full rounded-lg border border-neutral-800 bg-neutral-900 py-1.5 pl-8 pr-3 text-sm text-neutral-200 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
+            className="w-full rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 py-1.5 pl-8 pr-3 text-sm text-neutral-800 dark:text-neutral-200 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
           />
         </div>
         {projects.length > 0 && (
@@ -84,7 +84,7 @@ export function GoalManager({
             value={filterProjectId}
             onChange={setFilterProjectId}
             placeholder="All projects"
-            className="border-neutral-800 bg-neutral-900 py-1.5 text-sm"
+            className="border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 py-1.5 text-sm"
           />
         )}
         <div className="flex flex-wrap gap-1">
@@ -93,7 +93,7 @@ export function GoalManager({
             onClick={() => setStatusFilter("all")}
             className={cn(
               "rounded-full px-2.5 py-1 text-xs font-medium transition-colors",
-              statusFilter === "all" ? "bg-cyan-400 text-white" : "bg-neutral-900 text-neutral-400 hover:text-neutral-200",
+              statusFilter === "all" ? "bg-cyan-400 text-white" : "bg-white dark:bg-neutral-900 text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200",
             )}
           >
             All
@@ -105,7 +105,7 @@ export function GoalManager({
               onClick={() => setStatusFilter(s)}
               className={cn(
                 "rounded-full px-2.5 py-1 text-xs font-medium transition-colors",
-                statusFilter === s ? "bg-cyan-400 text-white" : "bg-neutral-900 text-neutral-400 hover:text-neutral-200",
+                statusFilter === s ? "bg-cyan-400 text-white" : "bg-white dark:bg-neutral-900 text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200",
               )}
             >
               {STATUS_LABELS[s]}
@@ -116,12 +116,12 @@ export function GoalManager({
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {visibleGoals.map((goal) => (
-          <div key={goal.id} className="group relative rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
+          <div key={goal.id} className="group relative rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4">
             <Link href={`/goals/${encodeURIComponent(goal.id)}`} className="flex items-center gap-3">
               <CircularProgress value={goal.progress} />
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <p className="truncate font-medium text-neutral-100">{goal.title}</p>
+                  <p className="truncate font-medium text-neutral-900 dark:text-neutral-100">{goal.title}</p>
                   <span
                     className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ${STATUS_STYLES[goal.status]}`}
                   >
@@ -129,7 +129,7 @@ export function GoalManager({
                   </span>
                   <ProjectBadge project={goal.projectId ? projectById.get(goal.projectId) : undefined} />
                 </div>
-                <p className="mt-1 text-xs text-neutral-500">
+                <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-500">
                   {goal.todoCount > 0 ? `${goal.doneTodoCount}/${goal.todoCount} tasks` : "No linked tasks yet"}
                   {goal.targetDate ? ` · due ${goal.targetDate}` : ""}
                 </p>
@@ -138,14 +138,14 @@ export function GoalManager({
             <button
               type="button"
               onClick={() => handleDelete(goal.id, goal.title)}
-              className="absolute right-1.5 top-1.5 p-1.5 text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+              className="absolute right-1.5 top-1.5 p-1.5 text-neutral-400 dark:text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
             >
               <Trash2 className="h-3.5 w-3.5" />
             </button>
           </div>
         ))}
         {visibleGoals.length === 0 && (
-          <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-neutral-800 py-10 text-sm text-neutral-500 sm:col-span-2">
+          <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-neutral-200 dark:border-neutral-800 py-10 text-sm text-neutral-600 dark:text-neutral-500 sm:col-span-2">
             <Target className="h-6 w-6" />
             {goals.length === 0
               ? "No goals yet. Each goal carries its own plan — link tasks to it and progress tracks itself."

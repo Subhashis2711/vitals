@@ -37,8 +37,8 @@ export function HabitFrequencyPicker({
             className={cn(
               "rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors",
               frequency === f
-                ? "border-cyan-400/60 bg-cyan-400/10 text-cyan-300"
-                : "border-neutral-700 text-neutral-400 hover:bg-neutral-800",
+                ? "border-cyan-400/60 bg-cyan-400/10 text-cyan-600 dark:text-cyan-300"
+                : "border-neutral-300 dark:border-neutral-700 text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800",
             )}
           >
             {FREQ_LABELS[f]}
@@ -56,8 +56,8 @@ export function HabitFrequencyPicker({
               className={cn(
                 "flex h-7 w-7 items-center justify-center rounded-full border text-[11px] font-medium transition-colors",
                 (daysOfWeek ?? []).includes(day)
-                  ? "border-cyan-400/60 bg-cyan-400/10 text-cyan-300"
-                  : "border-neutral-700 text-neutral-500 hover:bg-neutral-800",
+                  ? "border-cyan-400/60 bg-cyan-400/10 text-cyan-600 dark:text-cyan-300"
+                  : "border-neutral-300 dark:border-neutral-700 text-neutral-600 dark:text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800",
               )}
             >
               {label}
@@ -66,7 +66,7 @@ export function HabitFrequencyPicker({
         </div>
       )}
       {frequency === "weekly" && !daysOfWeek?.length && (
-        <p className="text-[11px] text-neutral-600">Pick which days this habit applies to.</p>
+        <p className="text-[11px] text-neutral-400 dark:text-neutral-600">Pick which days this habit applies to.</p>
       )}
     </div>
   );

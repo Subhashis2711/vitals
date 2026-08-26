@@ -46,7 +46,7 @@ export function PomodoroTimer({ todos, initialSessions }: { todos: Todo[]; initi
 
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-      <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-6">
+      <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-6">
         <div className="flex justify-center gap-1.5">
           {(Object.keys(MODE_LABELS) as PomodoroMode[]).map((m) => (
             <button
@@ -55,7 +55,7 @@ export function PomodoroTimer({ todos, initialSessions }: { todos: Todo[]; initi
               onClick={() => setMode(m)}
               className={cn(
                 "rounded-lg px-3 py-1.5 text-xs font-medium transition-colors",
-                mode === m ? "bg-cyan-400 text-white" : "text-neutral-400 hover:bg-neutral-800",
+                mode === m ? "bg-cyan-400 text-white" : "text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800",
               )}
             >
               {MODE_LABELS[m]}
@@ -63,11 +63,11 @@ export function PomodoroTimer({ todos, initialSessions }: { todos: Todo[]; initi
           ))}
         </div>
 
-        <p className="mt-6 text-center font-mono text-6xl font-bold tabular-nums text-neutral-50">
+        <p className="mt-6 text-center font-mono text-6xl font-bold tabular-nums text-neutral-950 dark:text-neutral-50">
           {formatTimer(remainingSeconds)}
         </p>
 
-        <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-neutral-800">
+        <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
           <div
             className="h-full rounded-full bg-cyan-400 transition-all"
             style={{ width: `${Math.min(100, Math.max(0, progress * 100))}%` }}
@@ -79,7 +79,7 @@ export function PomodoroTimer({ todos, initialSessions }: { todos: Todo[]; initi
             type="button"
             onClick={reset}
             title="Reset"
-            className="rounded-full border border-neutral-700 p-3 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100"
+            className="rounded-full border border-neutral-300 dark:border-neutral-700 p-3 text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-neutral-100"
           >
             <RotateCcw className="h-4 w-4" />
           </button>
@@ -91,7 +91,7 @@ export function PomodoroTimer({ todos, initialSessions }: { todos: Todo[]; initi
             {running ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
             {running ? "Pause" : "Start"}
           </button>
-          <label className="flex items-center gap-1.5 rounded-full border border-neutral-700 px-3 py-2 text-xs text-neutral-400">
+          <label className="flex items-center gap-1.5 rounded-full border border-neutral-300 dark:border-neutral-700 px-3 py-2 text-xs text-neutral-500 dark:text-neutral-400">
             min
             <input
               type="number"
@@ -100,7 +100,7 @@ export function PomodoroTimer({ todos, initialSessions }: { todos: Todo[]; initi
               disabled={running}
               value={durationMin}
               onChange={(e) => setDurationMin(Math.max(1, Number(e.target.value) || 1))}
-              className="w-12 bg-transparent text-center text-neutral-200 focus:outline-none disabled:opacity-50"
+              className="w-12 bg-transparent text-center text-neutral-800 dark:text-neutral-200 focus:outline-none disabled:opacity-50"
             />
           </label>
         </div>
@@ -117,27 +117,27 @@ export function PomodoroTimer({ todos, initialSessions }: { todos: Todo[]; initi
           </div>
         )}
 
-        <p className="mt-5 flex items-center justify-center gap-1.5 text-xs text-neutral-500">
+        <p className="mt-5 flex items-center justify-center gap-1.5 text-xs text-neutral-600 dark:text-neutral-500">
           <Timer className="h-3.5 w-3.5" />
           {focusSessionsToday} focus session{focusSessionsToday === 1 ? "" : "s"} today
         </p>
       </div>
 
-      <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
-        <h3 className="mb-3 text-sm font-semibold text-neutral-200">Recent sessions</h3>
+      <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4">
+        <h3 className="mb-3 text-sm font-semibold text-neutral-800 dark:text-neutral-200">Recent sessions</h3>
         <ul className="space-y-1.5">
           {sessions.slice(0, 10).map((session) => (
             <li
               key={session.id}
-              className="flex items-center justify-between rounded-lg border border-neutral-800 bg-neutral-950/60 p-2 text-sm"
+              className="flex items-center justify-between rounded-lg border border-neutral-200 dark:border-neutral-800 bg-neutral-100/60 dark:bg-neutral-950/60 p-2 text-sm"
             >
-              <span className="min-w-0 truncate text-neutral-200">{session.label ?? "Focus session"}</span>
-              <span className="shrink-0 text-xs text-neutral-500">
+              <span className="min-w-0 truncate text-neutral-800 dark:text-neutral-200">{session.label ?? "Focus session"}</span>
+              <span className="shrink-0 text-xs text-neutral-600 dark:text-neutral-500">
                 {session.durationMin}min · {new Date(session.completedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
               </span>
             </li>
           ))}
-          {sessions.length === 0 && <li className="text-xs text-neutral-600">No sessions logged yet.</li>}
+          {sessions.length === 0 && <li className="text-xs text-neutral-400 dark:text-neutral-600">No sessions logged yet.</li>}
         </ul>
       </div>
     </div>

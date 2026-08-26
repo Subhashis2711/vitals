@@ -137,13 +137,13 @@ export function HabitTracker({ initialHabits, initialLogs }: { initialHabits: Ha
 
   return (
     <div className="space-y-4">
-      <form onSubmit={handleCreate} className="space-y-2 rounded-2xl border border-neutral-800 bg-neutral-900 p-3">
+      <form onSubmit={handleCreate} className="space-y-2 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-3">
         <div className="flex gap-2">
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="New habit..."
-            className="flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 transition-colors focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+            className="flex-1 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 transition-colors focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
           />
           <button
             type="submit"
@@ -158,28 +158,28 @@ export function HabitTracker({ initialHabits, initialLogs }: { initialHabits: Ha
       </form>
 
       <div className="relative">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-neutral-500" />
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-neutral-600 dark:text-neutral-500" />
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search habits..."
-          className="w-full rounded-lg border border-neutral-800 bg-neutral-900 py-1.5 pl-8 pr-3 text-sm text-neutral-200 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
+          className="w-full rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 py-1.5 pl-8 pr-3 text-sm text-neutral-800 dark:text-neutral-200 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
         />
       </div>
 
-      <div className="overflow-x-auto rounded-2xl border border-neutral-800 bg-neutral-900">
+      <div className="overflow-x-auto rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900">
         <table className="w-full min-w-[420px] border-collapse text-sm">
           <thead>
-            <tr className="border-b border-neutral-800">
-              <th className="p-3 text-left font-medium text-neutral-500">Habit</th>
+            <tr className="border-b border-neutral-200 dark:border-neutral-800">
+              <th className="p-3 text-left font-medium text-neutral-600 dark:text-neutral-500">Habit</th>
               {days.map((date) => {
                 const { weekday, day } = dayLabel(date);
                 return (
                   <th
                     key={date}
                     className={cn(
-                      "w-10 p-1 text-center text-xs font-medium text-neutral-500",
-                      date === today && "text-cyan-300",
+                      "w-10 p-1 text-center text-xs font-medium text-neutral-600 dark:text-neutral-500",
+                      date === today && "text-cyan-600 dark:text-cyan-300",
                     )}
                   >
                     <div>{weekday}</div>
@@ -187,7 +187,7 @@ export function HabitTracker({ initialHabits, initialLogs }: { initialHabits: Ha
                   </th>
                 );
               })}
-              <th className="w-16 p-3 text-center font-medium text-neutral-500">Streak</th>
+              <th className="w-16 p-3 text-center font-medium text-neutral-600 dark:text-neutral-500">Streak</th>
               <th className="w-8" />
             </tr>
           </thead>
@@ -198,8 +198,8 @@ export function HabitTracker({ initialHabits, initialLogs }: { initialHabits: Ha
               const monthPrefix = today.slice(0, 7);
               const loggedDateThisMonth = habit.frequency === "monthly" ? [...habitDates].find((d) => d.startsWith(monthPrefix)) : undefined;
               return (
-                <tr key={habit.id} className="group border-b border-neutral-800/60 last:border-0">
-                  <td className="p-3 font-medium text-neutral-200">
+                <tr key={habit.id} className="group border-b border-neutral-200/60 dark:border-neutral-800/60 last:border-0">
+                  <td className="p-3 font-medium text-neutral-800 dark:text-neutral-200">
                     <span className="flex items-center gap-2">
                       <span
                         className="h-2 w-2 shrink-0 rounded-full"
@@ -218,7 +218,7 @@ export function HabitTracker({ initialHabits, initialLogs }: { initialHabits: Ha
                           "mx-auto flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-colors disabled:opacity-50",
                           loggedDateThisMonth
                             ? "border-transparent bg-emerald-500 text-white"
-                            : "border-neutral-700 text-neutral-400 hover:border-neutral-500",
+                            : "border-neutral-300 dark:border-neutral-700 text-neutral-500 dark:text-neutral-400 hover:border-neutral-400 dark:hover:border-neutral-500",
                         )}
                       >
                         <Check className="h-3.5 w-3.5" />
@@ -241,7 +241,7 @@ export function HabitTracker({ initialHabits, initialLogs }: { initialHabits: Ha
                               "mx-auto flex h-6 w-6 items-center justify-center rounded-full border transition-colors disabled:opacity-30",
                               done
                                 ? "border-transparent bg-emerald-500 text-white"
-                                : "border-neutral-700 text-transparent hover:border-neutral-500",
+                                : "border-neutral-300 dark:border-neutral-700 text-transparent hover:border-neutral-400 dark:hover:border-neutral-500",
                             )}
                           >
                             <Check className="h-3.5 w-3.5" />
@@ -262,7 +262,7 @@ export function HabitTracker({ initialHabits, initialLogs }: { initialHabits: Ha
                     <button
                       type="button"
                       onClick={() => handleDelete(habit.id, habit.name)}
-                      className="-m-1.5 p-1.5 text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+                      className="-m-1.5 p-1.5 text-neutral-400 dark:text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
@@ -272,7 +272,7 @@ export function HabitTracker({ initialHabits, initialLogs }: { initialHabits: Ha
             })}
             {visibleHabits.length === 0 && (
               <tr>
-                <td colSpan={DAYS_TO_SHOW + 3} className="p-8 text-center text-sm text-neutral-500">
+                <td colSpan={DAYS_TO_SHOW + 3} className="p-8 text-center text-sm text-neutral-600 dark:text-neutral-500">
                   {habits.length === 0 ? "No habits yet. Add one above." : "No habits match your search."}
                 </td>
               </tr>

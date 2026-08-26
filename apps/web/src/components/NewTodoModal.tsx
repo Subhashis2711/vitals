@@ -55,12 +55,12 @@ export function NewTodoModal({
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/70 px-4 pt-16 sm:pt-24" onClick={onClose}>
       <div
-        className="max-h-[85vh] w-full max-w-sm overflow-y-auto rounded-2xl border border-neutral-800 bg-neutral-900 p-4 shadow-2xl"
+        className="max-h-[85vh] w-full max-w-sm overflow-y-auto rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-neutral-200">New todo</h3>
-          <button type="button" onClick={onClose} className="text-neutral-500 hover:text-neutral-200">
+          <h3 className="text-sm font-semibold text-neutral-800 dark:text-neutral-200">New todo</h3>
+          <button type="button" onClick={onClose} className="text-neutral-600 dark:text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200">
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -71,34 +71,34 @@ export function NewTodoModal({
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="What needs to be done?"
-            className="w-full rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
+            className="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
           />
 
           {projects.length > 0 && (
-            <label className="block text-xs text-neutral-500">
+            <label className="block text-xs text-neutral-600 dark:text-neutral-500">
               Project
               <ProjectSelect projects={projects} value={projectId} onChange={setProjectId} className="mt-1 w-full" />
             </label>
           )}
 
           {goals.length > 0 && (
-            <label className="block text-xs text-neutral-500">
+            <label className="block text-xs text-neutral-600 dark:text-neutral-500">
               Goal
               <GoalSelect goals={goals} value={goalId} onChange={setGoalId} className="mt-1 w-full" />
             </label>
           )}
 
-          <label className="block text-xs text-neutral-500">
+          <label className="block text-xs text-neutral-600 dark:text-neutral-500">
             Due date
             <input
               type="date"
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-200 focus:border-cyan-400/60 focus:outline-none"
+              className="mt-1 w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-800 dark:text-neutral-200 focus:border-cyan-400/60 focus:outline-none"
             />
           </label>
 
-          <label className="block text-xs text-neutral-500">
+          <label className="block text-xs text-neutral-600 dark:text-neutral-500">
             Repeat
             <div className="mt-1">
               <RecurrencePicker
@@ -112,14 +112,14 @@ export function NewTodoModal({
             </div>
           </label>
 
-          <label className="block text-xs text-neutral-500">
+          <label className="block text-xs text-neutral-600 dark:text-neutral-500">
             Notes
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={2}
               placeholder="Optional details..."
-              className="mt-1 w-full rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
+              className="mt-1 w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
             />
           </label>
 

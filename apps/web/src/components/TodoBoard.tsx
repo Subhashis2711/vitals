@@ -162,12 +162,12 @@ export function TodoBoard({
 
       <div className="flex flex-wrap items-center gap-2">
         <div className="relative min-w-0 flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-neutral-500" />
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-neutral-600 dark:text-neutral-500" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search todos..."
-            className="w-full rounded-lg border border-neutral-800 bg-neutral-900 py-1.5 pl-8 pr-3 text-sm text-neutral-200 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
+            className="w-full rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 py-1.5 pl-8 pr-3 text-sm text-neutral-800 dark:text-neutral-200 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
           />
         </div>
         {projects.length > 0 && (
@@ -176,12 +176,12 @@ export function TodoBoard({
             value={filterProjectId}
             onChange={setFilterProjectId}
             placeholder="All projects"
-            className="border-neutral-800 bg-neutral-900 py-1.5 text-sm"
+            className="border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 py-1.5 text-sm"
           />
         )}
       </div>
 
-      <p className="text-xs text-neutral-600">
+      <p className="text-xs text-neutral-400 dark:text-neutral-600">
         Click a todo's title for details, dates, project/goal, or to start a focus session · use the arrows to reorder.
       </p>
 
@@ -189,11 +189,11 @@ export function TodoBoard({
         {TODO_STATUSES.map((status) => {
           const items = visibleTodos.filter((t) => t.status === status).sort((a, b) => a.position - b.position);
           return (
-            <div key={status} className="rounded-2xl border border-neutral-800 bg-neutral-900 p-3">
-              <h3 className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-neutral-400">
+            <div key={status} className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-3">
+              <h3 className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-neutral-500 dark:text-neutral-400">
                 <span className={cn("h-1.5 w-1.5 rounded-full", STATUS_DOT[status])} />
                 {STATUS_LABELS[status]}
-                <span className="ml-auto text-xs font-normal text-neutral-600">{items.length}</span>
+                <span className="ml-auto text-xs font-normal text-neutral-400 dark:text-neutral-600">{items.length}</span>
               </h3>
               <ul className="space-y-1.5">
                 {items.map((todo, i) => {
@@ -202,14 +202,14 @@ export function TodoBoard({
                   return (
                     <li
                       key={todo.id}
-                      className="group flex items-start gap-2 rounded-lg border border-neutral-800 bg-neutral-950/60 p-2 text-sm transition-colors hover:border-neutral-700"
+                      className="group flex items-start gap-2 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-neutral-100/60 dark:bg-neutral-950/60 p-2 text-sm transition-colors hover:border-neutral-400 dark:hover:border-neutral-700"
                     >
                       <div className="flex shrink-0 flex-col opacity-0 transition-opacity group-hover:opacity-100">
                         <button
                           type="button"
                           onClick={() => moveTodo(status, todo, "up")}
                           disabled={i === 0}
-                          className="-m-1.5 p-1.5 text-neutral-600 hover:text-cyan-300 disabled:pointer-events-none disabled:opacity-30"
+                          className="-m-1.5 p-1.5 text-neutral-400 dark:text-neutral-600 hover:text-cyan-600 dark:text-cyan-300 disabled:pointer-events-none disabled:opacity-30"
                           title="Move up"
                         >
                           <ChevronUp className="h-3.5 w-3.5" />
@@ -218,7 +218,7 @@ export function TodoBoard({
                           type="button"
                           onClick={() => moveTodo(status, todo, "down")}
                           disabled={i === items.length - 1}
-                          className="-m-1.5 p-1.5 text-neutral-600 hover:text-cyan-300 disabled:pointer-events-none disabled:opacity-30"
+                          className="-m-1.5 p-1.5 text-neutral-400 dark:text-neutral-600 hover:text-cyan-600 dark:text-cyan-300 disabled:pointer-events-none disabled:opacity-30"
                           title="Move down"
                         >
                           <ChevronDown className="h-3.5 w-3.5" />
@@ -228,7 +228,7 @@ export function TodoBoard({
                         type="button"
                         onClick={() => cycleStatus(todo)}
                         title="Click to advance status"
-                        className="mt-0.5 shrink-0 text-neutral-500 transition-colors hover:text-cyan-300"
+                        className="mt-0.5 shrink-0 text-neutral-600 dark:text-neutral-500 transition-colors hover:text-cyan-600 dark:text-cyan-300"
                       >
                         <StatusIcon className="h-4 w-4" />
                       </button>
@@ -237,8 +237,8 @@ export function TodoBoard({
                           onClick={() => setDetailTodoId(todo.id)}
                           title="Click for details, dates, project/goal, or to start a focus session"
                           className={cn(
-                            "cursor-pointer break-words text-neutral-200 hover:text-cyan-200",
-                            todo.status === "done" && "text-neutral-500 line-through",
+                            "cursor-pointer break-words text-neutral-800 dark:text-neutral-200 hover:text-cyan-700 dark:text-cyan-200",
+                            todo.status === "done" && "text-neutral-600 dark:text-neutral-500 line-through",
                           )}
                         >
                           {todo.title}
@@ -246,7 +246,7 @@ export function TodoBoard({
                         <div className="mt-1 flex flex-wrap items-center gap-1">
                           <ProjectBadge project={project} />
                             {todo.tags.map((tag) => (
-                              <span key={tag} className="rounded bg-neutral-800 px-1.5 py-0.5 text-[10px] text-neutral-400">
+                              <span key={tag} className="rounded bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 text-[10px] text-neutral-500 dark:text-neutral-400">
                                 {tag}
                               </span>
                             ))}
@@ -260,7 +260,7 @@ export function TodoBoard({
                                   if (e.key === "Enter") e.currentTarget.blur();
                                   if (e.key === "Escape") setEditingDueDateId(null);
                                 }}
-                                className="rounded border border-cyan-400/60 bg-neutral-900 px-1 py-0.5 text-[10px] text-neutral-100 focus:outline-none"
+                                className="rounded border border-cyan-400/60 bg-white dark:bg-neutral-900 px-1 py-0.5 text-[10px] text-neutral-900 dark:text-neutral-100 focus:outline-none"
                               />
                             ) : (
                               <button
@@ -272,8 +272,8 @@ export function TodoBoard({
                                   todo.dueDate
                                     ? isOverdue(todo.dueDate, todo.status)
                                       ? "bg-red-500/10 text-red-400"
-                                      : "bg-neutral-800 text-neutral-400"
-                                    : "text-neutral-600 opacity-0 group-hover:opacity-100",
+                                      : "bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400"
+                                    : "text-neutral-400 dark:text-neutral-600 opacity-0 group-hover:opacity-100",
                                 )}
                               >
                                 <CalendarDays className="h-3 w-3" />
@@ -283,7 +283,7 @@ export function TodoBoard({
                             {todo.recurrenceFreq && (
                               <span
                                 title={`Repeats ${todo.recurrenceFreq}`}
-                                className="flex items-center gap-1 rounded bg-neutral-800 px-1.5 py-0.5 text-[10px] text-neutral-400"
+                                className="flex items-center gap-1 rounded bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 text-[10px] text-neutral-500 dark:text-neutral-400"
                               >
                                 <Repeat className="h-3 w-3" />
                                 {todo.recurrenceFreq}
@@ -294,14 +294,14 @@ export function TodoBoard({
                       <button
                         type="button"
                         onClick={() => handleDelete(todo.id, todo.title)}
-                        className="-m-1.5 mt-0.5 shrink-0 p-1.5 text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+                        className="-m-1.5 mt-0.5 shrink-0 p-1.5 text-neutral-400 dark:text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
                     </li>
                   );
                 })}
-                {items.length === 0 && <li className="text-xs text-neutral-600">Nothing here</li>}
+                {items.length === 0 && <li className="text-xs text-neutral-400 dark:text-neutral-600">Nothing here</li>}
               </ul>
             </div>
           );

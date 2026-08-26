@@ -38,7 +38,7 @@ export function HabitsTodayMini({ habits, todayLogs }: { habits: Habit[]; todayL
         const done = doneIds.has(habit.id);
         return (
           <li key={habit.id} className="flex items-center justify-between gap-2">
-            <span className="flex min-w-0 items-center gap-2 truncate text-sm text-neutral-300">
+            <span className="flex min-w-0 items-center gap-2 truncate text-sm text-neutral-700 dark:text-neutral-300">
               <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: habit.color ?? "#a3a3a3" }} />
               <span className="truncate">{habit.name}</span>
             </span>
@@ -50,7 +50,7 @@ export function HabitsTodayMini({ habits, todayLogs }: { habits: Habit[]; todayL
                 "flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-colors disabled:opacity-50",
                 done
                   ? "border-transparent bg-emerald-500 text-white"
-                  : "border-neutral-700 text-transparent hover:border-emerald-400",
+                  : "border-neutral-300 dark:border-neutral-700 text-transparent hover:border-emerald-400",
               )}
             >
               <Check className="h-3.5 w-3.5" />
@@ -58,7 +58,7 @@ export function HabitsTodayMini({ habits, todayLogs }: { habits: Habit[]; todayL
           </li>
         );
       })}
-      {habits.length === 0 && <li className="text-xs text-neutral-500">No habits yet.</li>}
+      {habits.length === 0 && <li className="text-xs text-neutral-600 dark:text-neutral-500">No habits yet.</li>}
     </ul>
   );
 }

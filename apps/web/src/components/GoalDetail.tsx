@@ -75,12 +75,12 @@ export function GoalDetail({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-4 rounded-2xl border border-neutral-800 bg-neutral-900 p-5">
+      <div className="flex flex-wrap items-start justify-between gap-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-5">
         <div className="flex items-center gap-4">
           <CircularProgress value={progress} size={72} strokeWidth={6} />
           <div>
-            {goal.description && <p className="text-sm text-neutral-400">{goal.description}</p>}
-            <p className="mt-1 text-xs text-neutral-500">
+            {goal.description && <p className="text-sm text-neutral-500 dark:text-neutral-400">{goal.description}</p>}
+            <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-500">
               {goal.startDate ? `${goal.startDate} – ` : ""}
               {goal.targetDate ?? "No target date"}
             </p>
@@ -90,7 +90,7 @@ export function GoalDetail({
           <select
             value={goal.status}
             onChange={(e) => handleStatusChange(e.target.value)}
-            className="rounded-lg border border-neutral-700 bg-neutral-950 px-2 py-1.5 text-sm text-neutral-300 focus:border-cyan-400/60 focus:outline-none"
+            className="rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-2 py-1.5 text-sm text-neutral-700 dark:text-neutral-300 focus:border-cyan-400/60 focus:outline-none"
           >
             {GOAL_STATUSES.map((s) => (
               <option key={s} value={s}>
@@ -103,7 +103,7 @@ export function GoalDetail({
               projects={projects}
               value={goal.projectId ?? ""}
               onChange={handleProjectChange}
-              className="border-neutral-700 bg-neutral-950 py-1.5 text-sm"
+              className="border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 py-1.5 text-sm"
             />
           )}
           {topics.length > 0 && (
@@ -111,13 +111,13 @@ export function GoalDetail({
               topics={topics}
               value={goal.topicId ?? ""}
               onChange={handleTopicChange}
-              className="border-neutral-700 bg-neutral-950 py-1.5 text-sm"
+              className="border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 py-1.5 text-sm"
             />
           )}
           <button
             type="button"
             onClick={handleDeleteGoal}
-            className="flex items-center gap-1 text-xs text-neutral-500 hover:text-red-500"
+            className="flex items-center gap-1 text-xs text-neutral-600 dark:text-neutral-500 hover:text-red-500"
           >
             <Trash2 className="h-3.5 w-3.5" />
             Delete goal
@@ -125,14 +125,14 @@ export function GoalDetail({
         </div>
       </div>
 
-      <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
-        <h3 className="mb-3 text-sm font-semibold text-neutral-200">Linked tasks</h3>
+      <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4">
+        <h3 className="mb-3 text-sm font-semibold text-neutral-800 dark:text-neutral-200">Linked tasks</h3>
         <form onSubmit={handleAddTodo} className="mb-3 flex gap-2">
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Add a task toward this goal..."
-            className="min-w-0 flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+            className="min-w-0 flex-1 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
           />
           <button
             type="submit"
@@ -142,7 +142,7 @@ export function GoalDetail({
             <Plus className="h-4 w-4" />
           </button>
         </form>
-        <p className="mb-2 text-xs text-neutral-600">Double-click a task to rename it · use the arrows to reorder.</p>
+        <p className="mb-2 text-xs text-neutral-400 dark:text-neutral-600">Double-click a task to rename it · use the arrows to reorder.</p>
         <EditableTodoList todos={todos} onChange={setTodos} emptyMessage="No tasks linked yet." />
       </div>
     </div>

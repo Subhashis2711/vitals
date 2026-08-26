@@ -2,11 +2,13 @@
 
 import type { SavingsGoal, Transaction } from "@vitals/shared";
 import { ArrowDownRight, ArrowUpRight, Plus, Target, Trash2, Wallet } from "lucide-react";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { createSavingsGoal, createTransaction, deleteSavingsGoal, deleteTransaction } from "@/lib/api-browser";
 import { cn } from "@/lib/cn";
+import { currencySymbol, DEFAULT_CURRENCY, formatMoney } from "@/lib/currency";
 import { todayISO } from "@/lib/date";
+import { createClient } from "@/lib/supabase/client";
 
 function last6Months(): { key: string; label: string }[] {
   const result: { key: string; label: string }[] = [];
@@ -19,12 +21,7 @@ function last6Months(): { key: string; label: string }[] {
   return result;
 }
 
-function formatMoney(n: number): string {
-  const sign = n < 0 ? "-" : "";
-  return `${sign}$${Math.abs(n).toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
-}
-
-export function MoneyDashboard({
+export function FinanceDashboard({
   initialTransactions,
   initialSavingsGoals,
 }: {
@@ -33,6 +30,7 @@ export function MoneyDashboard({
 }) {
   const [transactions, setTransactions] = useState(initialTransactions);
   const [savingsGoals, setSavingsGoals] = useState(initialSavingsGoals);
+  const [currency, setCurrency] = useState(DEFAULT_CURRENCY);
 
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
@@ -42,6 +40,15 @@ export function MoneyDashboard({
 
   const [goalName, setGoalName] = useState("");
   const [goalTarget, setGoalTarget] = useState("");
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => {
+      setCurrency(data.user?.user_metadata?.currency ?? DEFAULT_CURRENCY);
+    });
+  }, []);
+
+  const money = (n: number) => formatMoney(n, currency);
 
   const balance = transactions.reduce((sum, t) => sum + t.amount, 0);
 
@@ -120,28 +127,28 @@ export function MoneyDashboard({
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <div className="rounded-2xl border border-cyan-400/30 bg-gradient-to-br from-cyan-400/20 to-cyan-500/5 p-4">
-          <p className="text-xs font-medium uppercase tracking-wide text-cyan-200">Runway</p>
-          <p className="mt-1 text-2xl font-semibold text-neutral-50">
+          <p className="text-xs font-medium uppercase tracking-wide text-cyan-700 dark:text-cyan-200">Runway</p>
+          <p className="mt-1 text-2xl font-semibold text-neutral-950 dark:text-neutral-50">
             {runwayMonths != null ? `${runwayMonths.toFixed(1)}mo` : "—"}
           </p>
-          <p className="mt-1 text-xs text-neutral-400">balance ÷ avg monthly spend</p>
+          <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">balance ÷ avg monthly spend</p>
         </div>
-        <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
-          <p className="text-xs font-medium uppercase tracking-wide text-neutral-500">Net this month</p>
+        <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4">
+          <p className="text-xs font-medium uppercase tracking-wide text-neutral-600 dark:text-neutral-500">Net this month</p>
           <p className={cn("mt-1 text-2xl font-semibold", netThisMonth >= 0 ? "text-emerald-400" : "text-red-400")}>
-            {formatMoney(netThisMonth)}
+            {money(netThisMonth)}
           </p>
         </div>
-        <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
-          <p className="text-xs font-medium uppercase tracking-wide text-neutral-500">Balance</p>
-          <p className="mt-1 text-2xl font-semibold text-neutral-50">{formatMoney(balance)}</p>
-          <p className="mt-1 text-xs text-neutral-500">all transactions</p>
+        <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4">
+          <p className="text-xs font-medium uppercase tracking-wide text-neutral-600 dark:text-neutral-500">Balance</p>
+          <p className="mt-1 text-2xl font-semibold text-neutral-950 dark:text-neutral-50">{money(balance)}</p>
+          <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-500">all transactions</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4 lg:col-span-2">
-          <h3 className="mb-3 text-sm font-semibold text-neutral-200">Income vs expenses · 6 months</h3>
+        <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4 lg:col-span-2">
+          <h3 className="mb-3 text-sm font-semibold text-neutral-800 dark:text-neutral-200">Income vs expenses · 6 months</h3>
           <div className="flex items-end gap-3" style={{ height: 100 }}>
             {chartData.map((d) => (
               <div key={d.label} className="flex flex-1 flex-col items-center gap-1">
@@ -155,11 +162,11 @@ export function MoneyDashboard({
                     style={{ height: Math.max((d.expense / chartMax) * 100, d.expense > 0 ? 4 : 0) }}
                   />
                 </div>
-                <span className="text-[9px] text-neutral-600">{d.label}</span>
+                <span className="text-[9px] text-neutral-400 dark:text-neutral-600">{d.label}</span>
               </div>
             ))}
           </div>
-          <div className="mt-2 flex items-center gap-3 text-[10px] text-neutral-500">
+          <div className="mt-2 flex items-center gap-3 text-[10px] text-neutral-600 dark:text-neutral-500">
             <span className="flex items-center gap-1">
               <span className="h-2 w-2 rounded-full bg-emerald-500" /> Income
             </span>
@@ -169,9 +176,9 @@ export function MoneyDashboard({
           </div>
         </div>
 
-        <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
-          <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-neutral-200">
-            <Target className="h-4 w-4 text-cyan-300" />
+        <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4">
+          <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-neutral-800 dark:text-neutral-200">
+            <Target className="h-4 w-4 text-cyan-600 dark:text-cyan-300" />
             Savings goals
           </h3>
           <ul className="mb-3 space-y-3">
@@ -181,43 +188,43 @@ export function MoneyDashboard({
               return (
                 <li key={goal.id} className="group">
                   <div className="mb-1 flex items-center justify-between text-xs">
-                    <span className="text-neutral-200">{goal.name}</span>
+                    <span className="text-neutral-800 dark:text-neutral-200">{goal.name}</span>
                     <div className="flex items-center gap-2">
-                      <span className="text-neutral-500">{pct}%</span>
+                      <span className="text-neutral-600 dark:text-neutral-500">{pct}%</span>
                       <button
                         type="button"
                         onClick={() => handleDeleteSavingsGoal(goal.id)}
-                        className="-m-1.5 p-1.5 text-neutral-700 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+                        className="-m-1.5 p-1.5 text-neutral-300 dark:text-neutral-700 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
                       >
                         <Trash2 className="h-3 w-3" />
                       </button>
                     </div>
                   </div>
-                  <div className="h-1.5 overflow-hidden rounded-full bg-neutral-800">
+                  <div className="h-1.5 overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
                     <div className="h-full rounded-full bg-cyan-400" style={{ width: `${pct}%` }} />
                   </div>
-                  <p className="mt-0.5 text-[10px] text-neutral-500">
-                    {formatMoney(goal.currentAmount)} / {formatMoney(goal.targetAmount)}
+                  <p className="mt-0.5 text-[10px] text-neutral-600 dark:text-neutral-500">
+                    {money(goal.currentAmount)} / {money(goal.targetAmount)}
                   </p>
                 </li>
               );
             })}
-            {savingsGoals.length === 0 && <li className="text-xs text-neutral-500">No savings goals yet.</li>}
+            {savingsGoals.length === 0 && <li className="text-xs text-neutral-600 dark:text-neutral-500">No savings goals yet.</li>}
           </ul>
           <form onSubmit={handleAddSavingsGoal} className="space-y-2">
             <input
               value={goalName}
               onChange={(e) => setGoalName(e.target.value)}
               placeholder="Goal name..."
-              className="w-full rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-1.5 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
+              className="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-1.5 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
             />
             <div className="flex gap-2">
               <input
                 type="number"
                 value={goalTarget}
                 onChange={(e) => setGoalTarget(e.target.value)}
-                placeholder="Target $"
-                className="min-w-0 flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-1.5 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
+                placeholder={`Target ${currencySymbol(currency)}`}
+                className="min-w-0 flex-1 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-1.5 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
               />
               <button
                 type="submit"
@@ -231,29 +238,29 @@ export function MoneyDashboard({
         </div>
       </div>
 
-      <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
-        <h3 className="mb-3 text-sm font-semibold text-neutral-200">Recent transactions</h3>
+      <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4">
+        <h3 className="mb-3 text-sm font-semibold text-neutral-800 dark:text-neutral-200">Recent transactions</h3>
         <form onSubmit={handleAddTransaction} className="mb-4 flex flex-wrap items-center gap-2">
           <input
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Description..."
-            className="min-w-0 flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
+            className="min-w-0 flex-1 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
           />
           <input
             type="number"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             placeholder="Amount"
-            className="w-28 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
+            className="w-28 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
           />
-          <div className="flex overflow-hidden rounded-lg border border-neutral-700">
+          <div className="flex overflow-hidden rounded-lg border border-neutral-300 dark:border-neutral-700">
             <button
               type="button"
               onClick={() => setKind("expense")}
               className={cn(
                 "px-3 py-2 text-sm",
-                kind === "expense" ? "bg-red-500/20 text-red-400" : "bg-neutral-950 text-neutral-500",
+                kind === "expense" ? "bg-red-500/20 text-red-400" : "bg-neutral-50 dark:bg-neutral-950 text-neutral-600 dark:text-neutral-500",
               )}
             >
               Expense
@@ -263,7 +270,7 @@ export function MoneyDashboard({
               onClick={() => setKind("income")}
               className={cn(
                 "px-3 py-2 text-sm",
-                kind === "income" ? "bg-emerald-500/20 text-emerald-400" : "bg-neutral-950 text-neutral-500",
+                kind === "income" ? "bg-emerald-500/20 text-emerald-400" : "bg-neutral-50 dark:bg-neutral-950 text-neutral-600 dark:text-neutral-500",
               )}
             >
               Income
@@ -273,7 +280,7 @@ export function MoneyDashboard({
             value={category}
             onChange={(e) => setCategory(e.target.value)}
             placeholder="Category (optional)"
-            className="min-w-0 flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
+            className="min-w-0 flex-1 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
           />
           <button
             type="submit"
@@ -288,7 +295,7 @@ export function MoneyDashboard({
           {transactions.slice(0, 10).map((t) => (
             <li
               key={t.id}
-              className="group flex items-center justify-between rounded-lg border border-neutral-800 bg-neutral-950/60 p-2 text-sm"
+              className="group flex items-center justify-between rounded-lg border border-neutral-200 dark:border-neutral-800 bg-neutral-100/60 dark:bg-neutral-950/60 p-2 text-sm"
             >
               <div className="flex min-w-0 items-center gap-2">
                 {t.amount >= 0 ? (
@@ -297,20 +304,20 @@ export function MoneyDashboard({
                   <ArrowDownRight className="h-3.5 w-3.5 shrink-0 text-red-500" />
                 )}
                 <div className="min-w-0">
-                  <p className="truncate text-neutral-200">{t.description}</p>
-                  <p className="truncate text-xs text-neutral-500">
+                  <p className="truncate text-neutral-800 dark:text-neutral-200">{t.description}</p>
+                  <p className="truncate text-xs text-neutral-600 dark:text-neutral-500">
                     {t.category ?? "Uncategorized"} · {t.occurredAt}
                   </p>
                 </div>
               </div>
               <div className="flex shrink-0 items-center gap-2">
                 <span className={cn("font-medium", t.amount >= 0 ? "text-emerald-400" : "text-red-400")}>
-                  {formatMoney(t.amount)}
+                  {money(t.amount)}
                 </span>
                 <button
                   type="button"
                   onClick={() => handleDeleteTransaction(t.id)}
-                  className="-m-1.5 p-1.5 text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+                  className="-m-1.5 p-1.5 text-neutral-400 dark:text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>
@@ -318,7 +325,7 @@ export function MoneyDashboard({
             </li>
           ))}
           {transactions.length === 0 && (
-            <li className="flex flex-col items-center gap-2 py-8 text-sm text-neutral-500">
+            <li className="flex flex-col items-center gap-2 py-8 text-sm text-neutral-600 dark:text-neutral-500">
               <Wallet className="h-6 w-6" />
               No transactions yet.
             </li>

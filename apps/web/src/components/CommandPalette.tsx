@@ -35,7 +35,7 @@ const STATIC_PAGES: { title: string; href: string; icon: LucideIcon }[] = [
   { title: "Journal", href: "/journal", icon: PenLine },
   { title: "Habits", href: "/habits", icon: Repeat },
   { title: "Health", href: "/health", icon: HeartPulse },
-  { title: "Money", href: "/money", icon: Wallet },
+  { title: "Finance", href: "/finance", icon: Wallet },
   { title: "Settings", href: "/settings", icon: Settings },
 ];
 
@@ -108,17 +108,17 @@ export function CommandPalette() {
       onClick={() => setPaletteOpen(false)}
     >
       <div
-        className="max-h-[75vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-neutral-800 bg-neutral-900 shadow-2xl"
+        className="max-h-[75vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center gap-2 border-b border-neutral-800 px-4 py-3">
+        <div className="flex items-center gap-2 border-b border-neutral-200 dark:border-neutral-800 px-4 py-3">
           <Activity className="h-4 w-4 text-cyan-400" />
           <input
             autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search or jump..."
-            className="w-full bg-transparent text-sm text-neutral-100 placeholder:text-neutral-500 focus:outline-none"
+            className="w-full bg-transparent text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none"
           />
         </div>
         <div className="max-h-96 overflow-y-auto p-2">
@@ -162,7 +162,7 @@ export function CommandPalette() {
               ))}
             </ResultGroup>
           )}
-          {nothingFound && <p className="p-4 text-center text-sm text-neutral-500">No results</p>}
+          {nothingFound && <p className="p-4 text-center text-sm text-neutral-600 dark:text-neutral-500">No results</p>}
         </div>
       </div>
     </div>
@@ -172,7 +172,7 @@ export function CommandPalette() {
 function ResultGroup({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="mb-1">
-      <p className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-neutral-500">{label}</p>
+      <p className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-neutral-600 dark:text-neutral-500">{label}</p>
       {children}
     </div>
   );
@@ -183,9 +183,9 @@ function ResultRow({ icon: Icon, label, onClick }: { icon: LucideIcon; label: st
     <button
       type="button"
       onClick={onClick}
-      className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm text-neutral-200 transition-colors hover:bg-neutral-800"
+      className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm text-neutral-800 dark:text-neutral-200 transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800"
     >
-      <Icon className="h-4 w-4 text-neutral-500" />
+      <Icon className="h-4 w-4 text-neutral-600 dark:text-neutral-500" />
       {label}
     </button>
   );

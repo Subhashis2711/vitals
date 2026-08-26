@@ -1,6 +1,14 @@
 @import "tailwindcss";
 
+/* Manual (class-based) dark mode instead of Tailwind v4's default
+   prefers-color-scheme media query — next-themes toggles the `dark` class
+   on <html> based on the stored preference, see AppThemeProvider.tsx. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
+  color-scheme: light;
+}
+:root.dark {
   color-scheme: dark;
 }
 
@@ -24,25 +32,25 @@ body {
    like headings/lists despite Tailwind's preflight reset stripping their
    default browser styling. */
 .rich-text h1 {
-  @apply mb-2 mt-5 text-xl font-semibold text-neutral-50;
+  @apply mb-2 mt-5 text-xl font-semibold text-neutral-950 dark:text-neutral-50;
 }
 .rich-text h1:first-child {
   @apply mt-0;
 }
 .rich-text h2 {
-  @apply mb-2 mt-4 text-lg font-semibold text-neutral-50;
+  @apply mb-2 mt-4 text-lg font-semibold text-neutral-950 dark:text-neutral-50;
 }
 .rich-text h2:first-child {
   @apply mt-0;
 }
 .rich-text h3 {
-  @apply mb-1.5 mt-3 text-base font-semibold text-neutral-100;
+  @apply mb-1.5 mt-3 text-base font-semibold text-neutral-900 dark:text-neutral-100;
 }
 .rich-text h3:first-child {
   @apply mt-0;
 }
 .rich-text h4 {
-  @apply mb-1 mt-2 text-sm font-semibold text-neutral-100;
+  @apply mb-1 mt-2 text-sm font-semibold text-neutral-900 dark:text-neutral-100;
 }
 .rich-text h4:first-child {
   @apply mt-0;
@@ -54,7 +62,7 @@ body {
   @apply mb-0;
 }
 .rich-text a {
-  @apply text-cyan-300 hover:underline;
+  @apply text-cyan-600 dark:text-cyan-300 hover:underline;
 }
 .rich-text ul {
   @apply mb-3 list-disc space-y-1 pl-5;
@@ -63,33 +71,33 @@ body {
   @apply mb-3 list-decimal space-y-1 pl-5;
 }
 .rich-text blockquote {
-  @apply mb-3 border-l-2 border-cyan-400/50 pl-3 italic text-neutral-400;
+  @apply mb-3 border-l-2 border-cyan-400/50 pl-3 italic text-neutral-500 dark:text-neutral-400;
 }
 .rich-text strong,
 .rich-text b {
-  @apply font-semibold text-neutral-100;
+  @apply font-semibold text-neutral-900 dark:text-neutral-100;
 }
 .rich-text u {
   @apply underline;
 }
 .rich-text hr {
-  @apply my-4 border-neutral-800;
+  @apply my-4 border-neutral-200 dark:border-neutral-800;
 }
 .rich-text table {
   @apply mb-3 w-full border-collapse text-left text-xs;
 }
 .rich-text th {
-  @apply border-b border-neutral-800 pb-1.5 pr-3 font-semibold text-neutral-400;
+  @apply border-b border-neutral-200 dark:border-neutral-800 pb-1.5 pr-3 font-semibold text-neutral-500 dark:text-neutral-400;
 }
 .rich-text td {
-  @apply border-b border-neutral-800/60 py-1.5 pr-3;
+  @apply border-b border-neutral-200/60 dark:border-neutral-800/60 py-1.5 pr-3;
 }
 .rich-text pre {
-  @apply my-2 overflow-x-auto rounded-lg bg-neutral-950 p-3;
+  @apply my-2 overflow-x-auto rounded-lg bg-neutral-50 dark:bg-neutral-950 p-3;
 }
 .rich-text pre code {
-  @apply bg-transparent p-0 text-xs text-neutral-300;
+  @apply bg-transparent p-0 text-xs text-neutral-700 dark:text-neutral-300;
 }
 .rich-text code {
-  @apply rounded bg-neutral-800 px-1 py-0.5 text-xs text-cyan-200;
+  @apply rounded bg-neutral-100 dark:bg-neutral-800 px-1 py-0.5 text-xs text-cyan-700 dark:text-cyan-200;
 }

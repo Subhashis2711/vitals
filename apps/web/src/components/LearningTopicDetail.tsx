@@ -86,13 +86,13 @@ export function LearningTopicDetail({
 
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-      <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
+      <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4">
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="flex items-center gap-1.5 text-sm font-semibold text-neutral-200">
-            <BookOpen className="h-4 w-4 text-cyan-300" />
+          <h3 className="flex items-center gap-1.5 text-sm font-semibold text-neutral-800 dark:text-neutral-200">
+            <BookOpen className="h-4 w-4 text-cyan-600 dark:text-cyan-300" />
             Roadmap — what to learn
           </h3>
-          <span className="text-xs text-neutral-500">
+          <span className="text-xs text-neutral-600 dark:text-neutral-500">
             {done}/{roadmap.length}
           </span>
         </div>
@@ -100,12 +100,12 @@ export function LearningTopicDetail({
           {roadmap.map((item) => (
             <li
               key={item.id}
-              className="group flex items-center gap-2 rounded-lg border border-neutral-800 bg-neutral-950/60 p-2 text-sm"
+              className="group flex items-center gap-2 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-neutral-100/60 dark:bg-neutral-950/60 p-2 text-sm"
             >
               <button
                 type="button"
                 onClick={() => handleToggleRoadmap(item)}
-                className="text-neutral-500 hover:text-cyan-300"
+                className="text-neutral-600 dark:text-neutral-500 hover:text-cyan-600 dark:text-cyan-300"
               >
                 {item.status === "done" ? (
                   <CheckSquare className="h-4 w-4 text-emerald-500" />
@@ -113,26 +113,26 @@ export function LearningTopicDetail({
                   <Square className="h-4 w-4" />
                 )}
               </button>
-              <span className={cn("flex-1 text-neutral-200", item.status === "done" && "text-neutral-500 line-through")}>
+              <span className={cn("flex-1 text-neutral-800 dark:text-neutral-200", item.status === "done" && "text-neutral-600 dark:text-neutral-500 line-through")}>
                 {item.title}
               </span>
               <button
                 type="button"
                 onClick={() => handleDeleteRoadmap(item.id)}
-                className="-m-1.5 p-1.5 text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+                className="-m-1.5 p-1.5 text-neutral-400 dark:text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </button>
             </li>
           ))}
-          {roadmap.length === 0 && <li className="text-xs text-neutral-500">No roadmap items yet.</li>}
+          {roadmap.length === 0 && <li className="text-xs text-neutral-600 dark:text-neutral-500">No roadmap items yet.</li>}
         </ul>
         <form onSubmit={handleAddRoadmap} className="flex gap-2">
           <input
             value={roadmapTitle}
             onChange={(e) => setRoadmapTitle(e.target.value)}
             placeholder="Add a step..."
-            className="min-w-0 flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
+            className="min-w-0 flex-1 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
           />
           <button
             type="submit"
@@ -144,50 +144,50 @@ export function LearningTopicDetail({
         </form>
       </div>
 
-      <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
-        <h3 className="mb-3 text-sm font-semibold text-neutral-200">Resources</h3>
+      <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4">
+        <h3 className="mb-3 text-sm font-semibold text-neutral-800 dark:text-neutral-200">Resources</h3>
         <ul className="mb-3 space-y-1.5">
           {resources.map((resource) => (
             <li
               key={resource.id}
-              className="group flex items-center gap-2 rounded-lg border border-neutral-800 bg-neutral-950/60 p-2 text-sm"
+              className="group flex items-center gap-2 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-neutral-100/60 dark:bg-neutral-950/60 p-2 text-sm"
             >
               {resource.url ? (
                 <a
                   href={resource.url}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex flex-1 items-center gap-1.5 truncate text-neutral-200 hover:text-cyan-300"
+                  className="flex flex-1 items-center gap-1.5 truncate text-neutral-800 dark:text-neutral-200 hover:text-cyan-600 dark:text-cyan-300"
                 >
                   <ExternalLink className="h-3.5 w-3.5 shrink-0" />
                   {resource.name}
                 </a>
               ) : (
-                <span className="flex-1 truncate text-neutral-200">{resource.name}</span>
+                <span className="flex-1 truncate text-neutral-800 dark:text-neutral-200">{resource.name}</span>
               )}
               <button
                 type="button"
                 onClick={() => handleDeleteResource(resource.id)}
-                className="-m-1.5 p-1.5 text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+                className="-m-1.5 p-1.5 text-neutral-400 dark:text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </button>
             </li>
           ))}
-          {resources.length === 0 && <li className="text-xs text-neutral-500">No resources yet.</li>}
+          {resources.length === 0 && <li className="text-xs text-neutral-600 dark:text-neutral-500">No resources yet.</li>}
         </ul>
         <form onSubmit={handleAddResource} className="flex flex-wrap gap-2">
           <input
             value={resourceName}
             onChange={(e) => setResourceName(e.target.value)}
             placeholder="Resource name..."
-            className="min-w-0 flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
+            className="min-w-0 flex-1 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
           />
           <input
             value={resourceUrl}
             onChange={(e) => setResourceUrl(e.target.value)}
             placeholder="Link (optional)"
-            className="min-w-0 flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
+            className="min-w-0 flex-1 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
           />
           <button
             type="submit"
@@ -199,8 +199,8 @@ export function LearningTopicDetail({
         </form>
       </div>
 
-      <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4 lg:col-span-2">
-        <h3 className="mb-3 text-sm font-semibold text-neutral-200">Insights & notes</h3>
+      <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4 lg:col-span-2">
+        <h3 className="mb-3 text-sm font-semibold text-neutral-800 dark:text-neutral-200">Insights & notes</h3>
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -219,7 +219,7 @@ export function LearningTopicDetail({
                 submitInsight();
               }
             }}
-            className="w-full rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
+            className="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
           />
           <button
             type="submit"
@@ -233,14 +233,14 @@ export function LearningTopicDetail({
           {insights.map((insight) => (
             <div
               key={insight.id}
-              className="group relative rounded-lg border border-neutral-800 bg-neutral-950/60 p-3 text-xs text-neutral-300"
+              className="group relative rounded-lg border border-neutral-200 dark:border-neutral-800 bg-neutral-100/60 dark:bg-neutral-950/60 p-3 text-xs text-neutral-700 dark:text-neutral-300"
             >
               <p className="whitespace-pre-wrap">{insight.content}</p>
-              <p className="mt-2 text-[10px] text-neutral-600">{new Date(insight.createdAt).toLocaleDateString()}</p>
+              <p className="mt-2 text-[10px] text-neutral-400 dark:text-neutral-600">{new Date(insight.createdAt).toLocaleDateString()}</p>
               <button
                 type="button"
                 onClick={() => handleDeleteInsight(insight.id)}
-                className="absolute right-0.5 top-0.5 p-1.5 text-neutral-700 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+                className="absolute right-0.5 top-0.5 p-1.5 text-neutral-300 dark:text-neutral-700 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
               >
                 <Trash2 className="h-3 w-3" />
               </button>

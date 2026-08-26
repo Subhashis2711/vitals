@@ -168,44 +168,44 @@ export function WeekCalendar({
           <button
             type="button"
             onClick={() => navigate(-7)}
-            className="rounded-lg border border-neutral-800 p-1.5 text-neutral-400 hover:bg-neutral-800"
+            className="rounded-lg border border-neutral-200 dark:border-neutral-800 p-1.5 text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
           <button
             type="button"
             onClick={goToday}
-            className="rounded-lg border border-neutral-800 px-3 py-1.5 text-sm text-neutral-300 hover:bg-neutral-800"
+            className="rounded-lg border border-neutral-200 dark:border-neutral-800 px-3 py-1.5 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800"
           >
             Today
           </button>
           <button
             type="button"
             onClick={() => navigate(7)}
-            className="rounded-lg border border-neutral-800 p-1.5 text-neutral-400 hover:bg-neutral-800"
+            className="rounded-lg border border-neutral-200 dark:border-neutral-800 p-1.5 text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
         </div>
-        <p className="text-sm font-medium text-neutral-300">
+        <p className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
           {weekDates[0].toLocaleDateString("en-US", { month: "long", year: "numeric" })}
         </p>
       </div>
 
       <div
         className={cn(
-          "overflow-x-auto rounded-2xl border border-neutral-800 bg-neutral-900 transition-opacity",
+          "overflow-x-auto rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 transition-opacity",
           loading && "opacity-50",
         )}
       >
-        <div className="grid min-w-[720px] grid-cols-[56px_repeat(7,1fr)] border-b border-neutral-800">
+        <div className="grid min-w-[720px] grid-cols-[56px_repeat(7,1fr)] border-b border-neutral-200 dark:border-neutral-800">
           <div />
           {weekDates.map((d, i) => {
             const iso = toISODate(d);
             return (
-              <div key={iso} className="border-l border-neutral-800 p-2 text-center">
-                <p className="text-[10px] font-semibold tracking-wider text-neutral-500">{DAY_LABELS[i]}</p>
-                <p className={cn("text-sm font-medium", iso === todayStr ? "text-cyan-300" : "text-neutral-200")}>
+              <div key={iso} className="border-l border-neutral-200 dark:border-neutral-800 p-2 text-center">
+                <p className="text-[10px] font-semibold tracking-wider text-neutral-600 dark:text-neutral-500">{DAY_LABELS[i]}</p>
+                <p className={cn("text-sm font-medium", iso === todayStr ? "text-cyan-600 dark:text-cyan-300" : "text-neutral-800 dark:text-neutral-200")}>
                   {d.getDate()}
                 </p>
               </div>
@@ -214,13 +214,13 @@ export function WeekCalendar({
         </div>
 
         {todosByDate.size > 0 && (
-          <div className="grid min-w-[720px] grid-cols-[56px_repeat(7,1fr)] border-b border-neutral-800">
-            <div className="p-1 text-right text-[9px] text-neutral-600">Due</div>
+          <div className="grid min-w-[720px] grid-cols-[56px_repeat(7,1fr)] border-b border-neutral-200 dark:border-neutral-800">
+            <div className="p-1 text-right text-[9px] text-neutral-400 dark:text-neutral-600">Due</div>
             {weekDates.map((d) => {
               const iso = toISODate(d);
               const dueTodos = todosByDate.get(iso) ?? [];
               return (
-                <div key={iso} className="flex flex-wrap gap-1 border-l border-neutral-800 p-1">
+                <div key={iso} className="flex flex-wrap gap-1 border-l border-neutral-200 dark:border-neutral-800 p-1">
                   {dueTodos.map((todo) => {
                     const StatusIcon = STATUS_ICON[todo.status];
                     return (
@@ -230,8 +230,8 @@ export function WeekCalendar({
                         onClick={() => cycleTodoStatus(todo)}
                         title="Click to advance status"
                         className={cn(
-                          "flex max-w-full items-center gap-1 rounded-md border border-neutral-700 bg-neutral-800/80 px-1.5 py-0.5 text-[10px] text-neutral-200",
-                          todo.status === "done" && "text-neutral-500 line-through",
+                          "flex max-w-full items-center gap-1 rounded-md border border-neutral-300 dark:border-neutral-700 bg-neutral-100/80 dark:bg-neutral-800/80 px-1.5 py-0.5 text-[10px] text-neutral-800 dark:text-neutral-200",
+                          todo.status === "done" && "text-neutral-600 dark:text-neutral-500 line-through",
                         )}
                       >
                         <StatusIcon className="h-3 w-3 shrink-0" />
@@ -251,7 +251,7 @@ export function WeekCalendar({
               <div
                 key={h}
                 style={{ height: ROW_HEIGHT }}
-                className="border-b border-neutral-800/60 pr-2 text-right text-[10px] text-neutral-600"
+                className="border-b border-neutral-200/60 dark:border-neutral-800/60 pr-2 text-right text-[10px] text-neutral-400 dark:text-neutral-600"
               >
                 {h % 12 === 0 ? 12 : h % 12}
                 {h < 12 ? "am" : "pm"}
@@ -262,14 +262,14 @@ export function WeekCalendar({
             const iso = toISODate(d);
             const dayEvents = events.filter((e) => e.date === iso);
             return (
-              <div key={iso} className="relative border-l border-neutral-800">
+              <div key={iso} className="relative border-l border-neutral-200 dark:border-neutral-800">
                 {hours.map((h) => (
                   <button
                     key={h}
                     type="button"
                     onClick={() => openCreate(iso, h)}
                     style={{ height: ROW_HEIGHT }}
-                    className="block w-full border-b border-neutral-800/60 transition-colors hover:bg-neutral-800/40"
+                    className="block w-full border-b border-neutral-200/60 dark:border-neutral-800/60 transition-colors hover:bg-neutral-100/40 dark:hover:bg-neutral-800/40"
                   />
                 ))}
                 {dayEvents.map((event) => {
@@ -288,10 +288,10 @@ export function WeekCalendar({
                         backgroundColor: `${event.color ?? "#f97316"}33`,
                         borderColor: event.color ?? "#f97316",
                       }}
-                      className="absolute left-1 right-1 overflow-hidden rounded-md border px-1.5 py-1 text-left text-[11px] font-medium text-neutral-100"
+                      className="absolute left-1 right-1 overflow-hidden rounded-md border px-1.5 py-1 text-left text-[11px] font-medium text-neutral-900 dark:text-neutral-100"
                     >
                       <p className="truncate">{event.title}</p>
-                      <p className="truncate text-[10px] text-neutral-300">
+                      <p className="truncate text-[10px] text-neutral-700 dark:text-neutral-300">
                         {event.startTime}–{event.endTime}
                       </p>
                     </button>
@@ -302,17 +302,17 @@ export function WeekCalendar({
           })}
         </div>
       </div>
-      <p className="text-xs text-neutral-600">Click any empty slot to add a block · click a block to edit.</p>
+      <p className="text-xs text-neutral-400 dark:text-neutral-600">Click any empty slot to add a block · click a block to edit.</p>
 
       {draft && (
         <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/70 px-4 pt-16 sm:pt-24" onClick={() => setDraft(null)}>
           <div
-            className="max-h-[85vh] w-full max-w-sm overflow-y-auto rounded-2xl border border-neutral-800 bg-neutral-900 p-4 shadow-2xl"
+            className="max-h-[85vh] w-full max-w-sm overflow-y-auto rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-3 flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-neutral-200">{draft.id ? "Edit block" : "New block"}</h3>
-              <button type="button" onClick={() => setDraft(null)} className="text-neutral-500 hover:text-neutral-200">
+              <h3 className="text-sm font-semibold text-neutral-800 dark:text-neutral-200">{draft.id ? "Edit block" : "New block"}</h3>
+              <button type="button" onClick={() => setDraft(null)} className="text-neutral-600 dark:text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200">
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -322,26 +322,26 @@ export function WeekCalendar({
                 value={draft.title}
                 onChange={(e) => setDraft({ ...draft, title: e.target.value })}
                 placeholder="Block title..."
-                className="w-full rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
+                className="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
               />
               <input
                 type="date"
                 value={draft.date}
                 onChange={(e) => setDraft({ ...draft, date: e.target.value })}
-                className="w-full rounded-lg border border-neutral-700 bg-neutral-950 px-2 py-2 text-sm text-neutral-300 focus:border-cyan-400/60 focus:outline-none"
+                className="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-2 py-2 text-sm text-neutral-700 dark:text-neutral-300 focus:border-cyan-400/60 focus:outline-none"
               />
               <div className="flex gap-2">
                 <input
                   type="time"
                   value={draft.startTime}
                   onChange={(e) => setDraft({ ...draft, startTime: e.target.value })}
-                  className="flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-2 py-2 text-sm text-neutral-300 focus:border-cyan-400/60 focus:outline-none"
+                  className="flex-1 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-2 py-2 text-sm text-neutral-700 dark:text-neutral-300 focus:border-cyan-400/60 focus:outline-none"
                 />
                 <input
                   type="time"
                   value={draft.endTime}
                   onChange={(e) => setDraft({ ...draft, endTime: e.target.value })}
-                  className="flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-2 py-2 text-sm text-neutral-300 focus:border-cyan-400/60 focus:outline-none"
+                  className="flex-1 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-2 py-2 text-sm text-neutral-700 dark:text-neutral-300 focus:border-cyan-400/60 focus:outline-none"
                 />
               </div>
               <div className="flex items-center gap-1.5">
@@ -363,7 +363,7 @@ export function WeekCalendar({
                   <button
                     type="button"
                     onClick={deleteDraft}
-                    className="flex items-center gap-1 text-xs text-neutral-500 hover:text-red-500"
+                    className="flex items-center gap-1 text-xs text-neutral-600 dark:text-neutral-500 hover:text-red-500"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                     Delete

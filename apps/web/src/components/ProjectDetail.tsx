@@ -76,7 +76,7 @@ export function ProjectDetail({
 
   return (
     <div className="space-y-6">
-      <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-5">
+      <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-5">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
           <div>
             <label className={fieldLabelClass}>Name</label>
@@ -104,7 +104,7 @@ export function ProjectDetail({
         <button
           type="button"
           onClick={handleDelete}
-          className="mt-3 flex items-center gap-1 text-xs text-neutral-500 hover:text-red-400"
+          className="mt-3 flex items-center gap-1 text-xs text-neutral-600 dark:text-neutral-500 hover:text-red-400"
         >
           <Trash2 className="h-3.5 w-3.5" />
           Delete project
@@ -112,38 +112,38 @@ export function ProjectDetail({
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <section className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
-          <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-neutral-200">
-            <Target className="h-4 w-4 text-cyan-300" />
-            Goals <span className="text-neutral-500">({goals.length})</span>
+        <section className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4">
+          <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-neutral-800 dark:text-neutral-200">
+            <Target className="h-4 w-4 text-cyan-600 dark:text-cyan-300" />
+            Goals <span className="text-neutral-600 dark:text-neutral-500">({goals.length})</span>
           </h3>
           <ul className="space-y-1.5">
             {goals.map((goal) => (
               <li key={goal.id}>
                 <Link
                   href={`/goals/${encodeURIComponent(goal.id)}`}
-                  className="flex items-center gap-2 rounded-lg p-1.5 hover:bg-neutral-800"
+                  className="flex items-center gap-2 rounded-lg p-1.5 hover:bg-neutral-100 dark:hover:bg-neutral-800"
                 >
                   <CircularProgress value={goal.progress} size={28} strokeWidth={3} />
-                  <span className="truncate text-sm text-neutral-200">{goal.title}</span>
+                  <span className="truncate text-sm text-neutral-800 dark:text-neutral-200">{goal.title}</span>
                 </Link>
               </li>
             ))}
-            {goals.length === 0 && <li className="text-xs text-neutral-500">No goals linked yet.</li>}
+            {goals.length === 0 && <li className="text-xs text-neutral-600 dark:text-neutral-500">No goals linked yet.</li>}
           </ul>
         </section>
 
-        <section className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
-          <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-neutral-200">
-            <ListTodo className="h-4 w-4 text-cyan-300" />
-            Todos <span className="text-neutral-500">({openTodos} open / {todos.length})</span>
+        <section className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4">
+          <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-neutral-800 dark:text-neutral-200">
+            <ListTodo className="h-4 w-4 text-cyan-600 dark:text-cyan-300" />
+            Todos <span className="text-neutral-600 dark:text-neutral-500">({openTodos} open / {todos.length})</span>
           </h3>
           <form onSubmit={handleAddTodo} className="mb-2 flex gap-1.5">
             <input
               value={newTodoTitle}
               onChange={(e) => setNewTodoTitle(e.target.value)}
               placeholder="Add a todo..."
-              className="min-w-0 flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-2.5 py-1.5 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
+              className="min-w-0 flex-1 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-2.5 py-1.5 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
             />
             <button
               type="submit"
@@ -155,30 +155,30 @@ export function ProjectDetail({
           </form>
           <EditableTodoList todos={todos} onChange={setTodos} emptyMessage="No todos linked yet." />
           {todos.length > 0 && (
-            <Link href="/todos" className="mt-2 inline-block text-xs text-neutral-500 hover:text-cyan-300">
+            <Link href="/todos" className="mt-2 inline-block text-xs text-neutral-600 dark:text-neutral-500 hover:text-cyan-600 dark:text-cyan-300">
               View all todos →
             </Link>
           )}
         </section>
 
-        <section className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
-          <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-neutral-200">
-            <StickyNote className="h-4 w-4 text-cyan-300" />
-            Notes <span className="text-neutral-500">({notes.length})</span>
+        <section className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4">
+          <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-neutral-800 dark:text-neutral-200">
+            <StickyNote className="h-4 w-4 text-cyan-600 dark:text-cyan-300" />
+            Notes <span className="text-neutral-600 dark:text-neutral-500">({notes.length})</span>
           </h3>
           <ul className="space-y-1.5">
             {notes.map((note) => (
               <li key={note.id}>
                 <Link
                   href={`/notes/${encodeURIComponent(note.id)}`}
-                  className="flex items-center gap-2 rounded-lg p-1.5 hover:bg-neutral-800"
+                  className="flex items-center gap-2 rounded-lg p-1.5 hover:bg-neutral-100 dark:hover:bg-neutral-800"
                 >
-                  <ContentTypeIcon type={note.contentType} className="h-3.5 w-3.5 shrink-0 text-neutral-500" />
-                  <span className="truncate text-sm text-neutral-200">{note.title ?? "Untitled"}</span>
+                  <ContentTypeIcon type={note.contentType} className="h-3.5 w-3.5 shrink-0 text-neutral-600 dark:text-neutral-500" />
+                  <span className="truncate text-sm text-neutral-800 dark:text-neutral-200">{note.title ?? "Untitled"}</span>
                 </Link>
               </li>
             ))}
-            {notes.length === 0 && <li className="text-xs text-neutral-500">No notes linked yet.</li>}
+            {notes.length === 0 && <li className="text-xs text-neutral-600 dark:text-neutral-500">No notes linked yet.</li>}
           </ul>
         </section>
       </div>

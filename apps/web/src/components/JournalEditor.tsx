@@ -44,14 +44,14 @@ export function JournalEditor({
 
   return (
     <div className="space-y-6">
-      <form onSubmit={handleSave} className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
-        <h3 className="mb-2 text-sm font-semibold text-neutral-200">Today</h3>
+      <form onSubmit={handleSave} className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4">
+        <h3 className="mb-2 text-sm font-semibold text-neutral-800 dark:text-neutral-200">Today</h3>
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="What happened today? What are you thinking about?"
           rows={6}
-          className="w-full rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+          className="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
         />
         <button
           type="submit"
@@ -64,12 +64,12 @@ export function JournalEditor({
       </form>
 
       <div>
-        <h3 className="mb-3 text-sm font-semibold text-neutral-200">Past entries</h3>
+        <h3 className="mb-3 text-sm font-semibold text-neutral-800 dark:text-neutral-200">Past entries</h3>
         <ul className="space-y-2">
           {pastEntries.map((entry) => (
-            <li key={entry.id} className="group rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
+            <li key={entry.id} className="group rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4">
               <div className="mb-1 flex items-center justify-between">
-                <p className="text-xs font-medium text-neutral-500">
+                <p className="text-xs font-medium text-neutral-600 dark:text-neutral-500">
                   {new Date(`${entry.date}T00:00:00`).toLocaleDateString("en-US", {
                     weekday: "long",
                     month: "long",
@@ -79,15 +79,15 @@ export function JournalEditor({
                 <button
                   type="button"
                   onClick={() => handleDelete(entry.id, entry.date)}
-                  className="text-xs text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+                  className="text-xs text-neutral-400 dark:text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
                 >
                   Delete
                 </button>
               </div>
-              <p className="whitespace-pre-wrap text-sm text-neutral-300">{entry.content}</p>
+              <p className="whitespace-pre-wrap text-sm text-neutral-700 dark:text-neutral-300">{entry.content}</p>
             </li>
           ))}
-          {pastEntries.length === 0 && <p className="text-sm text-neutral-500">No past entries yet.</p>}
+          {pastEntries.length === 0 && <p className="text-sm text-neutral-600 dark:text-neutral-500">No past entries yet.</p>}
         </ul>
       </div>
     </div>

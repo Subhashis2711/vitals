@@ -101,26 +101,63 @@ region `asia-south1`. The services are `vitals-api` and `vitals-web`; images
 are stored in the `vitals` Artifact Registry repository. Supabase remains the
 hosted database and authentication provider.
 
-### Run a production migration
+Prerequisites for anyone running these steps: the `gcloud` CLI installed and
+authenticated (`gcloud auth login`) against an account with access to the
+`oscas-dev-second-brain` project, and Docker installed locally (only needed to
+inspect/pull images when troubleshooting — the build itself runs on Cloud
+Build, not your machine).
+
+### Step 1 — Run a production migration (only if `packages/db/drizzle/` changed)
+
+Skip this step entirely if your change didn't add a new file under
+`packages/db/drizzle/`.
 
 1. Review the new SQL in `packages/db/drizzle/` and make a Supabase database
-   backup before applying it.
-2. From a secure machine, set `DATABASE_URL` in the root `.env` to the hosted
-   Supabase connection string. Do not commit this file.
-3. Apply the migrations once:
+   backup before applying it (Supabase dashboard → Database → Backups, or
+   `pg_dump`).
+2. From a secure machine, create (or reuse) a root-level `.env.production`
+   with `DATABASE_URL` set to the hosted Supabase connection string
+   (Supabase dashboard → Project Settings → Database → Connection string).
+   Keep this in a separate file from your local `.env` — don't overwrite
+   `.env` itself, and never commit `.env.production` (it's gitignored).
+3. Apply the migrations once, pointing `dotenv` at that file explicitly
+   rather than using `npm run db:migrate` (which is hardcoded to `-e .env`,
+   your local dev file):
 
    ```bash
-   npm run db:migrate
+   npx dotenv -e .env.production -- npm run migrate -w packages/db
    ```
 
 4. Verify the application can read and write the changed data. Never run
-   `supabase db reset` against production.
+   `supabase db reset` against production — that command drops and replays
+   the entire database and is local-development-only.
 
-### Deploy Cloud Run
+### Step 2 — Gather the production config values
 
-These commands build both images with Cloud Build, deploy the API first, then
-deploy the web app. `NEXT_PUBLIC_*` values are embedded at web build time, so
-use the production Supabase URL and anon key rather than local values.
+You need exactly three values, all safe to handle in a terminal (none of them
+are the Supabase *service role* key — never put that one in a client build):
+
+| Value | Where to find it |
+|---|---|
+| `NEXT_PUBLIC_API_URL` | `gcloud run services describe vitals-api --region asia-south1 --format="value(status.url)"` |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase dashboard → Project Settings → API → Project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase dashboard → Project Settings → API Keys → the `anon` / `publishable` key (safe to embed in a browser bundle by design — this is *not* the service role key) |
+
+**These three go into the build command below as literal values, not left as
+placeholders.** Every `NEXT_PUBLIC_*` variable is compiled directly into the
+Next.js JavaScript bundle at `docker build` time (see `apps/web/Dockerfile`)
+— Cloud Run's own env var settings have no effect on them, and a wrong or
+placeholder value here won't fail the build, it'll just make every Supabase
+Auth call in production fail at runtime with `AuthApiError: Invalid API key`,
+which shows up as users bouncing back to `/login` right after a successful
+Google sign-in.
+
+### Step 3 — Build both images with Cloud Build
+
+Building via `gcloud builds submit` (Google's build infra) rather than a
+local `docker build` sidesteps a real failure mode: an image built locally on
+an Apple Silicon (arm64) Mac without `--platform linux/amd64` won't boot on
+Cloud Run's x86_64 runtime ("exec format error" in the Cloud Run logs).
 
 ```bash
 export PROJECT_ID=oscas-dev-second-brain
@@ -129,16 +166,44 @@ export REPOSITORY=vitals
 export TAG=$(git rev-parse --short HEAD)
 export API_IMAGE="$REGION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/vitals-api:$TAG"
 export WEB_IMAGE="$REGION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/vitals-web:$TAG"
+
+# Paste the three real values from Step 2 here — do not leave placeholders.
 export NEXT_PUBLIC_API_URL=https://vitals-api-kww4rwnlqa-el.a.run.app
-export NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
-export NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_PRODUCTION_ANON_KEY
+export NEXT_PUBLIC_SUPABASE_URL=https://ethrvscxpdpsabrprtql.supabase.co
+export NEXT_PUBLIC_SUPABASE_ANON_KEY=<paste the real anon key here>
 
 gcloud builds submit \
   --project "$PROJECT_ID" \
   --config cloudbuild.yaml \
   --substitutions "_API_IMAGE=$API_IMAGE,_WEB_IMAGE=$WEB_IMAGE,_NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL,_NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL,_NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY" \
   .
+```
 
+This can take a few minutes; `gcloud builds submit` streams logs and blocks
+until both images finish (or fail). If your terminal or shell session has a
+short command timeout, check on it separately instead of assuming it failed:
+
+```bash
+gcloud builds list --project "$PROJECT_ID" --limit 3
+```
+
+Before deploying, it's worth confirming the web image actually got real
+values and not empty/placeholder ones — check the *length* of each baked-in
+var rather than printing the anon key outright:
+
+```bash
+docker pull "$WEB_IMAGE"
+docker inspect "$WEB_IMAGE" --format '{{range .Config.Env}}{{println .}}{{end}}' | grep NEXT_PUBLIC
+```
+
+`NEXT_PUBLIC_SUPABASE_ANON_KEY` should be well over 100 characters (a JWT or
+an `sb_publishable_...` key) — anything short (like the 24-character literal
+string `YOUR_PRODUCTION_ANON_KEY`) means Step 2's value never made it into
+the build command.
+
+### Step 4 — Deploy both services
+
+```bash
 gcloud run deploy vitals-api \
   --project "$PROJECT_ID" \
   --region "$REGION" \
@@ -150,12 +215,28 @@ gcloud run deploy vitals-web \
   --image "$WEB_IMAGE"
 ```
 
-Cloud Run retains the existing API service configuration, including its secret
-environment variables and `WEB_ORIGIN`, when deploying a new image. If either
-service configuration changes, update it deliberately with `gcloud run
-services update` and then verify Google OAuth redirect URLs and the API CORS
-allowlist. Finish by checking `/health`, signing in, and creating data in a
-non-production workspace.
+Cloud Run retains each service's existing configuration, including secret
+environment variables and `WEB_ORIGIN`, when deploying a new image to it. If
+either service's configuration needs to change, update it deliberately with
+`gcloud run services update` and then re-verify the Google OAuth redirect
+URLs and the API's CORS allowlist.
+
+If only one of the two images actually changed (e.g. a fix that only touches
+`apps/web`), it's fine to build and deploy just that one image — skip the
+other Dockerfile's build step and the matching `gcloud run deploy` call.
+
+### Step 5 — Verify
+
+1. `curl -s -o /dev/null -w '%{http_code}\n' https://vitals-api-.../health` → expect `200`.
+2. Open the web app, sign in with Google, and confirm you land in the app
+   (not bounced back to `/login`).
+3. Create a throwaway piece of data (e.g. a todo) to confirm the full
+   frontend → API → database path works, then delete it.
+4. Check for runtime errors in either service's logs:
+
+   ```bash
+   gcloud logging read 'resource.type="cloud_run_revision" AND resource.labels.service_name="vitals-web"' --limit 20 --freshness=10m
+   ```
 
 ## What's intentionally not built yet
 

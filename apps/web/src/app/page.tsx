@@ -59,7 +59,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title={<Greeting />} subtitle={`Here's what your second brain remembers · ${friendlyDate()}`} />
+      <PageHeader title={<Greeting />} subtitle={`Here's what's on your radar · ${friendlyDate()}`} />
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <StatCard label="Total notes" value={String(notes.length)} icon={StickyNote} accent="cyan" />
@@ -77,21 +77,21 @@ export default async function DashboardPage() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <section className="lg:col-span-2">
-          <h2 className="mb-3 flex items-center gap-1.5 text-base font-semibold text-neutral-100">
-            <ListTodo className="h-4.5 w-4.5 text-cyan-300" />
+          <h2 className="mb-3 flex items-center gap-1.5 text-base font-semibold text-neutral-900 dark:text-neutral-100">
+            <ListTodo className="h-4.5 w-4.5 text-cyan-600 dark:text-cyan-300" />
             Todos
           </h2>
           <TodoBoard initialTodos={todos} projects={projects} goals={goals} />
         </section>
 
         <div className="space-y-6">
-          <section className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
+          <section className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="flex items-center gap-1.5 text-sm font-semibold text-neutral-100">
-                <StickyNote className="h-4 w-4 text-cyan-300" />
+              <h2 className="flex items-center gap-1.5 text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+                <StickyNote className="h-4 w-4 text-cyan-600 dark:text-cyan-300" />
                 Recent activity
               </h2>
-              <Link href="/notes" className="text-xs text-neutral-500 hover:text-cyan-300">
+              <Link href="/notes" className="text-xs text-neutral-600 dark:text-neutral-500 hover:text-cyan-600 dark:text-cyan-300">
                 View all
               </Link>
             </div>
@@ -100,11 +100,11 @@ export default async function DashboardPage() {
                 <li key={`${item.kind}-${item.id}`}>
                   <Link
                     href={item.kind === "note" ? `/notes/${encodeURIComponent(item.id)}` : "/todos"}
-                    className="flex items-start gap-2.5 rounded-lg p-1.5 transition-colors hover:bg-neutral-800"
+                    className="flex items-start gap-2.5 rounded-lg p-1.5 transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800"
                   >
                     <span
                       className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${
-                        item.kind === "note" ? "bg-cyan-400/15 text-cyan-300" : "bg-blue-500/15 text-blue-400"
+                        item.kind === "note" ? "bg-cyan-400/15 text-cyan-600 dark:text-cyan-300" : "bg-blue-500/15 text-blue-400"
                       }`}
                     >
                       {item.kind === "note" && item.contentType ? (
@@ -114,8 +114,8 @@ export default async function DashboardPage() {
                       )}
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-medium text-neutral-200">{item.title}</span>
-                      <span className="flex items-center gap-1.5 text-[11px] text-neutral-500">
+                      <span className="block truncate text-sm font-medium text-neutral-800 dark:text-neutral-200">{item.title}</span>
+                      <span className="flex items-center gap-1.5 text-[11px] text-neutral-600 dark:text-neutral-500">
                         {timeAgo(item.createdAt)}
                         <ProjectBadge project={item.projectId ? projectById.get(item.projectId) : undefined} />
                       </span>
@@ -123,41 +123,41 @@ export default async function DashboardPage() {
                   </Link>
                 </li>
               ))}
-              {recentItems.length === 0 && <li className="text-xs text-neutral-500">Nothing captured yet.</li>}
+              {recentItems.length === 0 && <li className="text-xs text-neutral-600 dark:text-neutral-500">Nothing captured yet.</li>}
             </ul>
           </section>
 
-          <section className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
+          <section className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="flex items-center gap-1.5 text-sm font-semibold text-neutral-100">
+              <h2 className="flex items-center gap-1.5 text-sm font-semibold text-neutral-900 dark:text-neutral-100">
                 <Flame className="h-4 w-4 text-emerald-400" />
                 Habits today
               </h2>
-              <Link href="/habits" className="text-xs text-neutral-500 hover:text-cyan-300">
+              <Link href="/habits" className="text-xs text-neutral-600 dark:text-neutral-500 hover:text-cyan-600 dark:text-cyan-300">
                 View all
               </Link>
             </div>
             <HabitsTodayMini habits={habits} todayLogs={todayLogs} />
           </section>
 
-          <section className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
+          <section className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="flex items-center gap-1.5 text-sm font-semibold text-neutral-100">
+              <h2 className="flex items-center gap-1.5 text-sm font-semibold text-neutral-900 dark:text-neutral-100">
                 <Folder className="h-4 w-4 text-amber-400" />
                 Projects
               </h2>
-              <Link href="/projects" className="text-xs text-neutral-500 hover:text-cyan-300">
+              <Link href="/projects" className="text-xs text-neutral-600 dark:text-neutral-500 hover:text-cyan-600 dark:text-cyan-300">
                 View all
               </Link>
             </div>
             <ul className="space-y-2">
               {projects.slice(0, 5).map((project) => (
-                <li key={project.id} className="flex items-center gap-2 truncate text-sm text-neutral-300">
+                <li key={project.id} className="flex items-center gap-2 truncate text-sm text-neutral-700 dark:text-neutral-300">
                   <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: project.color ?? "#a3a3a3" }} />
                   <span className="truncate">{project.name}</span>
                 </li>
               ))}
-              {projects.length === 0 && <li className="text-xs text-neutral-500">No projects yet.</li>}
+              {projects.length === 0 && <li className="text-xs text-neutral-600 dark:text-neutral-500">No projects yet.</li>}
             </ul>
           </section>
         </div>

@@ -27,7 +27,7 @@ export function CircularProgress({
           className="stroke-cyan-400 transition-all duration-500"
         />
       </svg>
-      <span className="absolute inset-0 flex items-center justify-center text-xs font-semibold text-neutral-100">
+      <span className="absolute inset-0 flex items-center justify-center text-xs font-semibold text-neutral-900 dark:text-neutral-100">
         {value}%
       </span>
     </div>

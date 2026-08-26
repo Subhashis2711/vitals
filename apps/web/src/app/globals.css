@@ -54,7 +54,7 @@ body {
   @apply mb-0;
 }
 .rich-text a {
-  @apply text-orange-400 hover:underline;
+  @apply text-cyan-300 hover:underline;
 }
 .rich-text ul {
   @apply mb-3 list-disc space-y-1 pl-5;
@@ -63,7 +63,7 @@ body {
   @apply mb-3 list-decimal space-y-1 pl-5;
 }
 .rich-text blockquote {
-  @apply mb-3 border-l-2 border-orange-500/50 pl-3 italic text-neutral-400;
+  @apply mb-3 border-l-2 border-cyan-400/50 pl-3 italic text-neutral-400;
 }
 .rich-text strong,
 .rich-text b {
@@ -91,5 +91,5 @@ body {
   @apply bg-transparent p-0 text-xs text-neutral-300;
 }
 .rich-text code {
-  @apply rounded bg-neutral-800 px-1 py-0.5 text-xs text-orange-300;
+  @apply rounded bg-neutral-800 px-1 py-0.5 text-xs text-cyan-200;
 }

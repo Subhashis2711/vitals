@@ -90,7 +90,7 @@ export function GoalDetail({
           <select
             value={goal.status}
             onChange={(e) => handleStatusChange(e.target.value)}
-            className="rounded-lg border border-neutral-700 bg-neutral-950 px-2 py-1.5 text-sm text-neutral-300 focus:border-orange-500/60 focus:outline-none"
+            className="rounded-lg border border-neutral-700 bg-neutral-950 px-2 py-1.5 text-sm text-neutral-300 focus:border-cyan-400/60 focus:outline-none"
           >
             {GOAL_STATUSES.map((s) => (
               <option key={s} value={s}>
@@ -132,12 +132,12 @@ export function GoalDetail({
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Add a task toward this goal..."
-            className="min-w-0 flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-orange-500/60 focus:outline-none focus:ring-2 focus:ring-orange-500/20"
+            className="min-w-0 flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
           />
           <button
             type="submit"
             disabled={submitting || !title.trim()}
-            className="flex items-center gap-1 rounded-lg bg-orange-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-orange-600 disabled:opacity-50"
+            className="flex items-center gap-1 rounded-lg bg-cyan-400 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-cyan-500 disabled:opacity-50"
           >
             <Plus className="h-4 w-4" />
           </button>

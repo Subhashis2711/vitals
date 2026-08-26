@@ -29,7 +29,7 @@ export function PageHeader({ title, subtitle }: { title: string; subtitle?: stri
         <button
           type="button"
           onClick={() => setCaptureOpen(true)}
-          className="flex items-center gap-1.5 rounded-lg bg-orange-500 px-3 py-1.5 text-sm font-medium text-white shadow-sm shadow-orange-500/30 transition-colors hover:bg-orange-600"
+          className="flex items-center gap-1.5 rounded-lg bg-cyan-400 px-3 py-1.5 text-sm font-medium text-white shadow-sm shadow-cyan-400/30 transition-colors hover:bg-cyan-500"
         >
           <Zap className="h-3.5 w-3.5" />
           Capture

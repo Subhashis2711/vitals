@@ -1,7 +1,7 @@
 export function BarChart({
   data,
   height = 80,
-  color = "#f97316",
+  color = "#06b6d4",
 }: {
   data: { label: string; value: number }[];
   height?: number;

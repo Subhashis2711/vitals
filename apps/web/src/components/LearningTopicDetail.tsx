@@ -89,7 +89,7 @@ export function LearningTopicDetail({
       <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
         <div className="mb-3 flex items-center justify-between">
           <h3 className="flex items-center gap-1.5 text-sm font-semibold text-neutral-200">
-            <BookOpen className="h-4 w-4 text-orange-400" />
+            <BookOpen className="h-4 w-4 text-cyan-300" />
             Roadmap — what to learn
           </h3>
           <span className="text-xs text-neutral-500">
@@ -105,7 +105,7 @@ export function LearningTopicDetail({
               <button
                 type="button"
                 onClick={() => handleToggleRoadmap(item)}
-                className="text-neutral-500 hover:text-orange-400"
+                className="text-neutral-500 hover:text-cyan-300"
               >
                 {item.status === "done" ? (
                   <CheckSquare className="h-4 w-4 text-emerald-500" />
@@ -119,7 +119,7 @@ export function LearningTopicDetail({
               <button
                 type="button"
                 onClick={() => handleDeleteRoadmap(item.id)}
-                className="text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+                className="-m-1.5 p-1.5 text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </button>
@@ -132,12 +132,12 @@ export function LearningTopicDetail({
             value={roadmapTitle}
             onChange={(e) => setRoadmapTitle(e.target.value)}
             placeholder="Add a step..."
-            className="min-w-0 flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-orange-500/60 focus:outline-none"
+            className="min-w-0 flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
           />
           <button
             type="submit"
             disabled={!roadmapTitle.trim()}
-            className="rounded-lg bg-orange-500 px-3 py-2 text-white transition-colors hover:bg-orange-600 disabled:opacity-50"
+            className="rounded-lg bg-cyan-400 px-3 py-2 text-white transition-colors hover:bg-cyan-500 disabled:opacity-50"
           >
             <Plus className="h-4 w-4" />
           </button>
@@ -157,7 +157,7 @@ export function LearningTopicDetail({
                   href={resource.url}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex flex-1 items-center gap-1.5 truncate text-neutral-200 hover:text-orange-400"
+                  className="flex flex-1 items-center gap-1.5 truncate text-neutral-200 hover:text-cyan-300"
                 >
                   <ExternalLink className="h-3.5 w-3.5 shrink-0" />
                   {resource.name}
@@ -168,7 +168,7 @@ export function LearningTopicDetail({
               <button
                 type="button"
                 onClick={() => handleDeleteResource(resource.id)}
-                className="text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+                className="-m-1.5 p-1.5 text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </button>
@@ -181,18 +181,18 @@ export function LearningTopicDetail({
             value={resourceName}
             onChange={(e) => setResourceName(e.target.value)}
             placeholder="Resource name..."
-            className="min-w-0 flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-orange-500/60 focus:outline-none"
+            className="min-w-0 flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
           />
           <input
             value={resourceUrl}
             onChange={(e) => setResourceUrl(e.target.value)}
             placeholder="Link (optional)"
-            className="min-w-0 flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-orange-500/60 focus:outline-none"
+            className="min-w-0 flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
           />
           <button
             type="submit"
             disabled={!resourceName.trim()}
-            className="rounded-lg bg-orange-500 px-3 py-2 text-white transition-colors hover:bg-orange-600 disabled:opacity-50"
+            className="rounded-lg bg-cyan-400 px-3 py-2 text-white transition-colors hover:bg-cyan-500 disabled:opacity-50"
           >
             <Plus className="h-4 w-4" />
           </button>
@@ -219,12 +219,12 @@ export function LearningTopicDetail({
                 submitInsight();
               }
             }}
-            className="w-full rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-orange-500/60 focus:outline-none"
+            className="w-full rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
           />
           <button
             type="submit"
             disabled={savingInsight || !insightText.trim()}
-            className="rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-orange-600 disabled:opacity-50"
+            className="rounded-lg bg-cyan-400 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-cyan-500 disabled:opacity-50"
           >
             Save
           </button>
@@ -240,7 +240,7 @@ export function LearningTopicDetail({
               <button
                 type="button"
                 onClick={() => handleDeleteInsight(insight.id)}
-                className="absolute right-2 top-2 text-neutral-700 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+                className="absolute right-0.5 top-0.5 p-1.5 text-neutral-700 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
               >
                 <Trash2 className="h-3 w-3" />
               </button>

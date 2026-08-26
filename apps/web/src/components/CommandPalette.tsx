@@ -2,8 +2,8 @@
 
 import type { Goal, Note, Project, Todo } from "@vitals/shared";
 import {
+  Activity,
   BookOpen,
-  Brain,
   Calendar,
   Folder,
   HeartPulse,
@@ -13,6 +13,7 @@ import {
   Repeat,
   StickyNote,
   Target,
+  Timer,
   Wallet,
   type LucideIcon,
 } from "lucide-react";
@@ -27,6 +28,7 @@ const STATIC_PAGES: { title: string; href: string; icon: LucideIcon }[] = [
   { title: "Projects", href: "/projects", icon: Folder },
   { title: "Todos", href: "/todos", icon: ListTodo },
   { title: "Calendar", href: "/calendar", icon: Calendar },
+  { title: "Focus", href: "/focus", icon: Timer },
   { title: "Notes", href: "/notes", icon: StickyNote },
   { title: "Learning", href: "/learning", icon: BookOpen },
   { title: "Journal", href: "/journal", icon: PenLine },
@@ -108,7 +110,7 @@ export function CommandPalette() {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-2 border-b border-neutral-800 px-4 py-3">
-          <Brain className="h-4 w-4 text-orange-500" />
+          <Activity className="h-4 w-4 text-cyan-400" />
           <input
             autoFocus
             value={query}

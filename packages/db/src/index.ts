@@ -11,3 +11,4 @@ export * as learningRepo from "./repositories/learning";
 export * as journalRepo from "./repositories/journal";
 export * as healthRepo from "./repositories/health";
 export * as moneyRepo from "./repositories/money";
+export * as pomodoroRepo from "./repositories/pomodoro";

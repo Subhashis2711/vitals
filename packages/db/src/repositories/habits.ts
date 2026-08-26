@@ -29,6 +29,8 @@ export async function createHabit(input: CreateHabitInput, userId: string) {
       name: input.name,
       description: input.description ?? null,
       color: input.color ?? null,
+      frequency: input.frequency ?? "daily",
+      daysOfWeek: input.daysOfWeek ?? null,
     })
     .returning();
   return row;

@@ -108,7 +108,7 @@ export function EditableTodoList({
             <button
               type="button"
               onClick={() => toggleTodo(todo)}
-              className="shrink-0 text-neutral-500 hover:text-orange-400"
+              className="shrink-0 text-neutral-500 hover:text-cyan-300"
             >
               {todo.status === "done" ? (
                 <CheckCircle2 className="h-4 w-4 text-emerald-500" />
@@ -125,7 +125,7 @@ export function EditableTodoList({
                   onBlur={commitEdit}
                   onKeyDown={handleEditKeyDown}
                   autoFocus
-                  className="w-full rounded border border-orange-500/60 bg-neutral-900 px-1.5 py-0.5 text-sm text-neutral-100 focus:outline-none"
+                  className="w-full rounded border border-cyan-400/60 bg-neutral-900 px-1.5 py-0.5 text-sm text-neutral-100 focus:outline-none"
                 />
               ) : (
                 <p
@@ -145,7 +145,7 @@ export function EditableTodoList({
                 type="button"
                 onClick={() => move(todo, "up")}
                 disabled={i === 0}
-                className="text-neutral-600 hover:text-orange-400 disabled:pointer-events-none disabled:opacity-30"
+                className="-m-1.5 p-1.5 text-neutral-600 hover:text-cyan-300 disabled:pointer-events-none disabled:opacity-30"
                 title="Move up"
               >
                 <ChevronUp className="h-3.5 w-3.5" />
@@ -154,7 +154,7 @@ export function EditableTodoList({
                 type="button"
                 onClick={() => move(todo, "down")}
                 disabled={i === sorted.length - 1}
-                className="text-neutral-600 hover:text-orange-400 disabled:pointer-events-none disabled:opacity-30"
+                className="-m-1.5 p-1.5 text-neutral-600 hover:text-cyan-300 disabled:pointer-events-none disabled:opacity-30"
                 title="Move down"
               >
                 <ChevronDown className="h-3.5 w-3.5" />
@@ -163,7 +163,7 @@ export function EditableTodoList({
             <button
               type="button"
               onClick={() => handleDelete(todo.id)}
-              className="shrink-0 text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+              className="-m-1.5 shrink-0 p-1.5 text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
             >
               <Trash2 className="h-3.5 w-3.5" />
             </button>

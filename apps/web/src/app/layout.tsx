@@ -6,6 +6,7 @@ import { CaptureModal } from "@/components/CaptureModal";
 import { CommandPalette } from "@/components/CommandPalette";
 import { Sidebar } from "@/components/Sidebar";
 import { cn } from "@/lib/cn";
+import { PomodoroProvider } from "@/lib/pomodoro-context";
 import { UIProvider } from "@/lib/ui-context";
 import "./globals.css";
 
@@ -21,14 +22,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en" className="dark">
       <body className={cn(inter.className, "bg-neutral-950 text-neutral-100 antialiased")}>
         <UIProvider>
-          <div className="flex min-h-screen flex-col md:flex-row">
-            <Sidebar />
-            <main className="min-w-0 flex-1 px-4 py-4 sm:px-8 sm:py-6">
-              <div className="mx-auto max-w-5xl">{children}</div>
-            </main>
-          </div>
-          <CommandPalette />
-          <CaptureModal />
+          <PomodoroProvider>
+            <div className="flex min-h-screen flex-col md:flex-row">
+              <Sidebar />
+              <main className="min-w-0 flex-1 px-4 py-4 sm:px-8 sm:py-6">
+                <div className="mx-auto max-w-5xl">{children}</div>
+              </main>
+            </div>
+            <CommandPalette />
+            <CaptureModal />
+          </PomodoroProvider>
         </UIProvider>
         <Toaster richColors theme="dark" position="bottom-right" />
       </body>

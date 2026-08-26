@@ -72,4 +72,8 @@ export const {
   createSavingsGoal,
   updateSavingsGoal,
   deleteSavingsGoal,
+  getPomodoroSessions,
+  getPomodoroSessionsByTodo,
+  createPomodoroSession,
+  deletePomodoroSession,
 } = api;

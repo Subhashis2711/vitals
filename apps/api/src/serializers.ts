@@ -1,7 +1,7 @@
 // Central place for GID-encoding API responses. Repositories (packages/db)
 // work with plain uuids throughout — encoding only happens here, right
 // before a route sends a response. See packages/shared/src/gid.ts.
-import { goalsRepo, journalRepo, learningRepo, notesRepo, projectsRepo, todosRepo } from "@vitals/db";
+import { goalsRepo, journalRepo, learningRepo, notesRepo, pomodoroRepo, projectsRepo, todosRepo } from "@vitals/db";
 import { toGid } from "@vitals/shared";
 
 type ProjectRow = NonNullable<Awaited<ReturnType<typeof projectsRepo.getProjectById>>>;
@@ -15,6 +15,7 @@ type GoalRow = NonNullable<Awaited<ReturnType<typeof goalsRepo.deleteGoal>>>;
 type TopicRow = Awaited<ReturnType<typeof learningRepo.listTopics>>[number];
 type ResourceRow = NonNullable<Awaited<ReturnType<typeof learningRepo.addResource>>>;
 type JournalEntryRow = NonNullable<Awaited<ReturnType<typeof journalRepo.getJournalEntryByDate>>>;
+type PomodoroSessionRow = Awaited<ReturnType<typeof pomodoroRepo.listPomodoroSessions>>[number];
 
 export function serializeProject(row: ProjectRow) {
   return { ...row, id: toGid("project", row.id) };
@@ -58,4 +59,8 @@ export function serializeResource(row: ResourceRow) {
 
 export function serializeJournalEntry(row: JournalEntryRow) {
   return { ...row, id: toGid("journal", row.id), noteId: toGid("note", row.noteId) };
+}
+
+export function serializePomodoroSession(row: PomodoroSessionRow) {
+  return { ...row, id: toGid("pomodoro", row.id), todoId: row.todoId ? toGid("todo", row.todoId) : null };
 }

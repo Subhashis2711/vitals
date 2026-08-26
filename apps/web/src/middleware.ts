@@ -40,9 +40,12 @@ export async function middleware(request: NextRequest) {
     // container's own bind address, not the public host.
     const forwardedHost = request.headers.get("x-forwarded-host");
     if (forwardedHost) {
+      // `host` (not `hostname`) — forwardedHost may already carry its own
+      // ":port" (e.g. Next's own dev server sets "localhost:3000"), and the
+      // `host` setter applies both pieces together. Setting `.port` after
+      // this would just re-clear whatever port `.host` just set.
       url.protocol = request.headers.get("x-forwarded-proto") ?? "https";
       url.host = forwardedHost;
-      url.port = "";
     }
     url.pathname = "/login";
     return NextResponse.redirect(url);

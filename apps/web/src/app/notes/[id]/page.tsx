@@ -24,7 +24,7 @@ export default async function NoteDetailPage({ params }: { params: Promise<{ id:
   return (
     <div>
       <PageHeader title="Notes" />
-      <Link href="/notes" className="mb-4 inline-flex items-center gap-1 text-sm text-neutral-500 hover:text-orange-400">
+      <Link href="/notes" className="mb-4 inline-flex items-center gap-1 text-sm text-neutral-500 hover:text-cyan-300">
         <ArrowLeft className="h-4 w-4" />
         Back to notes
       </Link>

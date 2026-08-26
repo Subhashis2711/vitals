@@ -14,7 +14,7 @@ export default async function NotesPage() {
       <div className="mb-4 flex justify-end">
         <Link
           href="/notes/new"
-          className="flex items-center gap-1 rounded-lg bg-orange-500 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-orange-600"
+          className="flex items-center gap-1 rounded-lg bg-cyan-400 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-cyan-500"
         >
           <Plus className="h-4 w-4" />
           New note

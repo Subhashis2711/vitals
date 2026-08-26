@@ -24,7 +24,7 @@ export function CircularProgress({
           strokeDasharray={circumference}
           strokeDashoffset={offset}
           strokeLinecap="round"
-          className="stroke-orange-500 transition-all duration-500"
+          className="stroke-cyan-400 transition-all duration-500"
         />
       </svg>
       <span className="absolute inset-0 flex items-center justify-center text-xs font-semibold text-neutral-100">

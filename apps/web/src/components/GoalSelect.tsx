@@ -1,16 +1,16 @@
 "use client";
 
-import type { LearningTopic } from "@vitals/shared";
+import type { Goal } from "@vitals/shared";
 import { cn } from "@/lib/cn";
 
-export function TopicSelect({
-  topics,
+export function GoalSelect({
+  goals,
   value,
   onChange,
   className,
-  placeholder = "No topic",
+  placeholder = "No goal",
 }: {
-  topics: LearningTopic[];
+  goals: Goal[];
   value: string;
   onChange: (value: string) => void;
   className?: string;
@@ -26,9 +26,9 @@ export function TopicSelect({
       )}
     >
       <option value="">{placeholder}</option>
-      {topics.map((topic) => (
-        <option key={topic.id} value={topic.id}>
-          {topic.title}
+      {goals.map((goal) => (
+        <option key={goal.id} value={goal.id}>
+          {goal.title}
         </option>
       ))}
     </select>

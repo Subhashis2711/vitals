@@ -24,8 +24,10 @@ import type {
   LearningTopicDetail,
   MarkdownFromTextResponse,
   MarkdownToTextResponse,
+  CreatePomodoroSessionInput,
   Note,
   NoteDomain,
+  PomodoroSession,
   Project,
   SavingsGoal,
   Todo,
@@ -56,7 +58,11 @@ export function createApiClient(getAccessToken: () => Promise<string | undefined
     const res = await fetch(`${API_BASE_URL}${path}`, {
       ...init,
       headers: {
-        "Content-Type": "application/json",
+        // Fastify's default JSON body parser rejects a declared JSON
+        // content-type on a request with no body (FST_ERR_CTP_EMPTY_JSON_BODY)
+        // — only send it when there's actually a body to parse (DELETE calls
+        // and bodyless GETs must not set it).
+        ...(init?.body ? { "Content-Type": "application/json" } : {}),
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...init?.headers,
       },
@@ -86,8 +92,10 @@ export function createApiClient(getAccessToken: () => Promise<string | undefined
       return request<{ todo: Todo }>("/todos", { method: "POST", body: JSON.stringify(input) });
     },
 
+    // nextTodo is set when completing a recurring todo spawns its next
+    // occurrence as a new row — see packages/db/src/repositories/todos.ts.
     updateTodo(id: string, input: UpdateTodoInput) {
-      return request<{ todo: Todo }>(`/todos/${encodeURIComponent(id)}`, {
+      return request<{ todo: Todo; nextTodo: Todo | null }>(`/todos/${encodeURIComponent(id)}`, {
         method: "PATCH",
         body: JSON.stringify(input),
       });
@@ -356,6 +364,25 @@ export function createApiClient(getAccessToken: () => Promise<string | undefined
 
     deleteSavingsGoal(id: string) {
       return request<{ savingsGoal: SavingsGoal }>(`/money/savings-goals/${id}`, { method: "DELETE" });
+    },
+
+    // --- Pomodoro ---
+
+    getPomodoroSessions(since?: string) {
+      const qs = since ? `?since=${encodeURIComponent(since)}` : "";
+      return request<{ sessions: PomodoroSession[] }>(`/pomodoro${qs}`);
+    },
+
+    getPomodoroSessionsByTodo(todoId: string) {
+      return request<{ sessions: PomodoroSession[] }>(`/pomodoro?todoId=${encodeURIComponent(todoId)}`);
+    },
+
+    createPomodoroSession(input: CreatePomodoroSessionInput) {
+      return request<{ session: PomodoroSession }>("/pomodoro", { method: "POST", body: JSON.stringify(input) });
+    },
+
+    deletePomodoroSession(id: string) {
+      return request<{ session: PomodoroSession }>(`/pomodoro/${encodeURIComponent(id)}`, { method: "DELETE" });
     },
   };
 }

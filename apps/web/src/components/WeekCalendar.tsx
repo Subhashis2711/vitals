@@ -1,12 +1,30 @@
 "use client";
 
-import type { CalendarEvent } from "@vitals/shared";
-import { ChevronLeft, ChevronRight, Plus, Trash2, X } from "lucide-react";
+import type { CalendarEvent, Todo, TodoStatus } from "@vitals/shared";
+import { CheckCircle2, ChevronLeft, ChevronRight, Circle, Clock3, Plus, Trash2, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { createCalendarEvent, deleteCalendarEvent, getCalendarEvents, updateCalendarEvent } from "@/lib/api-browser";
+import {
+  createCalendarEvent,
+  deleteCalendarEvent,
+  getCalendarEvents,
+  updateCalendarEvent,
+  updateTodo,
+} from "@/lib/api-browser";
 import { cn } from "@/lib/cn";
 import { addDays, getWeekDates, toISODate } from "@/lib/date";
+
+const NEXT_STATUS: Record<TodoStatus, TodoStatus> = {
+  todo: "in_progress",
+  in_progress: "done",
+  done: "todo",
+};
+
+const STATUS_ICON: Record<TodoStatus, typeof Circle> = {
+  todo: Circle,
+  in_progress: Clock3,
+  done: CheckCircle2,
+};
 
 const START_HOUR = 6;
 const END_HOUR = 22;
@@ -41,14 +59,37 @@ interface DraftEvent {
 export function WeekCalendar({
   initialWeekStart,
   initialEvents,
+  initialTodos,
 }: {
   initialWeekStart: string;
   initialEvents: CalendarEvent[];
+  initialTodos: Todo[];
 }) {
   const [weekStart, setWeekStart] = useState(new Date(`${initialWeekStart}T00:00:00`));
   const [events, setEvents] = useState(initialEvents);
+  const [todos, setTodos] = useState(initialTodos);
   const [loading, setLoading] = useState(false);
   const [draft, setDraft] = useState<DraftEvent | null>(null);
+
+  const todosByDate = useMemo(() => {
+    const map = new Map<string, Todo[]>();
+    for (const todo of todos) {
+      if (!todo.dueDate) continue;
+      const day = todo.dueDate.slice(0, 10);
+      const list = map.get(day) ?? [];
+      list.push(todo);
+      map.set(day, list);
+    }
+    return map;
+  }, [todos]);
+
+  async function cycleTodoStatus(todo: Todo) {
+    const { todo: updated, nextTodo } = await updateTodo(todo.id, { status: NEXT_STATUS[todo.status] });
+    setTodos((prev) => {
+      const next = prev.map((t) => (t.id === updated.id ? updated : t));
+      return nextTodo ? [nextTodo, ...next] : next;
+    });
+  }
 
   const weekDates = useMemo(() => getWeekDates(weekStart), [weekStart]);
   const todayStr = toISODate(new Date());
@@ -164,13 +205,45 @@ export function WeekCalendar({
             return (
               <div key={iso} className="border-l border-neutral-800 p-2 text-center">
                 <p className="text-[10px] font-semibold tracking-wider text-neutral-500">{DAY_LABELS[i]}</p>
-                <p className={cn("text-sm font-medium", iso === todayStr ? "text-orange-400" : "text-neutral-200")}>
+                <p className={cn("text-sm font-medium", iso === todayStr ? "text-cyan-300" : "text-neutral-200")}>
                   {d.getDate()}
                 </p>
               </div>
             );
           })}
         </div>
+
+        {todosByDate.size > 0 && (
+          <div className="grid min-w-[720px] grid-cols-[56px_repeat(7,1fr)] border-b border-neutral-800">
+            <div className="p-1 text-right text-[9px] text-neutral-600">Due</div>
+            {weekDates.map((d) => {
+              const iso = toISODate(d);
+              const dueTodos = todosByDate.get(iso) ?? [];
+              return (
+                <div key={iso} className="flex flex-wrap gap-1 border-l border-neutral-800 p-1">
+                  {dueTodos.map((todo) => {
+                    const StatusIcon = STATUS_ICON[todo.status];
+                    return (
+                      <button
+                        key={todo.id}
+                        type="button"
+                        onClick={() => cycleTodoStatus(todo)}
+                        title="Click to advance status"
+                        className={cn(
+                          "flex max-w-full items-center gap-1 rounded-md border border-neutral-700 bg-neutral-800/80 px-1.5 py-0.5 text-[10px] text-neutral-200",
+                          todo.status === "done" && "text-neutral-500 line-through",
+                        )}
+                      >
+                        <StatusIcon className="h-3 w-3 shrink-0" />
+                        <span className="truncate">{todo.title}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         <div className="relative grid min-w-[720px] grid-cols-[56px_repeat(7,1fr)]" style={{ height: gridHeight }}>
           <div className="relative">
@@ -249,26 +322,26 @@ export function WeekCalendar({
                 value={draft.title}
                 onChange={(e) => setDraft({ ...draft, title: e.target.value })}
                 placeholder="Block title..."
-                className="w-full rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-orange-500/60 focus:outline-none"
+                className="w-full rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
               />
               <input
                 type="date"
                 value={draft.date}
                 onChange={(e) => setDraft({ ...draft, date: e.target.value })}
-                className="w-full rounded-lg border border-neutral-700 bg-neutral-950 px-2 py-2 text-sm text-neutral-300 focus:border-orange-500/60 focus:outline-none"
+                className="w-full rounded-lg border border-neutral-700 bg-neutral-950 px-2 py-2 text-sm text-neutral-300 focus:border-cyan-400/60 focus:outline-none"
               />
               <div className="flex gap-2">
                 <input
                   type="time"
                   value={draft.startTime}
                   onChange={(e) => setDraft({ ...draft, startTime: e.target.value })}
-                  className="flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-2 py-2 text-sm text-neutral-300 focus:border-orange-500/60 focus:outline-none"
+                  className="flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-2 py-2 text-sm text-neutral-300 focus:border-cyan-400/60 focus:outline-none"
                 />
                 <input
                   type="time"
                   value={draft.endTime}
                   onChange={(e) => setDraft({ ...draft, endTime: e.target.value })}
-                  className="flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-2 py-2 text-sm text-neutral-300 focus:border-orange-500/60 focus:outline-none"
+                  className="flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-2 py-2 text-sm text-neutral-300 focus:border-cyan-400/60 focus:outline-none"
                 />
               </div>
               <div className="flex items-center gap-1.5">
@@ -302,7 +375,7 @@ export function WeekCalendar({
                   type="button"
                   onClick={saveDraft}
                   disabled={!draft.title.trim()}
-                  className="flex items-center gap-1.5 rounded-lg bg-orange-500 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-orange-600 disabled:opacity-50"
+                  className="flex items-center gap-1.5 rounded-lg bg-cyan-400 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-cyan-500 disabled:opacity-50"
                 >
                   <Plus className="h-3.5 w-3.5" />
                   Save

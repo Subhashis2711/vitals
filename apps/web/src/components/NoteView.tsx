@@ -60,7 +60,7 @@ export function NoteView({
             <button
               type="button"
               onClick={onEdit}
-              className="flex items-center gap-1.5 rounded-lg bg-orange-500 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-orange-600"
+              className="flex items-center gap-1.5 rounded-lg bg-cyan-400 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-cyan-500"
             >
               <Pencil className="h-3.5 w-3.5" />
               Edit
@@ -92,10 +92,10 @@ export function NoteView({
             href={note.sourceUrl}
             target="_blank"
             rel="noreferrer"
-            className="mt-3 inline-flex items-center gap-1 text-sm text-blue-400 hover:underline"
+            className="mt-3 flex min-w-0 items-center gap-1 text-sm text-blue-400 hover:underline"
           >
-            <ExternalLink className="h-3.5 w-3.5" />
-            {note.sourceUrl}
+            <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+            <span className="truncate">{note.sourceUrl}</span>
           </a>
         )}
 
@@ -113,7 +113,7 @@ export function NoteView({
                 key={todo.id}
                 className="group flex items-center gap-2 rounded-lg border border-neutral-800 bg-neutral-950/60 p-2 text-sm"
               >
-                <button type="button" onClick={() => toggleTodo(todo)} className="text-neutral-500 hover:text-orange-400">
+                <button type="button" onClick={() => toggleTodo(todo)} className="text-neutral-500 hover:text-cyan-300">
                   {todo.status === "done" ? (
                     <CheckCircle2 className="h-4 w-4 text-emerald-500" />
                   ) : (
@@ -126,7 +126,7 @@ export function NoteView({
                 <button
                   type="button"
                   onClick={() => handleDeleteTodo(todo.id)}
-                  className="text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+                  className="-m-1.5 p-1.5 text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>

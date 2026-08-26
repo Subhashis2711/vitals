@@ -105,7 +105,7 @@ function SegmentedToggle<T extends string>({
           onClick={() => onChange(opt.value)}
           className={cn(
             "rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
-            value === opt.value ? "bg-orange-500 text-white" : "text-neutral-400 hover:text-neutral-200",
+            value === opt.value ? "bg-cyan-400 text-white" : "text-neutral-400 hover:text-neutral-200",
           )}
         >
           {opt.label}
@@ -137,7 +137,7 @@ function ToolbarButton({
       title={label}
       className={cn(
         "flex h-7 w-7 items-center justify-center rounded-md transition-colors",
-        active ? "bg-orange-500/20 text-orange-400" : "text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100",
+        active ? "bg-cyan-400/20 text-cyan-300" : "text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100",
       )}
     >
       <Icon className="h-3.5 w-3.5" />
@@ -457,7 +457,7 @@ export function NoteEditor({ mode, projects, note, initialLinkedTodos, onSaved, 
                   value={fontFamily}
                   onChange={(e) => setFontFamily(e.target.value as FontFamily)}
                   title="Font family"
-                  className="rounded-md border border-neutral-700 bg-neutral-950 px-2 py-1 text-xs text-neutral-300 focus:border-orange-500/60 focus:outline-none"
+                  className="rounded-md border border-neutral-700 bg-neutral-950 px-2 py-1 text-xs text-neutral-300 focus:border-cyan-400/60 focus:outline-none"
                 >
                   <option value="sans">Sans</option>
                   <option value="serif">Serif</option>
@@ -493,7 +493,7 @@ export function NoteEditor({ mode, projects, note, initialLinkedTodos, onSaved, 
                     execFormat("formatBlock", e.target.value);
                   }}
                   title="Text style"
-                  className="rounded-md border border-neutral-700 bg-neutral-950 px-2 py-1 text-xs text-neutral-300 focus:border-orange-500/60 focus:outline-none"
+                  className="rounded-md border border-neutral-700 bg-neutral-950 px-2 py-1 text-xs text-neutral-300 focus:border-cyan-400/60 focus:outline-none"
                 >
                   <option value="P">Paragraph</option>
                   <option value="H1">Heading 1</option>
@@ -569,7 +569,7 @@ export function NoteEditor({ mode, projects, note, initialLinkedTodos, onSaved, 
                 type="button"
                 onClick={handleStrip}
                 disabled={stripping || !content.trim()}
-                className="flex items-center gap-1 text-xs text-neutral-500 hover:text-orange-400 disabled:opacity-50"
+                className="flex items-center gap-1 text-xs text-neutral-500 hover:text-cyan-300 disabled:opacity-50"
                 title="Deterministically strip markdown syntax (no AI) and switch to Plain text"
               >
                 {stripping ? <Loader2 className="h-3 w-3 animate-spin" /> : <Eraser className="h-3 w-3" />}
@@ -581,7 +581,7 @@ export function NoteEditor({ mode, projects, note, initialLinkedTodos, onSaved, 
                 type="button"
                 onClick={handleFormat}
                 disabled={formatting || !hasContent(content)}
-                className="flex items-center gap-1 text-xs text-neutral-500 hover:text-orange-400 disabled:opacity-50"
+                className="flex items-center gap-1 text-xs text-neutral-500 hover:text-cyan-300 disabled:opacity-50"
                 title="Ask Gemini to infer markdown structure and switch to Markdown"
               >
                 {formatting ? <Loader2 className="h-3 w-3 animate-spin" /> : <Wand2 className="h-3 w-3" />}
@@ -592,7 +592,7 @@ export function NoteEditor({ mode, projects, note, initialLinkedTodos, onSaved, 
               type="button"
               onClick={handleExport}
               disabled={!hasContent(content)}
-              className="flex items-center gap-1 text-xs text-neutral-500 hover:text-orange-400 disabled:opacity-50"
+              className="flex items-center gap-1 text-xs text-neutral-500 hover:text-cyan-300 disabled:opacity-50"
               title="Download the current content as a .md file"
             >
               <Download className="h-3 w-3" />
@@ -606,7 +606,7 @@ export function NoteEditor({ mode, projects, note, initialLinkedTodos, onSaved, 
             <button
               type="submit"
               disabled={saving || !title.trim() || !hasContent(content)}
-              className="flex items-center gap-1.5 rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-orange-600 disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-lg bg-cyan-400 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-cyan-500 disabled:opacity-50"
             >
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
               {saving ? "Saving..." : mode === "create" ? "Save note" : "Save changes"}
@@ -647,7 +647,7 @@ export function NoteEditor({ mode, projects, note, initialLinkedTodos, onSaved, 
             <button
               type="submit"
               disabled={addingTodo || !newTodoTitle.trim()}
-              className="flex shrink-0 items-center gap-1 rounded-xl bg-orange-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-orange-600 disabled:opacity-50"
+              className="flex shrink-0 items-center gap-1 rounded-xl bg-cyan-400 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-cyan-500 disabled:opacity-50"
             >
               <Plus className="h-4 w-4" />
             </button>
@@ -658,7 +658,7 @@ export function NoteEditor({ mode, projects, note, initialLinkedTodos, onSaved, 
                 key={todo.id}
                 className="group flex items-center gap-2 rounded-lg border border-neutral-800 bg-neutral-950/60 p-2 text-sm"
               >
-                <button type="button" onClick={() => toggleTodo(todo)} className="text-neutral-500 hover:text-orange-400">
+                <button type="button" onClick={() => toggleTodo(todo)} className="text-neutral-500 hover:text-cyan-300">
                   {todo.status === "done" ? (
                     <CheckCircle2 className="h-4 w-4 text-emerald-500" />
                   ) : (

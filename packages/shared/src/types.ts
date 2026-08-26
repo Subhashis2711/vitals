@@ -1,6 +1,24 @@
 import { z } from "zod";
-import { GOAL_STATUSES, NOTE_CONTENT_TYPES, NOTE_DOMAINS, TEMPLATE_TYPES, TODO_SOURCES, TODO_STATUSES } from "./enums";
+import {
+  GOAL_STATUSES,
+  HABIT_FREQUENCIES,
+  NOTE_CONTENT_TYPES,
+  NOTE_DOMAINS,
+  RECURRENCE_FREQS,
+  TEMPLATE_TYPES,
+  TODO_SOURCES,
+  TODO_STATUSES,
+} from "./enums";
 import { gidSchema } from "./gid";
+
+// A todo's recurrence rule. daysOfWeek only applies to "weekly" — repeat on
+// specific weekdays (0=Sun..6=Sat) instead of every 7 days from the due
+// date; omitted/empty means "every 7 days on the same weekday as the due
+// date" (see nextOccurrence in packages/db/src/repositories/todos.ts).
+const recurrenceFieldsSchema = {
+  recurrenceFreq: z.enum(RECURRENCE_FREQS).nullable(),
+  recurrenceDaysOfWeek: z.array(z.number().min(0).max(6)).nullable(),
+};
 
 // --- Entities (mirror the DB shape returned by the API) ---
 // id/FK fields are Shopify-style GIDs (`brain/<type>/<uuid>`) as returned by
@@ -19,6 +37,7 @@ export const todoSchema = z.object({
   projectId: z.string().nullable(),
   goalId: z.string().nullable(),
   position: z.number(),
+  ...recurrenceFieldsSchema,
   createdAt: z.string(),
   updatedAt: z.string(),
 });
@@ -66,6 +85,8 @@ export const createTodoInputSchema = z.object({
   tags: z.array(z.string()).optional(),
   projectId: gidSchema("project").nullable().optional(),
   goalId: gidSchema("goal").nullable().optional(),
+  recurrenceFreq: z.enum(RECURRENCE_FREQS).nullable().optional(),
+  recurrenceDaysOfWeek: z.array(z.number().min(0).max(6)).nullable().optional(),
 });
 export type CreateTodoInput = z.infer<typeof createTodoInputSchema>;
 
@@ -163,6 +184,11 @@ export const habitSchema = z.object({
   name: z.string(),
   description: z.string().nullable(),
   color: z.string().nullable(),
+  frequency: z.enum(HABIT_FREQUENCIES),
+  // Only meaningful for "weekly" — which weekdays (0=Sun..6=Sat) this habit
+  // is expected on. Unused for "daily" (every day) and "monthly" (the
+  // tracker just checks for one log anywhere in the current month).
+  daysOfWeek: z.array(z.number().min(0).max(6)).nullable(),
   createdAt: z.string(),
 });
 export type Habit = z.infer<typeof habitSchema>;
@@ -171,6 +197,8 @@ export const createHabitInputSchema = z.object({
   name: z.string().min(1),
   description: z.string().nullable().optional(),
   color: z.string().nullable().optional(),
+  frequency: z.enum(HABIT_FREQUENCIES).optional(),
+  daysOfWeek: z.array(z.number().min(0).max(6)).nullable().optional(),
 });
 export type CreateHabitInput = z.infer<typeof createHabitInputSchema>;
 
@@ -398,3 +426,27 @@ export type CreateSavingsGoalInput = z.infer<typeof createSavingsGoalInputSchema
 
 export const updateSavingsGoalInputSchema = createSavingsGoalInputSchema.partial();
 export type UpdateSavingsGoalInput = z.infer<typeof updateSavingsGoalInputSchema>;
+
+// --- Pomodoro ---
+// A session is logged once a focus interval finishes — the running countdown
+// itself is client-side only (see apps/web/src/lib/pomodoro-context.tsx).
+
+export const pomodoroSessionSchema = z.object({
+  id: z.string(),
+  todoId: z.string().nullable(),
+  label: z.string().nullable(),
+  durationMin: z.number(),
+  startedAt: z.string(),
+  completedAt: z.string(),
+  createdAt: z.string(),
+});
+export type PomodoroSession = z.infer<typeof pomodoroSessionSchema>;
+
+export const createPomodoroSessionInputSchema = z.object({
+  todoId: gidSchema("todo").nullable().optional(),
+  label: z.string().nullable().optional(),
+  durationMin: z.number().min(1),
+  startedAt: z.string(),
+  completedAt: z.string(),
+});
+export type CreatePomodoroSessionInput = z.infer<typeof createPomodoroSessionInputSchema>;

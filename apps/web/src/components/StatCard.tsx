@@ -1,7 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 
 const ACCENTS = {
-  orange: "bg-orange-500/15 text-orange-400",
+  cyan: "bg-cyan-400/15 text-cyan-300",
   emerald: "bg-emerald-500/15 text-emerald-400",
   amber: "bg-amber-500/15 text-amber-400",
   blue: "bg-blue-500/15 text-blue-400",
@@ -11,7 +11,7 @@ export function StatCard({
   label,
   value,
   icon: Icon,
-  accent = "orange",
+  accent = "cyan",
 }: {
   label: string;
   value: string;

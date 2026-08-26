@@ -46,12 +46,12 @@ export function LearningTopicList({ initialTopics }: { initialTopics: LearningTo
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="New learning topic..."
-          className="min-w-0 flex-1 rounded-lg border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-orange-500/60 focus:outline-none focus:ring-2 focus:ring-orange-500/20"
+          className="min-w-0 flex-1 rounded-lg border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
         />
         <button
           type="submit"
           disabled={submitting || !title.trim()}
-          className="flex items-center gap-1 rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-orange-600 disabled:opacity-50"
+          className="flex items-center gap-1 rounded-lg bg-cyan-400 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-cyan-500 disabled:opacity-50"
         >
           <Plus className="h-4 w-4" />
           Add
@@ -64,7 +64,7 @@ export function LearningTopicList({ initialTopics }: { initialTopics: LearningTo
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search topics..."
-          className="w-full rounded-lg border border-neutral-800 bg-neutral-900 py-1.5 pl-8 pr-3 text-sm text-neutral-200 placeholder:text-neutral-500 focus:border-orange-500/60 focus:outline-none"
+          className="w-full rounded-lg border border-neutral-800 bg-neutral-900 py-1.5 pl-8 pr-3 text-sm text-neutral-200 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
         />
       </div>
 
@@ -72,7 +72,7 @@ export function LearningTopicList({ initialTopics }: { initialTopics: LearningTo
         {visibleTopics.map((topic) => (
           <div key={topic.id} className="group relative rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
             <Link href={`/learning/${encodeURIComponent(topic.id)}`} className="flex items-center gap-3">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-500/15 text-orange-400">
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-400/15 text-cyan-300">
                 <BookOpen className="h-4 w-4" />
               </span>
               <div className="min-w-0">
@@ -85,7 +85,7 @@ export function LearningTopicList({ initialTopics }: { initialTopics: LearningTo
             <button
               type="button"
               onClick={() => handleDelete(topic.id, topic.title)}
-              className="absolute right-3 top-3 text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+              className="absolute right-1.5 top-1.5 p-1.5 text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
             >
               <Trash2 className="h-3.5 w-3.5" />
             </button>

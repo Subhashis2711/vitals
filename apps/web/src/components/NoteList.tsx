@@ -43,13 +43,13 @@ export function NoteList({ initialNotes, projects }: { initialNotes: Note[]; pro
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search notes..."
-            className="w-full rounded-lg border border-neutral-800 bg-neutral-900 py-1.5 pl-8 pr-3 text-sm text-neutral-200 placeholder:text-neutral-500 focus:border-orange-500/60 focus:outline-none"
+            className="w-full rounded-lg border border-neutral-800 bg-neutral-900 py-1.5 pl-8 pr-3 text-sm text-neutral-200 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
           />
         </div>
         <select
           value={contentType}
           onChange={(e) => setContentType(e.target.value)}
-          className="rounded-lg border border-neutral-800 bg-neutral-900 px-2 py-1.5 text-sm text-neutral-300 focus:border-orange-500/60 focus:outline-none"
+          className="rounded-lg border border-neutral-800 bg-neutral-900 px-2 py-1.5 text-sm text-neutral-300 focus:border-cyan-400/60 focus:outline-none"
         >
           <option value="all">All types</option>
           {NOTE_CONTENT_TYPES.map((type) => (
@@ -77,7 +77,7 @@ export function NoteList({ initialNotes, projects }: { initialNotes: Note[]; pro
           >
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
-                <Link href={`/notes/${encodeURIComponent(note.id)}`} className="font-medium text-neutral-100 hover:text-orange-400">
+                <Link href={`/notes/${encodeURIComponent(note.id)}`} className="font-medium text-neutral-100 hover:text-cyan-300">
                   {note.title ?? "Untitled"}
                 </Link>
                 <p className="mt-1 flex items-center gap-1 text-xs uppercase tracking-wide text-neutral-500">

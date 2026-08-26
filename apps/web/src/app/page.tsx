@@ -7,7 +7,7 @@ import { ProjectBadge } from "@/components/ProjectBadge";
 import { QuickCapture } from "@/components/QuickCapture";
 import { StatCard } from "@/components/StatCard";
 import { TodoBoard } from "@/components/TodoBoard";
-import { getHabitLogs, getHabits, getNotes, getProjects, getTodos } from "@/lib/api";
+import { getGoals, getHabitLogs, getHabits, getNotes, getProjects, getTodos } from "@/lib/api";
 import { friendlyDate } from "@/lib/date";
 
 function timeAgo(iso: string): string {
@@ -30,12 +30,13 @@ function greeting(): string {
 
 export default async function DashboardPage() {
   const todayStr = new Date().toLocaleDateString("en-CA");
-  const [{ todos }, { notes }, { projects }, { habits }, { logs: todayLogs }] = await Promise.all([
+  const [{ todos }, { notes }, { projects }, { habits }, { logs: todayLogs }, { goals }] = await Promise.all([
     getTodos(),
     getNotes(),
     getProjects(),
     getHabits(),
     getHabitLogs(todayStr),
+    getGoals(),
   ]);
 
   const projectById = new Map(projects.map((p) => [p.id, p]));
@@ -67,7 +68,7 @@ export default async function DashboardPage() {
       <PageHeader title={greeting()} subtitle={`Here's what your second brain remembers · ${friendlyDate()}`} />
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatCard label="Total notes" value={String(notes.length)} icon={StickyNote} accent="orange" />
+        <StatCard label="Total notes" value={String(notes.length)} icon={StickyNote} accent="cyan" />
         <StatCard label="Open todos" value={String(openTodos)} icon={ListTodo} accent="blue" />
         <StatCard label="Projects" value={String(projects.length)} icon={Folder} accent="amber" />
         <StatCard
@@ -83,20 +84,20 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <section className="lg:col-span-2">
           <h2 className="mb-3 flex items-center gap-1.5 text-base font-semibold text-neutral-100">
-            <ListTodo className="h-4.5 w-4.5 text-orange-400" />
+            <ListTodo className="h-4.5 w-4.5 text-cyan-300" />
             Todos
           </h2>
-          <TodoBoard initialTodos={todos} projects={projects} />
+          <TodoBoard initialTodos={todos} projects={projects} goals={goals} />
         </section>
 
         <div className="space-y-6">
           <section className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
             <div className="mb-3 flex items-center justify-between">
               <h2 className="flex items-center gap-1.5 text-sm font-semibold text-neutral-100">
-                <StickyNote className="h-4 w-4 text-orange-400" />
+                <StickyNote className="h-4 w-4 text-cyan-300" />
                 Recent activity
               </h2>
-              <Link href="/notes" className="text-xs text-neutral-500 hover:text-orange-400">
+              <Link href="/notes" className="text-xs text-neutral-500 hover:text-cyan-300">
                 View all
               </Link>
             </div>
@@ -109,7 +110,7 @@ export default async function DashboardPage() {
                   >
                     <span
                       className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${
-                        item.kind === "note" ? "bg-orange-500/15 text-orange-400" : "bg-blue-500/15 text-blue-400"
+                        item.kind === "note" ? "bg-cyan-400/15 text-cyan-300" : "bg-blue-500/15 text-blue-400"
                       }`}
                     >
                       {item.kind === "note" && item.contentType ? (
@@ -138,7 +139,7 @@ export default async function DashboardPage() {
                 <Flame className="h-4 w-4 text-emerald-400" />
                 Habits today
               </h2>
-              <Link href="/habits" className="text-xs text-neutral-500 hover:text-orange-400">
+              <Link href="/habits" className="text-xs text-neutral-500 hover:text-cyan-300">
                 View all
               </Link>
             </div>
@@ -151,7 +152,7 @@ export default async function DashboardPage() {
                 <Folder className="h-4 w-4 text-amber-400" />
                 Projects
               </h2>
-              <Link href="/projects" className="text-xs text-neutral-500 hover:text-orange-400">
+              <Link href="/projects" className="text-xs text-neutral-500 hover:text-cyan-300">
                 View all
               </Link>
             </div>

@@ -3,13 +3,13 @@
 import { GOAL_STATUSES, type Goal, type LearningTopic, type Project } from "@vitals/shared";
 import { Plus, Search, Target, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState, type FormEvent } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { CircularProgress } from "@/components/CircularProgress";
+import { NewGoalModal } from "@/components/NewGoalModal";
 import { ProjectBadge } from "@/components/ProjectBadge";
 import { ProjectSelect } from "@/components/ProjectSelect";
-import { TopicSelect } from "@/components/TopicSelect";
-import { createGoal, deleteGoal } from "@/lib/api-browser";
+import { deleteGoal } from "@/lib/api-browser";
 import { cn } from "@/lib/cn";
 
 const STATUS_STYLES: Record<string, string> = {
@@ -33,11 +33,7 @@ export function GoalManager({
   topics: LearningTopic[];
 }) {
   const [goals, setGoals] = useState(initialGoals);
-  const [title, setTitle] = useState("");
-  const [targetDate, setTargetDate] = useState("");
-  const [projectId, setProjectId] = useState("");
-  const [topicId, setTopicId] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -55,29 +51,6 @@ export function GoalManager({
     });
   }, [goals, search, statusFilter, filterProjectId]);
 
-  async function handleCreate(e: FormEvent) {
-    e.preventDefault();
-    if (!title.trim()) return;
-    setSubmitting(true);
-    try {
-      const { goal } = await createGoal({
-        title: title.trim(),
-        targetDate: targetDate || undefined,
-        projectId: projectId || undefined,
-        topicId: topicId || undefined,
-      });
-      setGoals((prev) => [goal, ...prev]);
-      setTitle("");
-      setTargetDate("");
-      setProjectId("");
-      setTopicId("");
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Couldn't create goal");
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
   async function handleDelete(id: string, goalTitle: string) {
     setGoals((prev) => prev.filter((g) => g.id !== id));
     await deleteGoal(id);
@@ -86,42 +59,14 @@ export function GoalManager({
 
   return (
     <div className="space-y-4">
-      <form
-        onSubmit={handleCreate}
-        className="flex flex-wrap gap-2 rounded-2xl border border-neutral-800 bg-neutral-900 p-4"
+      <button
+        type="button"
+        onClick={() => setCreateOpen(true)}
+        className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-cyan-400 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-cyan-500 sm:w-auto"
       >
-        <input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="New goal..."
-          className="min-w-0 flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-orange-500/60 focus:outline-none focus:ring-2 focus:ring-orange-500/20"
-        />
-        {projects.length > 0 && (
-          <ProjectSelect
-            projects={projects}
-            value={projectId}
-            onChange={setProjectId}
-            className="border-neutral-700 bg-neutral-950"
-          />
-        )}
-        {topics.length > 0 && (
-          <TopicSelect topics={topics} value={topicId} onChange={setTopicId} className="border-neutral-700 bg-neutral-950" />
-        )}
-        <input
-          type="date"
-          value={targetDate}
-          onChange={(e) => setTargetDate(e.target.value)}
-          className="rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-300 focus:border-orange-500/60 focus:outline-none focus:ring-2 focus:ring-orange-500/20"
-        />
-        <button
-          type="submit"
-          disabled={submitting || !title.trim()}
-          className="flex items-center gap-1 rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-orange-600 disabled:opacity-50"
-        >
-          <Plus className="h-4 w-4" />
-          Add
-        </button>
-      </form>
+        <Plus className="h-4 w-4" />
+        New Goal
+      </button>
 
       <div className="flex flex-wrap items-center gap-2">
         <div className="relative min-w-0 flex-1">
@@ -130,7 +75,7 @@ export function GoalManager({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search goals..."
-            className="w-full rounded-lg border border-neutral-800 bg-neutral-900 py-1.5 pl-8 pr-3 text-sm text-neutral-200 placeholder:text-neutral-500 focus:border-orange-500/60 focus:outline-none"
+            className="w-full rounded-lg border border-neutral-800 bg-neutral-900 py-1.5 pl-8 pr-3 text-sm text-neutral-200 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
           />
         </div>
         {projects.length > 0 && (
@@ -148,7 +93,7 @@ export function GoalManager({
             onClick={() => setStatusFilter("all")}
             className={cn(
               "rounded-full px-2.5 py-1 text-xs font-medium transition-colors",
-              statusFilter === "all" ? "bg-orange-500 text-white" : "bg-neutral-900 text-neutral-400 hover:text-neutral-200",
+              statusFilter === "all" ? "bg-cyan-400 text-white" : "bg-neutral-900 text-neutral-400 hover:text-neutral-200",
             )}
           >
             All
@@ -160,7 +105,7 @@ export function GoalManager({
               onClick={() => setStatusFilter(s)}
               className={cn(
                 "rounded-full px-2.5 py-1 text-xs font-medium transition-colors",
-                statusFilter === s ? "bg-orange-500 text-white" : "bg-neutral-900 text-neutral-400 hover:text-neutral-200",
+                statusFilter === s ? "bg-cyan-400 text-white" : "bg-neutral-900 text-neutral-400 hover:text-neutral-200",
               )}
             >
               {STATUS_LABELS[s]}
@@ -193,7 +138,7 @@ export function GoalManager({
             <button
               type="button"
               onClick={() => handleDelete(goal.id, goal.title)}
-              className="absolute right-3 top-3 text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+              className="absolute right-1.5 top-1.5 p-1.5 text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
             >
               <Trash2 className="h-3.5 w-3.5" />
             </button>
@@ -208,6 +153,15 @@ export function GoalManager({
           </div>
         )}
       </div>
+
+      {createOpen && (
+        <NewGoalModal
+          projects={projects}
+          topics={topics}
+          onClose={() => setCreateOpen(false)}
+          onCreated={(goal) => setGoals((prev) => [goal, ...prev])}
+        />
+      )}
     </div>
   );
 }

@@ -147,7 +147,7 @@ export function HealthDashboard({
               value={sport}
               onChange={(e) => setSport(e.target.value)}
               placeholder="Activity (e.g. Running)"
-              className="min-w-0 flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-orange-500/60 focus:outline-none"
+              className="min-w-0 flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
             />
             <input
               type="number"
@@ -155,12 +155,12 @@ export function HealthDashboard({
               value={duration}
               onChange={(e) => setDuration(e.target.value)}
               placeholder="min"
-              className="w-20 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-orange-500/60 focus:outline-none"
+              className="w-20 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
             />
             <button
               type="submit"
               disabled={submitting || !sport.trim() || !duration}
-              className="flex items-center gap-1 rounded-lg bg-orange-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-orange-600 disabled:opacity-50"
+              className="flex items-center gap-1 rounded-lg bg-cyan-400 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-cyan-500 disabled:opacity-50"
             >
               <Plus className="h-4 w-4" />
             </button>
@@ -171,16 +171,16 @@ export function HealthDashboard({
                 key={a.id}
                 className="group flex items-center justify-between rounded-lg border border-neutral-800 bg-neutral-950/60 p-2 text-sm"
               >
-                <div>
-                  <p className="text-neutral-200">{a.sport}</p>
+                <div className="min-w-0">
+                  <p className="truncate text-neutral-200">{a.sport}</p>
                   <p className="text-xs text-neutral-500">{a.date}</p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex shrink-0 items-center gap-2">
                   <span className="text-neutral-400">{a.durationMin}min</span>
                   <button
                     type="button"
                     onClick={() => handleDeleteActivity(a.id)}
-                    className="text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+                    className="-m-1.5 p-1.5 text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
@@ -198,7 +198,7 @@ export function HealthDashboard({
           </div>
           <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
             <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-neutral-500">Steps · 7 days</h3>
-            <BarChart data={stepsData} color="#f97316" />
+            <BarChart data={stepsData} color="#06b6d4" />
           </div>
           {weightData.length > 1 && (
             <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">

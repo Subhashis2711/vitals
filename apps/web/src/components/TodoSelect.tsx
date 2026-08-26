@@ -1,16 +1,16 @@
 "use client";
 
-import type { LearningTopic } from "@vitals/shared";
+import type { Todo } from "@vitals/shared";
 import { cn } from "@/lib/cn";
 
-export function TopicSelect({
-  topics,
+export function TodoSelect({
+  todos,
   value,
   onChange,
   className,
-  placeholder = "No topic",
+  placeholder = "No linked todo",
 }: {
-  topics: LearningTopic[];
+  todos: Todo[];
   value: string;
   onChange: (value: string) => void;
   className?: string;
@@ -26,9 +26,9 @@ export function TopicSelect({
       )}
     >
       <option value="">{placeholder}</option>
-      {topics.map((topic) => (
-        <option key={topic.id} value={topic.id}>
-          {topic.title}
+      {todos.map((todo) => (
+        <option key={todo.id} value={todo.id}>
+          {todo.title}
         </option>
       ))}
     </select>

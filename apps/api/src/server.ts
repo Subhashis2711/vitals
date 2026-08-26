@@ -10,6 +10,7 @@ import { learningRoutes } from "./routes/learning";
 import { markdownRoutes } from "./routes/markdown";
 import { moneyRoutes } from "./routes/money";
 import { notesRoutes } from "./routes/notes";
+import { pomodoroRoutes } from "./routes/pomodoro";
 import { projectsRoutes } from "./routes/projects";
 import { todosRoutes } from "./routes/todos";
 
@@ -47,6 +48,7 @@ export function buildServer() {
     protectedApp.register(journalRoutes, { prefix: "/journal" });
     protectedApp.register(healthRoutes, { prefix: "/wellness" });
     protectedApp.register(moneyRoutes, { prefix: "/money" });
+    protectedApp.register(pomodoroRoutes, { prefix: "/pomodoro" });
   });
 
   return app;

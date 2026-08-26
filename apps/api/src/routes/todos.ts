@@ -34,9 +34,9 @@ export async function todosRoutes(app: FastifyInstance) {
     const parsed = updateTodoInputSchema.safeParse(req.body);
     if (!parsed.success) return reply.code(400).send({ error: parsed.error.flatten() });
     const { id } = fromGid(req.params.id);
-    const todo = await todosRepo.updateTodo(id, parsed.data, req.userId);
-    if (!todo) return reply.code(404).send({ error: "Todo not found" });
-    return { todo: serializeTodo(todo) };
+    const result = await todosRepo.updateTodo(id, parsed.data, req.userId);
+    if (!result) return reply.code(404).send({ error: "Todo not found" });
+    return { todo: serializeTodo(result.todo), nextTodo: result.nextTodo ? serializeTodo(result.nextTodo) : null };
   });
 
   app.delete<{ Params: { id: string } }>("/:id", async (req, reply) => {

@@ -11,6 +11,7 @@ export const RESOURCE_TYPES = [
   "journal",
   "learning",
   "resource",
+  "pomodoro",
 ] as const;
 export type ResourceType = (typeof RESOURCE_TYPES)[number];
 

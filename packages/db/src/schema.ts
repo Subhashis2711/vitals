@@ -1,8 +1,10 @@
 import { randomUUID } from "node:crypto";
 import {
   GOAL_STATUSES,
+  HABIT_FREQUENCIES,
   NOTE_CONTENT_TYPES,
   NOTE_DOMAINS,
+  RECURRENCE_FREQS,
   TEMPLATE_TYPES,
   TODO_SOURCES,
   TODO_STATUSES,
@@ -26,6 +28,8 @@ export const noteContentTypeEnum = pgEnum("note_content_type", NOTE_CONTENT_TYPE
 export const noteDomainEnum = pgEnum("note_domain", NOTE_DOMAINS);
 export const templateTypeEnum = pgEnum("template_type", TEMPLATE_TYPES);
 export const goalStatusEnum = pgEnum("goal_status", GOAL_STATUSES);
+export const recurrenceFreqEnum = pgEnum("recurrence_freq", RECURRENCE_FREQS);
+export const habitFrequencyEnum = pgEnum("habit_frequency", HABIT_FREQUENCIES);
 
 // Supabase-managed table — declared here only so every other table can FK
 // against it. Supabase owns auth.users' own schema/migrations; we never
@@ -128,6 +132,13 @@ export const todos = pgTable("todos", {
   // status, not global — moving between columns reassigns it to the end of
   // the new column. See repositories/todos.ts.
   position: integer("position").notNull().default(0),
+  // Recurrence is opt-in (null = one-off, the default). recurrenceDaysOfWeek
+  // only applies to "weekly" — repeat on specific weekdays (0=Sun..6=Sat)
+  // instead of every 7 days from the due date. Completing a recurring todo
+  // spawns the next occurrence as a new row rather than mutating this one —
+  // see repositories/todos.ts.
+  recurrenceFreq: recurrenceFreqEnum("recurrence_freq"),
+  recurrenceDaysOfWeek: integer("recurrence_days_of_week").array(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
@@ -156,6 +167,12 @@ export const habits = pgTable("habits", {
   name: text("name").notNull(),
   description: text("description"),
   color: text("color"),
+  // "daily" (default) expects a check-in every day. "weekly" pairs with
+  // daysOfWeek (0=Sun..6=Sat) to expect check-ins only on specific weekdays.
+  // "monthly" expects one check-in per calendar month — the tracker shows a
+  // single indicator for it instead of a daily grid, see HabitTracker.tsx.
+  frequency: habitFrequencyEnum("frequency").notNull().default("daily"),
+  daysOfWeek: integer("days_of_week").array(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
@@ -309,6 +326,26 @@ export const transactions = pgTable("transactions", {
   amount: doublePrecision("amount").notNull(),
   category: text("category"),
   occurredAt: text("occurred_at").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// One row per completed focus interval — the countdown itself lives entirely
+// client-side (packages/shared doesn't need to model "running" state); this
+// table only records history, so stats/history survive a page reload.
+// todoId is optional — a session can stand alone (label carries context
+// instead) or be tied to the task it was spent on.
+export const pomodoroSessions = pgTable("pomodoro_sessions", {
+  id: uuid("id")
+    .primaryKey()
+    .$defaultFn(() => randomUUID()),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => authUsers.id, { onDelete: "cascade" }),
+  todoId: uuid("todo_id").references(() => todos.id, { onDelete: "set null" }),
+  label: text("label"),
+  durationMin: integer("duration_min").notNull(),
+  startedAt: timestamp("started_at", { withTimezone: true }).notNull(),
+  completedAt: timestamp("completed_at", { withTimezone: true }).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

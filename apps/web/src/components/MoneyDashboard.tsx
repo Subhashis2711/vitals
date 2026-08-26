@@ -119,8 +119,8 @@ export function MoneyDashboard({
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <div className="rounded-2xl border border-orange-500/30 bg-gradient-to-br from-orange-500/20 to-orange-600/5 p-4">
-          <p className="text-xs font-medium uppercase tracking-wide text-orange-300">Runway</p>
+        <div className="rounded-2xl border border-cyan-400/30 bg-gradient-to-br from-cyan-400/20 to-cyan-500/5 p-4">
+          <p className="text-xs font-medium uppercase tracking-wide text-cyan-200">Runway</p>
           <p className="mt-1 text-2xl font-semibold text-neutral-50">
             {runwayMonths != null ? `${runwayMonths.toFixed(1)}mo` : "—"}
           </p>
@@ -171,7 +171,7 @@ export function MoneyDashboard({
 
         <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
           <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-neutral-200">
-            <Target className="h-4 w-4 text-orange-400" />
+            <Target className="h-4 w-4 text-cyan-300" />
             Savings goals
           </h3>
           <ul className="mb-3 space-y-3">
@@ -187,14 +187,14 @@ export function MoneyDashboard({
                       <button
                         type="button"
                         onClick={() => handleDeleteSavingsGoal(goal.id)}
-                        className="text-neutral-700 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+                        className="-m-1.5 p-1.5 text-neutral-700 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
                       >
                         <Trash2 className="h-3 w-3" />
                       </button>
                     </div>
                   </div>
                   <div className="h-1.5 overflow-hidden rounded-full bg-neutral-800">
-                    <div className="h-full rounded-full bg-orange-500" style={{ width: `${pct}%` }} />
+                    <div className="h-full rounded-full bg-cyan-400" style={{ width: `${pct}%` }} />
                   </div>
                   <p className="mt-0.5 text-[10px] text-neutral-500">
                     {formatMoney(goal.currentAmount)} / {formatMoney(goal.targetAmount)}
@@ -209,7 +209,7 @@ export function MoneyDashboard({
               value={goalName}
               onChange={(e) => setGoalName(e.target.value)}
               placeholder="Goal name..."
-              className="w-full rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-1.5 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-orange-500/60 focus:outline-none"
+              className="w-full rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-1.5 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
             />
             <div className="flex gap-2">
               <input
@@ -217,12 +217,12 @@ export function MoneyDashboard({
                 value={goalTarget}
                 onChange={(e) => setGoalTarget(e.target.value)}
                 placeholder="Target $"
-                className="min-w-0 flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-1.5 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-orange-500/60 focus:outline-none"
+                className="min-w-0 flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-1.5 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
               />
               <button
                 type="submit"
                 disabled={!goalName.trim() || !goalTarget}
-                className="rounded-lg bg-orange-500 px-3 py-1.5 text-white transition-colors hover:bg-orange-600 disabled:opacity-50"
+                className="rounded-lg bg-cyan-400 px-3 py-1.5 text-white transition-colors hover:bg-cyan-500 disabled:opacity-50"
               >
                 <Plus className="h-4 w-4" />
               </button>
@@ -238,14 +238,14 @@ export function MoneyDashboard({
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Description..."
-            className="min-w-0 flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-orange-500/60 focus:outline-none"
+            className="min-w-0 flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
           />
           <input
             type="number"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             placeholder="Amount"
-            className="w-28 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-orange-500/60 focus:outline-none"
+            className="w-28 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
           />
           <div className="flex overflow-hidden rounded-lg border border-neutral-700">
             <button
@@ -273,12 +273,12 @@ export function MoneyDashboard({
             value={category}
             onChange={(e) => setCategory(e.target.value)}
             placeholder="Category (optional)"
-            className="min-w-0 flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-orange-500/60 focus:outline-none"
+            className="min-w-0 flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
           />
           <button
             type="submit"
             disabled={submittingTxn || !description.trim() || !amount}
-            className="flex items-center gap-1.5 rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-orange-600 disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-lg bg-cyan-400 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-cyan-500 disabled:opacity-50"
           >
             <Plus className="h-4 w-4" />
             Log transaction
@@ -290,27 +290,27 @@ export function MoneyDashboard({
               key={t.id}
               className="group flex items-center justify-between rounded-lg border border-neutral-800 bg-neutral-950/60 p-2 text-sm"
             >
-              <div className="flex items-center gap-2">
+              <div className="flex min-w-0 items-center gap-2">
                 {t.amount >= 0 ? (
-                  <ArrowUpRight className="h-3.5 w-3.5 text-emerald-500" />
+                  <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-emerald-500" />
                 ) : (
-                  <ArrowDownRight className="h-3.5 w-3.5 text-red-500" />
+                  <ArrowDownRight className="h-3.5 w-3.5 shrink-0 text-red-500" />
                 )}
-                <div>
-                  <p className="text-neutral-200">{t.description}</p>
-                  <p className="text-xs text-neutral-500">
+                <div className="min-w-0">
+                  <p className="truncate text-neutral-200">{t.description}</p>
+                  <p className="truncate text-xs text-neutral-500">
                     {t.category ?? "Uncategorized"} · {t.occurredAt}
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex shrink-0 items-center gap-2">
                 <span className={cn("font-medium", t.amount >= 0 ? "text-emerald-400" : "text-red-400")}>
                   {formatMoney(t.amount)}
                 </span>
                 <button
                   type="button"
                   onClick={() => handleDeleteTransaction(t.id)}
-                  className="text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+                  className="-m-1.5 p-1.5 text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>

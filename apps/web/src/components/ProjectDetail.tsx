@@ -13,8 +13,6 @@ import { createTodo, updateProject, deleteProject } from "@/lib/api-browser";
 import { cn } from "@/lib/cn";
 import { fieldInputClass, fieldLabelClass } from "@/lib/fieldStyles";
 
-const COLOR_OPTIONS = ["#f97316", "#10b981", "#f59e0b", "#ef4444", "#3b82f6", "#a855f7"];
-
 export function ProjectDetail({
   project: initialProject,
   notes,
@@ -30,7 +28,6 @@ export function ProjectDetail({
   const [project, setProject] = useState(initialProject);
   const [name, setName] = useState(initialProject.name);
   const [description, setDescription] = useState(initialProject.description ?? "");
-  const [color, setColor] = useState(initialProject.color ?? COLOR_OPTIONS[0]);
   const [saving, setSaving] = useState(false);
 
   const [todos, setTodos] = useState(initialTodos);
@@ -59,7 +56,6 @@ export function ProjectDetail({
       const { project: updated } = await updateProject(project.id, {
         name: name.trim(),
         description: description.trim() || null,
-        color,
       });
       setProject(updated);
       toast.success("Project saved");
@@ -81,22 +77,7 @@ export function ProjectDetail({
   return (
     <div className="space-y-6">
       <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-5">
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-[auto_1fr_auto] sm:items-end">
-          <div>
-            <label className={fieldLabelClass}>Color</label>
-            <div className="flex items-center gap-1.5 pt-1.5">
-              {COLOR_OPTIONS.map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  onClick={() => setColor(c)}
-                  className={cn("h-6 w-6 rounded-full border-2", color === c ? "border-neutral-100" : "border-transparent")}
-                  style={{ backgroundColor: c }}
-                  aria-label={`Choose color ${c}`}
-                />
-              ))}
-            </div>
-          </div>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
           <div>
             <label className={fieldLabelClass}>Name</label>
             <input value={name} onChange={(e) => setName(e.target.value)} className={fieldInputClass} />
@@ -105,7 +86,7 @@ export function ProjectDetail({
             type="button"
             onClick={handleSave}
             disabled={saving || !name.trim()}
-            className="rounded-lg bg-orange-500 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-orange-600 disabled:opacity-50"
+            className="rounded-lg bg-cyan-400 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-cyan-500 disabled:opacity-50"
           >
             Save
           </button>
@@ -133,7 +114,7 @@ export function ProjectDetail({
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <section className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
           <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-neutral-200">
-            <Target className="h-4 w-4 text-orange-400" />
+            <Target className="h-4 w-4 text-cyan-300" />
             Goals <span className="text-neutral-500">({goals.length})</span>
           </h3>
           <ul className="space-y-1.5">
@@ -154,7 +135,7 @@ export function ProjectDetail({
 
         <section className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
           <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-neutral-200">
-            <ListTodo className="h-4 w-4 text-orange-400" />
+            <ListTodo className="h-4 w-4 text-cyan-300" />
             Todos <span className="text-neutral-500">({openTodos} open / {todos.length})</span>
           </h3>
           <form onSubmit={handleAddTodo} className="mb-2 flex gap-1.5">
@@ -162,19 +143,19 @@ export function ProjectDetail({
               value={newTodoTitle}
               onChange={(e) => setNewTodoTitle(e.target.value)}
               placeholder="Add a todo..."
-              className="min-w-0 flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-2.5 py-1.5 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-orange-500/60 focus:outline-none"
+              className="min-w-0 flex-1 rounded-lg border border-neutral-700 bg-neutral-950 px-2.5 py-1.5 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
             />
             <button
               type="submit"
               disabled={addingTodo || !newTodoTitle.trim()}
-              className="flex shrink-0 items-center justify-center rounded-lg bg-orange-500 px-2.5 text-white transition-colors hover:bg-orange-600 disabled:opacity-50"
+              className="flex shrink-0 items-center justify-center rounded-lg bg-cyan-400 px-2.5 text-white transition-colors hover:bg-cyan-500 disabled:opacity-50"
             >
               <Plus className="h-4 w-4" />
             </button>
           </form>
           <EditableTodoList todos={todos} onChange={setTodos} emptyMessage="No todos linked yet." />
           {todos.length > 0 && (
-            <Link href="/todos" className="mt-2 inline-block text-xs text-neutral-500 hover:text-orange-400">
+            <Link href="/todos" className="mt-2 inline-block text-xs text-neutral-500 hover:text-cyan-300">
               View all todos →
             </Link>
           )}
@@ -182,7 +163,7 @@ export function ProjectDetail({
 
         <section className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
           <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-neutral-200">
-            <StickyNote className="h-4 w-4 text-orange-400" />
+            <StickyNote className="h-4 w-4 text-cyan-300" />
             Notes <span className="text-neutral-500">({notes.length})</span>
           </h3>
           <ul className="space-y-1.5">

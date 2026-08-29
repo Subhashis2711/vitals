@@ -3,9 +3,20 @@
 import { Activity } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
+import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 
 type Mode = "signin" | "signup";
+
+// AuthApiError doesn't type its `code` field narrowly enough to switch on
+// safely, so check loosely — Supabase returns this for both the code and
+// message when a password sign-in is attempted before the account's
+// confirmation link has been clicked.
+function isUnconfirmedEmailError(err: unknown): boolean {
+  if (!(err instanceof Error)) return false;
+  const code = (err as { code?: string }).code;
+  return code === "email_not_confirmed" || err.message.toLowerCase().includes("not confirmed");
+}
 
 export default function LoginPage() {
   const router = useRouter();
@@ -15,6 +26,8 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [unconfirmedEmail, setUnconfirmedEmail] = useState(false);
+  const [resending, setResending] = useState(false);
   const [confirmSent, setConfirmSent] = useState(false);
 
   async function handleGoogleSignIn() {
@@ -29,6 +42,7 @@ export default function LoginPage() {
   async function handleEmailSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
+    setUnconfirmedEmail(false);
     setSubmitting(true);
     try {
       const supabase = createClient();
@@ -54,15 +68,38 @@ export default function LoginPage() {
       router.push("/");
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      if (isUnconfirmedEmailError(err)) {
+        setUnconfirmedEmail(true);
+      } else {
+        setError(err instanceof Error ? err.message : "Something went wrong");
+      }
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  async function handleResendConfirmation() {
+    setResending(true);
+    try {
+      const supabase = createClient();
+      const { error: resendError } = await supabase.auth.resend({
+        type: "signup",
+        email,
+        options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+      });
+      if (resendError) throw resendError;
+      toast.success("Confirmation email resent — check your inbox (and spam folder).");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Couldn't resend the confirmation email");
+    } finally {
+      setResending(false);
     }
   }
 
   function switchMode(next: Mode) {
     setMode(next);
     setError(null);
+    setUnconfirmedEmail(false);
     setConfirmSent(false);
   }
 
@@ -116,7 +153,25 @@ export default function LoginPage() {
               placeholder="Password"
               className="w-full rounded-lg border border-neutral-300 bg-neutral-50 px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-cyan-400/60 focus:outline-none dark:border-neutral-700 dark:bg-neutral-950 dark:text-neutral-100 dark:placeholder:text-neutral-500"
             />
-            {error && <p className="text-xs text-red-500">{error}</p>}
+            {unconfirmedEmail ? (
+              <div className="rounded-lg border border-amber-400/30 bg-amber-400/10 px-3 py-2.5 text-xs text-neutral-700 dark:text-neutral-300">
+                <p>
+                  This account hasn&apos;t confirmed its email yet — check{" "}
+                  <span className="font-medium text-neutral-900 dark:text-neutral-100">{email}</span> (and spam) for the
+                  link.
+                </p>
+                <button
+                  type="button"
+                  onClick={handleResendConfirmation}
+                  disabled={resending}
+                  className="mt-1.5 font-medium text-cyan-600 hover:underline disabled:opacity-50 dark:text-cyan-300"
+                >
+                  {resending ? "Resending…" : "Resend confirmation email"}
+                </button>
+              </div>
+            ) : (
+              error && <p className="text-xs text-red-500">{error}</p>
+            )}
             <button
               type="submit"
               disabled={submitting || !email || !password}

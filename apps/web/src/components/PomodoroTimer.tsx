@@ -3,6 +3,7 @@
 import type { PomodoroSession, Todo } from "@vitals/shared";
 import { Pause, Play, RotateCcw, Timer } from "lucide-react";
 import { useEffect, useState } from "react";
+import { EmptyState } from "@/components/EmptyState";
 import { TodoSelect } from "@/components/TodoSelect";
 import { getPomodoroSessions } from "@/lib/api-browser";
 import { cn } from "@/lib/cn";
@@ -32,6 +33,22 @@ export function PomodoroTimer({ todos, initialSessions }: { todos: Todo[]; initi
   } = usePomodoro();
 
   const [sessions, setSessions] = useState(initialSessions);
+  const [durationText, setDurationText] = useState(String(durationMin));
+
+  // Keep the text in sync when the duration changes from outside typing
+  // (switching modes, resuming a mode with a previously-set duration) — but
+  // not on every durationMin change, since committing a typed value also
+  // changes durationMin and would otherwise clobber what's still being typed.
+  useEffect(() => {
+    setDurationText(String(durationMin));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode]);
+
+  function commitDuration(raw: string) {
+    const parsed = Math.min(180, Math.max(1, Number(raw) || 1));
+    setDurationMin(parsed);
+    setDurationText(String(parsed));
+  }
 
   // Refetch history whenever a focus session finishes (bumps lastCompletedAt).
   useEffect(() => {
@@ -98,8 +115,10 @@ export function PomodoroTimer({ todos, initialSessions }: { todos: Todo[]; initi
               min={1}
               max={180}
               disabled={running}
-              value={durationMin}
-              onChange={(e) => setDurationMin(Math.max(1, Number(e.target.value) || 1))}
+              value={durationText}
+              onChange={(e) => setDurationText(e.target.value)}
+              onBlur={(e) => commitDuration(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && commitDuration(e.currentTarget.value)}
               className="w-12 bg-transparent text-center text-neutral-800 dark:text-neutral-200 focus:outline-none disabled:opacity-50"
             />
           </label>
@@ -137,7 +156,7 @@ export function PomodoroTimer({ todos, initialSessions }: { todos: Todo[]; initi
               </span>
             </li>
           ))}
-          {sessions.length === 0 && <li className="text-xs text-neutral-400 dark:text-neutral-600">No sessions logged yet.</li>}
+          {sessions.length === 0 && <EmptyState as="li" icon={Timer} message="No sessions logged yet." />}
         </ul>
       </div>
     </div>

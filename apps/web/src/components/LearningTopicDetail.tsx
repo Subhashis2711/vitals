@@ -3,8 +3,18 @@
 import type { Goal, LearningResource, LearningTopic, Note } from "@vitals/shared";
 import { BookOpen, CheckSquare, ExternalLink, Plus, Square, Trash2 } from "lucide-react";
 import { useState, type FormEvent } from "react";
-import { addLearningResource, createGoal, createNote, deleteGoal, deleteLearningResource, deleteNote, updateGoal } from "@/lib/api-browser";
+import {
+  addLearningResource,
+  createGoal,
+  createNote,
+  deleteGoal,
+  deleteLearningResource,
+  deleteNote,
+  updateGoal,
+} from "@/lib/api-browser";
 import { cn } from "@/lib/cn";
+import { fieldInputClass, fieldInputCompactClass } from "@/lib/fieldStyles";
+import { rowIconButtonClass } from "@/lib/rowIconButton";
 
 // Roadmap steps are goals scoped to this topic (topicId), and insights are
 // notes scoped to this topic (domain: "learning", domainId: topicId) — see
@@ -119,7 +129,7 @@ export function LearningTopicDetail({
               <button
                 type="button"
                 onClick={() => handleDeleteRoadmap(item.id)}
-                className="-m-1.5 p-1.5 text-neutral-400 dark:text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+                className={cn(rowIconButtonClass, "-m-1.5")}
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </button>
@@ -132,7 +142,7 @@ export function LearningTopicDetail({
             value={roadmapTitle}
             onChange={(e) => setRoadmapTitle(e.target.value)}
             placeholder="Add a step..."
-            className="min-w-0 flex-1 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
+            className={cn(fieldInputCompactClass, "min-w-0 flex-1")}
           />
           <button
             type="submit"
@@ -168,7 +178,7 @@ export function LearningTopicDetail({
               <button
                 type="button"
                 onClick={() => handleDeleteResource(resource.id)}
-                className="-m-1.5 p-1.5 text-neutral-400 dark:text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+                className={cn(rowIconButtonClass, "-m-1.5")}
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </button>
@@ -181,13 +191,13 @@ export function LearningTopicDetail({
             value={resourceName}
             onChange={(e) => setResourceName(e.target.value)}
             placeholder="Resource name..."
-            className="min-w-0 flex-1 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
+            className={cn(fieldInputCompactClass, "min-w-0 flex-1")}
           />
           <input
             value={resourceUrl}
             onChange={(e) => setResourceUrl(e.target.value)}
             placeholder="Link (optional)"
-            className="min-w-0 flex-1 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
+            className={cn(fieldInputCompactClass, "min-w-0 flex-1")}
           />
           <button
             type="submit"
@@ -219,7 +229,7 @@ export function LearningTopicDetail({
                 submitInsight();
               }
             }}
-            className="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
+            className={fieldInputClass}
           />
           <button
             type="submit"
@@ -240,9 +250,9 @@ export function LearningTopicDetail({
               <button
                 type="button"
                 onClick={() => handleDeleteInsight(insight.id)}
-                className="absolute right-0.5 top-0.5 p-1.5 text-neutral-300 dark:text-neutral-700 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+                className={cn(rowIconButtonClass, "absolute right-0.5 top-0.5")}
               >
-                <Trash2 className="h-3 w-3" />
+                <Trash2 className="h-3.5 w-3.5" />
               </button>
             </div>
           ))}

@@ -1,4 +1,4 @@
-import type { CreateHabitInput } from "@vitals/shared";
+import type { CreateHabitInput, UpdateHabitInput } from "@vitals/shared";
 import { and, desc, eq, gte } from "drizzle-orm";
 import { getDb } from "../client";
 import { habitLogs, habits } from "../schema";
@@ -42,6 +42,22 @@ export async function createHabit(input: CreateHabitInput, userId: string, works
     })
     .returning();
   return row;
+}
+
+export async function updateHabit(id: string, input: UpdateHabitInput, userId: string, workspaceId: string) {
+  const db = getDb();
+  const [row] = await db
+    .update(habits)
+    .set({
+      ...(input.name !== undefined ? { name: input.name } : {}),
+      ...(input.description !== undefined ? { description: input.description } : {}),
+      ...(input.color !== undefined ? { color: input.color } : {}),
+      ...(input.frequency !== undefined ? { frequency: input.frequency } : {}),
+      ...(input.daysOfWeek !== undefined ? { daysOfWeek: input.daysOfWeek } : {}),
+    })
+    .where(and(eq(habits.id, id), eq(habits.userId, userId), eq(habits.workspaceId, workspaceId)))
+    .returning();
+  return row ?? null;
 }
 
 export async function deleteHabit(id: string, userId: string, workspaceId: string) {

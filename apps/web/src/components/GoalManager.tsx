@@ -11,6 +11,7 @@ import { ProjectBadge } from "@/components/ProjectBadge";
 import { ProjectSelect } from "@/components/ProjectSelect";
 import { deleteGoal } from "@/lib/api-browser";
 import { cn } from "@/lib/cn";
+import { rowIconButtonClass } from "@/lib/rowIconButton";
 
 const STATUS_STYLES: Record<string, string> = {
   todo: "bg-neutral-400/15 dark:bg-neutral-500/15 text-neutral-500 dark:text-neutral-400",
@@ -65,7 +66,7 @@ export function GoalManager({
         className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-cyan-400 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-cyan-500 sm:w-auto"
       >
         <Plus className="h-4 w-4" />
-        New Goal
+        New goal
       </button>
 
       <div className="flex flex-wrap items-center gap-2">
@@ -120,16 +121,18 @@ export function GoalManager({
             <Link href={`/goals/${encodeURIComponent(goal.id)}`} className="flex items-center gap-3">
               <CircularProgress value={goal.progress} />
               <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className="truncate font-medium text-neutral-900 dark:text-neutral-100">{goal.title}</p>
+                <div className="flex flex-nowrap items-center gap-2 overflow-hidden">
+                  <p className="min-w-0 flex-1 truncate font-medium text-neutral-900 dark:text-neutral-100">{goal.title}</p>
                   <span
                     className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ${STATUS_STYLES[goal.status]}`}
                   >
                     {STATUS_LABELS[goal.status]}
                   </span>
-                  <ProjectBadge project={goal.projectId ? projectById.get(goal.projectId) : undefined} />
+                  <span className="shrink-0">
+                    <ProjectBadge project={goal.projectId ? projectById.get(goal.projectId) : undefined} />
+                  </span>
                 </div>
-                <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-500">
+                <p className="mt-1 truncate text-xs text-neutral-600 dark:text-neutral-500">
                   {goal.todoCount > 0 ? `${goal.doneTodoCount}/${goal.todoCount} tasks` : "No linked tasks yet"}
                   {goal.targetDate ? ` · due ${goal.targetDate}` : ""}
                 </p>
@@ -138,7 +141,7 @@ export function GoalManager({
             <button
               type="button"
               onClick={() => handleDelete(goal.id, goal.title)}
-              className="absolute right-1.5 top-1.5 p-1.5 text-neutral-400 dark:text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+              className={cn(rowIconButtonClass, "absolute right-1.5 top-1.5")}
             >
               <Trash2 className="h-3.5 w-3.5" />
             </button>

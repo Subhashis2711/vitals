@@ -1,11 +1,15 @@
 "use client";
 
 import type { JournalEntry } from "@vitals/shared";
-import { Loader2, Save } from "lucide-react";
+import { Loader2, NotebookPen, Pencil, Save, Trash2 } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
+import { EmptyState } from "@/components/EmptyState";
 import { deleteJournalEntry, upsertJournalEntry } from "@/lib/api-browser";
+import { cn } from "@/lib/cn";
 import { todayISO } from "@/lib/date";
+import { fieldInputClass } from "@/lib/fieldStyles";
+import { rowIconButtonClass } from "@/lib/rowIconButton";
 
 export function JournalEditor({
   initialEntries,
@@ -18,6 +22,35 @@ export function JournalEditor({
   const [content, setContent] = useState(todayEntry?.content ?? "");
   const [saving, setSaving] = useState(false);
   const today = todayISO();
+
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingContent, setEditingContent] = useState("");
+  const [savingEdit, setSavingEdit] = useState(false);
+
+  function startEdit(entry: JournalEntry) {
+    setEditingId(entry.id);
+    setEditingContent(entry.content);
+  }
+
+  function cancelEdit() {
+    setEditingId(null);
+    setEditingContent("");
+  }
+
+  async function handleSaveEdit(entry: JournalEntry) {
+    if (!editingContent.trim()) return;
+    setSavingEdit(true);
+    try {
+      const { entry: updated } = await upsertJournalEntry({ date: entry.date, content: editingContent.trim() });
+      setEntries((prev) => prev.map((e) => (e.id === entry.id ? updated : e)));
+      setEditingId(null);
+      setEditingContent("");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Couldn't save entry");
+    } finally {
+      setSavingEdit(false);
+    }
+  }
 
   async function handleSave(e: FormEvent) {
     e.preventDefault();
@@ -51,7 +84,7 @@ export function JournalEditor({
           onChange={(e) => setContent(e.target.value)}
           placeholder="What happened today? What are you thinking about?"
           rows={6}
-          className="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+          className={fieldInputClass}
         />
         <button
           type="submit"
@@ -76,18 +109,58 @@ export function JournalEditor({
                     day: "numeric",
                   })}
                 </p>
-                <button
-                  type="button"
-                  onClick={() => handleDelete(entry.id, entry.date)}
-                  className="text-xs text-neutral-400 dark:text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
-                >
-                  Delete
-                </button>
+                <div className="flex items-center gap-1">
+                  {editingId !== entry.id && (
+                    <button
+                      type="button"
+                      onClick={() => startEdit(entry)}
+                      className={cn(rowIconButtonClass, "-m-1.5 hover:text-cyan-600 dark:hover:text-cyan-300")}
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(entry.id, entry.date)}
+                    className={cn(rowIconButtonClass, "-m-1.5")}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
               </div>
-              <p className="whitespace-pre-wrap text-sm text-neutral-700 dark:text-neutral-300">{entry.content}</p>
+              {editingId === entry.id ? (
+                <div className="space-y-2">
+                  <textarea
+                    autoFocus
+                    value={editingContent}
+                    onChange={(e) => setEditingContent(e.target.value)}
+                    rows={4}
+                    className={fieldInputClass}
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleSaveEdit(entry)}
+                      disabled={savingEdit || !editingContent.trim()}
+                      className="rounded-lg bg-cyan-400 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-cyan-500 disabled:opacity-50"
+                    >
+                      Save
+                    </button>
+                    <button
+                      type="button"
+                      onClick={cancelEdit}
+                      className="rounded-lg border border-neutral-200 dark:border-neutral-800 px-3 py-1.5 text-xs text-neutral-600 dark:text-neutral-400 transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <p className="whitespace-pre-wrap text-sm text-neutral-700 dark:text-neutral-300">{entry.content}</p>
+              )}
             </li>
           ))}
-          {pastEntries.length === 0 && <p className="text-sm text-neutral-600 dark:text-neutral-500">No past entries yet.</p>}
+          {pastEntries.length === 0 && <EmptyState as="li" icon={NotebookPen} message="No past entries yet." />}
         </ul>
       </div>
     </div>

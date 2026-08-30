@@ -5,6 +5,7 @@ import { Check, ChevronsUpDown, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createWorkspace, deleteWorkspace, getWorkspaces } from "@/lib/api-browser";
 import { cn } from "@/lib/cn";
+import { fieldInputCompactClass } from "@/lib/fieldStyles";
 import { getWorkspaceIdFromDocument, setWorkspaceIdCookie } from "@/lib/workspace-cookie";
 
 // Renders inline (expands in place) rather than as a positioned popover, so
@@ -120,7 +121,7 @@ export function WorkspaceSwitcher({ compact }: { compact?: boolean }) {
                   disabled={Boolean(deletingId)}
                   aria-label={`Delete ${w.name}`}
                   title={`Delete ${w.name}`}
-                  className="mr-1 rounded p-1.5 text-neutral-600 dark:text-neutral-500 transition-colors hover:bg-red-500/15 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="mr-1 rounded-full p-1.5 text-neutral-600 dark:text-neutral-500 transition-colors hover:bg-red-500/10 hover:text-red-500 dark:hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>
@@ -135,7 +136,7 @@ export function WorkspaceSwitcher({ compact }: { compact?: boolean }) {
                 onChange={(e) => setNewName(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleCreate()}
                 placeholder="Workspace name"
-                className="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-2.5 py-1.5 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
+                className={fieldInputCompactClass}
               />
               <button
                 type="button"

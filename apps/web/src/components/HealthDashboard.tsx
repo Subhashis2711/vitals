@@ -3,11 +3,15 @@
 import type { HealthActivityLog, HealthDailyLog } from "@vitals/shared";
 import { Droplet, Flame, Footprints, Moon, Plus, Scale, Trash2, type LucideIcon } from "lucide-react";
 import { useState, type FormEvent } from "react";
+import { toast } from "sonner";
 import { BarChart } from "@/components/charts/BarChart";
 import { LineChart } from "@/components/charts/LineChart";
+import { EmptyState } from "@/components/EmptyState";
 import { createHealthActivityLog, deleteHealthActivityLog, upsertHealthDailyLog } from "@/lib/api-browser";
 import { cn } from "@/lib/cn";
 import { todayISO } from "@/lib/date";
+import { fieldInputClass, fieldInputCompactClass, fieldLabelClass } from "@/lib/fieldStyles";
+import { rowIconButtonClass } from "@/lib/rowIconButton";
 
 function last7Dates(): string[] {
   const dates: string[] = [];
@@ -39,6 +43,30 @@ export function HealthDashboard({
 
   const today = todayISO();
   const todayLog = dailyLogs.find((l) => l.date === today) ?? null;
+
+  const [steps, setSteps] = useState(todayLog?.steps?.toString() ?? "");
+  const [sleepHours, setSleepHours] = useState(todayLog?.sleepHours?.toString() ?? "");
+  const [weightKg, setWeightKg] = useState(todayLog?.weightKg?.toString() ?? "");
+  const [savingDailyLog, setSavingDailyLog] = useState(false);
+
+  async function handleSaveDailyLog(e: FormEvent) {
+    e.preventDefault();
+    setSavingDailyLog(true);
+    try {
+      const { log } = await upsertHealthDailyLog({
+        date: today,
+        steps: steps.trim() ? Number(steps) : null,
+        sleepHours: sleepHours.trim() ? Number(sleepHours) : null,
+        weightKg: weightKg.trim() ? Number(weightKg) : null,
+      });
+      setDailyLogs((prev) => [...prev.filter((l) => l.date !== today), log]);
+      toast.success("Today's log saved");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Couldn't save log");
+    } finally {
+      setSavingDailyLog(false);
+    }
+  }
 
   const days7 = last7Dates();
   const stepsData = days7.map((d) => ({ label: dayLabel(d), value: dailyLogs.find((l) => l.date === d)?.steps ?? 0 }));
@@ -86,9 +114,10 @@ export function HealthDashboard({
     }
   }
 
-  async function handleDeleteActivity(id: string) {
+  async function handleDeleteActivity(id: string, sport: string) {
     setActivityLogs((prev) => prev.filter((a) => a.id !== id));
     await deleteHealthActivityLog(id);
+    toast(`Deleted "${sport}"`);
   }
 
   return (
@@ -139,6 +168,57 @@ export function HealthDashboard({
         </div>
       </div>
 
+      <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4">
+        <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-neutral-800 dark:text-neutral-200">
+          <Footprints className="h-4 w-4 text-cyan-600 dark:text-cyan-300" />
+          Log today
+        </h3>
+        <form onSubmit={handleSaveDailyLog} className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_1fr_1fr_auto] sm:items-end">
+          <div>
+            <label className={fieldLabelClass}>Steps</label>
+            <input
+              type="number"
+              min={0}
+              value={steps}
+              onChange={(e) => setSteps(e.target.value)}
+              placeholder="e.g. 8000"
+              className={fieldInputCompactClass}
+            />
+          </div>
+          <div>
+            <label className={fieldLabelClass}>Sleep (hours)</label>
+            <input
+              type="number"
+              min={0}
+              step={0.1}
+              value={sleepHours}
+              onChange={(e) => setSleepHours(e.target.value)}
+              placeholder="e.g. 7.5"
+              className={fieldInputCompactClass}
+            />
+          </div>
+          <div>
+            <label className={fieldLabelClass}>Weight (kg)</label>
+            <input
+              type="number"
+              min={0}
+              step={0.1}
+              value={weightKg}
+              onChange={(e) => setWeightKg(e.target.value)}
+              placeholder="e.g. 70"
+              className={fieldInputCompactClass}
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={savingDailyLog}
+            className="rounded-lg bg-cyan-400 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-cyan-500 disabled:opacity-50"
+          >
+            Save
+          </button>
+        </form>
+      </div>
+
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4">
           <h3 className="mb-3 text-sm font-semibold text-neutral-800 dark:text-neutral-200">Activity log</h3>
@@ -147,7 +227,7 @@ export function HealthDashboard({
               value={sport}
               onChange={(e) => setSport(e.target.value)}
               placeholder="Activity (e.g. Running)"
-              className="min-w-0 flex-1 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
+              className={cn(fieldInputClass, "min-w-0 flex-1")}
             />
             <input
               type="number"
@@ -155,7 +235,7 @@ export function HealthDashboard({
               value={duration}
               onChange={(e) => setDuration(e.target.value)}
               placeholder="min"
-              className="w-20 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
+              className="w-20 rounded-xl border border-neutral-300 bg-neutral-50 px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 shadow-inner shadow-black/5 transition-all duration-150 hover:border-neutral-400 focus:border-cyan-400/70 focus:outline-none focus:ring-4 focus:ring-cyan-400/10 dark:border-neutral-700/80 dark:bg-neutral-900/60 dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:shadow-black/20 dark:hover:border-neutral-600"
             />
             <button
               type="submit"
@@ -179,15 +259,15 @@ export function HealthDashboard({
                   <span className="text-neutral-500 dark:text-neutral-400">{a.durationMin}min</span>
                   <button
                     type="button"
-                    onClick={() => handleDeleteActivity(a.id)}
-                    className="-m-1.5 p-1.5 text-neutral-400 dark:text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+                    onClick={() => handleDeleteActivity(a.id, a.sport)}
+                    className={cn(rowIconButtonClass, "-m-1.5")}
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
                 </div>
               </li>
             ))}
-            {activityLogs.length === 0 && <li className="text-xs text-neutral-600 dark:text-neutral-500">No activity logged yet.</li>}
+            {activityLogs.length === 0 && <EmptyState as="li" icon={Footprints} message="No activity logged yet." />}
           </ul>
         </div>
 

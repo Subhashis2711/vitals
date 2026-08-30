@@ -202,6 +202,9 @@ export const createHabitInputSchema = z.object({
 });
 export type CreateHabitInput = z.infer<typeof createHabitInputSchema>;
 
+export const updateHabitInputSchema = createHabitInputSchema.partial();
+export type UpdateHabitInput = z.infer<typeof updateHabitInputSchema>;
+
 // Dates are plain "YYYY-MM-DD" strings — habits are tracked per calendar day.
 export const habitLogSchema = z.object({
   id: z.string().uuid(),
@@ -304,6 +307,9 @@ export const createLearningTopicInputSchema = z.object({
   title: z.string().min(1),
 });
 export type CreateLearningTopicInput = z.infer<typeof createLearningTopicInputSchema>;
+
+export const updateLearningTopicInputSchema = createLearningTopicInputSchema.partial();
+export type UpdateLearningTopicInput = z.infer<typeof updateLearningTopicInputSchema>;
 
 export const learningResourceSchema = z.object({
   id: z.string(),

@@ -36,6 +36,7 @@ import {
 } from "@/lib/api-browser";
 import { cn } from "@/lib/cn";
 import { fieldInputClass } from "@/lib/fieldStyles";
+import { rowIconButtonClass } from "@/lib/rowIconButton";
 import { htmlToMarkdown, markdownToHtml } from "@/lib/markdownHtml";
 
 const CONTENT_TYPE_LABELS: Record<NoteContentType, string> = {
@@ -543,7 +544,7 @@ export function NoteEditor({ mode, projects, note, initialLinkedTodos, onSaved, 
                 data-placeholder="Write your note..."
                 style={{ fontSize }}
                 className={cn(
-                  "rich-text min-h-[19.5rem] w-full overflow-y-auto bg-neutral-50 dark:bg-neutral-950 px-3.5 py-2.5 leading-relaxed text-neutral-900 dark:text-neutral-100 focus:outline-none",
+                  "rich-text min-h-[19.5rem] w-full overflow-y-auto bg-neutral-50 dark:bg-neutral-900/60 px-3.5 py-2.5 leading-relaxed text-neutral-900 dark:text-neutral-100 focus:outline-none",
                   "empty:before:text-neutral-600 dark:text-neutral-500 empty:before:content-[attr(data-placeholder)]",
                   FONT_FAMILY_CLASS[fontFamily],
                 )}
@@ -558,7 +559,7 @@ export function NoteEditor({ mode, projects, note, initialLinkedTodos, onSaved, 
               className={cn(fieldInputClass, "font-mono leading-relaxed")}
             />
           ) : (
-            <div className="min-h-[20rem] rounded-xl border border-neutral-300/80 dark:border-neutral-700/80 bg-neutral-50 dark:bg-neutral-950 px-4 py-3 shadow-inner shadow-black/20">
+            <div className="min-h-[20rem] rounded-xl border border-neutral-300/80 dark:border-neutral-700/80 bg-neutral-50 dark:bg-neutral-900/60 px-4 py-3 shadow-inner shadow-black/20">
               <MarkdownPreview content={content || "*Nothing to preview yet.*"} />
             </div>
           )}
@@ -625,7 +626,7 @@ export function NoteEditor({ mode, projects, note, initialLinkedTodos, onSaved, 
             <button
               type="button"
               onClick={handleDeleteNote}
-              className="flex items-center gap-1 text-xs text-neutral-600 dark:text-neutral-500 hover:text-red-400"
+              className="flex items-center gap-1 text-xs text-neutral-600 hover:text-red-500 dark:text-neutral-500 dark:hover:text-red-400"
             >
               <Trash2 className="h-3.5 w-3.5" />
               Delete note
@@ -671,7 +672,7 @@ export function NoteEditor({ mode, projects, note, initialLinkedTodos, onSaved, 
                 <button
                   type="button"
                   onClick={() => handleDeleteTodo(todo.id)}
-                  className="text-neutral-400 dark:text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+                  className={rowIconButtonClass}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>

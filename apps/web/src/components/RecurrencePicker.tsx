@@ -2,6 +2,7 @@
 
 import type { RecurrenceFreq } from "@vitals/shared";
 import { cn } from "@/lib/cn";
+import { fieldSelectClass } from "@/lib/fieldStyles";
 
 const FREQ_LABELS: Record<RecurrenceFreq, string> = {
   daily: "Daily",
@@ -35,7 +36,7 @@ export function RecurrencePicker({
           const next = (e.target.value || null) as RecurrenceFreq | null;
           onChange(next, next === "weekly" ? daysOfWeek : null);
         }}
-        className="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-2 py-2 text-sm text-neutral-700 dark:text-neutral-300 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+        className={fieldSelectClass}
       >
         <option value="">Never</option>
         {(Object.keys(FREQ_LABELS) as RecurrenceFreq[]).map((f) => (

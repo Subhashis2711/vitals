@@ -1,5 +1,10 @@
 import { learningRepo } from "@vitals/db";
-import { createLearningResourceInputSchema, createLearningTopicInputSchema, fromGid } from "@vitals/shared";
+import {
+  createLearningResourceInputSchema,
+  createLearningTopicInputSchema,
+  fromGid,
+  updateLearningTopicInputSchema,
+} from "@vitals/shared";
 import type { FastifyInstance } from "fastify";
 import { serializeGoal, serializeNote, serializeResource, serializeTopic } from "../serializers";
 
@@ -30,6 +35,15 @@ export async function learningRoutes(app: FastifyInstance) {
     if (!parsed.success) return reply.code(400).send({ error: parsed.error.flatten() });
     const topic = await learningRepo.createTopic(parsed.data, req.userId, req.workspaceId);
     return reply.code(201).send({ topic: serializeTopic(topic) });
+  });
+
+  app.patch<{ Params: { id: string } }>("/topics/:id", async (req, reply) => {
+    const parsed = updateLearningTopicInputSchema.safeParse(req.body);
+    if (!parsed.success) return reply.code(400).send({ error: parsed.error.flatten() });
+    const { id } = fromGid(req.params.id);
+    const topic = await learningRepo.updateTopic(id, parsed.data, req.userId, req.workspaceId);
+    if (!topic) return reply.code(404).send({ error: "Topic not found" });
+    return { topic: serializeTopic(topic) };
   });
 
   app.delete<{ Params: { id: string } }>("/topics/:id", async (req, reply) => {

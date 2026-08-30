@@ -11,7 +11,7 @@ import { ContentTypeIcon } from "@/components/ContentTypeIcon";
 import { EditableTodoList } from "@/components/EditableTodoList";
 import { createTodo, updateProject, deleteProject } from "@/lib/api-browser";
 import { cn } from "@/lib/cn";
-import { fieldInputClass, fieldLabelClass } from "@/lib/fieldStyles";
+import { fieldInputClass, fieldInputCompactClass, fieldLabelClass } from "@/lib/fieldStyles";
 
 export function ProjectDetail({
   project: initialProject,
@@ -104,7 +104,7 @@ export function ProjectDetail({
         <button
           type="button"
           onClick={handleDelete}
-          className="mt-3 flex items-center gap-1 text-xs text-neutral-600 dark:text-neutral-500 hover:text-red-400"
+          className="mt-3 flex items-center gap-1 text-xs text-neutral-600 hover:text-red-500 dark:text-neutral-500 dark:hover:text-red-400"
         >
           <Trash2 className="h-3.5 w-3.5" />
           Delete project
@@ -143,7 +143,7 @@ export function ProjectDetail({
               value={newTodoTitle}
               onChange={(e) => setNewTodoTitle(e.target.value)}
               placeholder="Add a todo..."
-              className="min-w-0 flex-1 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-2.5 py-1.5 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
+              className={cn(fieldInputCompactClass, "min-w-0 flex-1")}
             />
             <button
               type="submit"

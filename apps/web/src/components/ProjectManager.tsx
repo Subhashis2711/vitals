@@ -7,6 +7,8 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { NewProjectModal } from "@/components/NewProjectModal";
 import { deleteProject } from "@/lib/api-browser";
+import { cn } from "@/lib/cn";
+import { rowIconButtonClass } from "@/lib/rowIconButton";
 
 export function ProjectManager({ initialProjects }: { initialProjects: Project[] }) {
   const [projects, setProjects] = useState(initialProjects);
@@ -35,7 +37,7 @@ export function ProjectManager({ initialProjects }: { initialProjects: Project[]
         className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-cyan-400 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-cyan-500 sm:w-auto"
       >
         <Plus className="h-4 w-4" />
-        New Project
+        New project
       </button>
 
       <div className="relative">
@@ -65,7 +67,7 @@ export function ProjectManager({ initialProjects }: { initialProjects: Project[]
               <button
                 type="button"
                 onClick={() => handleDelete(project.id, project.name)}
-                className="-m-1.5 shrink-0 p-1.5 text-neutral-400 dark:text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+                className={cn(rowIconButtonClass, "-m-1.5 shrink-0")}
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </button>

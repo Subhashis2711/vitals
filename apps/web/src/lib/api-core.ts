@@ -5,9 +5,11 @@ import type {
   CreateCalendarEventInput,
   CreateGoalInput,
   CreateHabitInput,
+  UpdateHabitInput,
   CreateHealthActivityLogInput,
   CreateLearningResourceInput,
   CreateLearningTopicInput,
+  UpdateLearningTopicInput,
   CreateNoteInput,
   CreateProjectInput,
   CreateSavingsGoalInput,
@@ -209,6 +211,10 @@ export function createApiClient(
       return request<{ habit: Habit }>("/habits", { method: "POST", body: JSON.stringify(input) });
     },
 
+    updateHabit(id: string, input: UpdateHabitInput) {
+      return request<{ habit: Habit }>(`/habits/${id}`, { method: "PATCH", body: JSON.stringify(input) });
+    },
+
     deleteHabit(id: string) {
       return request<{ habit: Habit }>(`/habits/${id}`, { method: "DELETE" });
     },
@@ -284,6 +290,13 @@ export function createApiClient(
 
     createLearningTopic(input: CreateLearningTopicInput) {
       return request<{ topic: LearningTopic }>("/learning/topics", { method: "POST", body: JSON.stringify(input) });
+    },
+
+    updateLearningTopic(id: string, input: UpdateLearningTopicInput) {
+      return request<{ topic: LearningTopic }>(`/learning/topics/${encodeURIComponent(id)}`, {
+        method: "PATCH",
+        body: JSON.stringify(input),
+      });
     },
 
     deleteLearningTopic(id: string) {

@@ -6,6 +6,7 @@ import { useRef, useState, type KeyboardEvent } from "react";
 import { toast } from "sonner";
 import { deleteTodo, reorderTodos, updateTodo } from "@/lib/api-browser";
 import { cn } from "@/lib/cn";
+import { rowIconButtonClass } from "@/lib/rowIconButton";
 
 // Shared list rendering for any flat (non-Kanban) todo list — Goal and
 // Project detail pages both use this so rename/reorder/toggle/delete stay in
@@ -163,7 +164,7 @@ export function EditableTodoList({
             <button
               type="button"
               onClick={() => handleDelete(todo.id)}
-              className="-m-1.5 shrink-0 p-1.5 text-neutral-400 dark:text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+              className={cn(rowIconButtonClass, "-m-1.5 shrink-0")}
             >
               <Trash2 className="h-3.5 w-3.5" />
             </button>

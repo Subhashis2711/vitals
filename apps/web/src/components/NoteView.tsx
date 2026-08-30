@@ -10,6 +10,8 @@ import { MarkdownPreview } from "@/components/MarkdownPreview";
 import { ProjectBadge } from "@/components/ProjectBadge";
 import { deleteNote, deleteTodo, updateTodo } from "@/lib/api-browser";
 import { cn } from "@/lib/cn";
+import { modalDeleteButtonClass } from "@/lib/modalIconButton";
+import { rowIconButtonClass } from "@/lib/rowIconButton";
 
 export function NoteView({
   note,
@@ -65,7 +67,7 @@ export function NoteView({
               <Pencil className="h-3.5 w-3.5" />
               Edit
             </button>
-            <button type="button" onClick={handleDeleteNote} className="text-neutral-600 dark:text-neutral-500 hover:text-red-400">
+            <button type="button" onClick={handleDeleteNote} title="Delete note" className={modalDeleteButtonClass}>
               <Trash2 className="h-4 w-4" />
             </button>
           </div>
@@ -126,7 +128,7 @@ export function NoteView({
                 <button
                   type="button"
                   onClick={() => handleDeleteTodo(todo.id)}
-                  className="-m-1.5 p-1.5 text-neutral-400 dark:text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+                  className={cn(rowIconButtonClass, "-m-1.5")}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>

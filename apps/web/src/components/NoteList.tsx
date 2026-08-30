@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { ContentTypeIcon } from "@/components/ContentTypeIcon";
 import { DeleteNoteButton } from "@/components/DeleteNoteButton";
+import { EmptyState } from "@/components/EmptyState";
 import { ProjectBadge } from "@/components/ProjectBadge";
 import { ProjectSelect } from "@/components/ProjectSelect";
 
@@ -77,14 +78,14 @@ export function NoteList({ initialNotes, projects }: { initialNotes: Note[]; pro
           >
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
-                <Link href={`/notes/${encodeURIComponent(note.id)}`} className="font-medium text-neutral-900 dark:text-neutral-100 hover:text-cyan-600 dark:text-cyan-300">
+                <Link href={`/notes/${encodeURIComponent(note.id)}`} className="block truncate font-medium text-neutral-900 dark:text-neutral-100 hover:text-cyan-600 dark:text-cyan-300">
                   {note.title ?? "Untitled"}
                 </Link>
                 <p className="mt-1 flex items-center gap-1 text-xs uppercase tracking-wide text-neutral-600 dark:text-neutral-500">
                   <ContentTypeIcon type={note.contentType} className="h-3 w-3" />
                   {note.contentType}
                 </p>
-                {note.aiSummary && <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">{note.aiSummary}</p>}
+                {note.aiSummary && <p className="mt-1 line-clamp-1 text-sm text-neutral-500 dark:text-neutral-400">{note.aiSummary}</p>}
                 <div className="mt-1.5">
                   <ProjectBadge
                     project={note.domain === "project" && note.domainId ? projectById.get(note.domainId) : undefined}
@@ -96,10 +97,11 @@ export function NoteList({ initialNotes, projects }: { initialNotes: Note[]; pro
           </li>
         ))}
         {visibleNotes.length === 0 && (
-          <li className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-neutral-200 dark:border-neutral-800 py-10 text-sm text-neutral-600 dark:text-neutral-500">
-            <StickyNote className="h-6 w-6" />
-            {notes.length === 0 ? "No notes yet." : "No notes match your filters."}
-          </li>
+          <EmptyState
+            as="li"
+            icon={StickyNote}
+            message={notes.length === 0 ? "No notes yet." : "No notes match your filters."}
+          />
         )}
       </ul>
     </div>

@@ -1,4 +1,4 @@
-import type { CreateLearningResourceInput, CreateLearningTopicInput } from "@vitals/shared";
+import type { CreateLearningResourceInput, CreateLearningTopicInput, UpdateLearningTopicInput } from "@vitals/shared";
 import { and, desc, eq } from "drizzle-orm";
 import { getDb } from "../client";
 import { learningResources, learningTopics } from "../schema";
@@ -40,6 +40,18 @@ export async function createTopic(input: CreateLearningTopicInput, userId: strin
   const db = getDb();
   const [row] = await db.insert(learningTopics).values({ userId, workspaceId, title: input.title }).returning();
   return row;
+}
+
+export async function updateTopic(id: string, input: UpdateLearningTopicInput, userId: string, workspaceId: string) {
+  const db = getDb();
+  const [row] = await db
+    .update(learningTopics)
+    .set({
+      ...(input.title !== undefined ? { title: input.title } : {}),
+    })
+    .where(and(eq(learningTopics.id, id), eq(learningTopics.userId, userId), eq(learningTopics.workspaceId, workspaceId)))
+    .returning();
+  return row ?? null;
 }
 
 // domainId has no DB-level FK (see schema.ts comment on notes), so deleting

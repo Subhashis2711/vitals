@@ -13,6 +13,8 @@ import {
 } from "@/lib/api-browser";
 import { cn } from "@/lib/cn";
 import { addDays, getWeekDates, toISODate } from "@/lib/date";
+import { fieldInputClass } from "@/lib/fieldStyles";
+import { modalCloseButtonClass } from "@/lib/modalIconButton";
 
 const NEXT_STATUS: Record<TodoStatus, TodoStatus> = {
   todo: "in_progress",
@@ -312,7 +314,7 @@ export function WeekCalendar({
           >
             <div className="mb-3 flex items-center justify-between">
               <h3 className="text-sm font-semibold text-neutral-800 dark:text-neutral-200">{draft.id ? "Edit block" : "New block"}</h3>
-              <button type="button" onClick={() => setDraft(null)} className="text-neutral-600 dark:text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200">
+              <button type="button" onClick={() => setDraft(null)} title="Close" className={modalCloseButtonClass}>
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -322,26 +324,26 @@ export function WeekCalendar({
                 value={draft.title}
                 onChange={(e) => setDraft({ ...draft, title: e.target.value })}
                 placeholder="Block title..."
-                className="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
+                className={fieldInputClass}
               />
               <input
                 type="date"
                 value={draft.date}
                 onChange={(e) => setDraft({ ...draft, date: e.target.value })}
-                className="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-2 py-2 text-sm text-neutral-700 dark:text-neutral-300 focus:border-cyan-400/60 focus:outline-none"
+                className={fieldInputClass}
               />
               <div className="flex gap-2">
                 <input
                   type="time"
                   value={draft.startTime}
                   onChange={(e) => setDraft({ ...draft, startTime: e.target.value })}
-                  className="flex-1 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-2 py-2 text-sm text-neutral-700 dark:text-neutral-300 focus:border-cyan-400/60 focus:outline-none"
+                  className={cn(fieldInputClass, "flex-1")}
                 />
                 <input
                   type="time"
                   value={draft.endTime}
                   onChange={(e) => setDraft({ ...draft, endTime: e.target.value })}
-                  className="flex-1 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-2 py-2 text-sm text-neutral-700 dark:text-neutral-300 focus:border-cyan-400/60 focus:outline-none"
+                  className={cn(fieldInputClass, "flex-1")}
                 />
               </div>
               <div className="flex items-center gap-1.5">
@@ -363,7 +365,7 @@ export function WeekCalendar({
                   <button
                     type="button"
                     onClick={deleteDraft}
-                    className="flex items-center gap-1 text-xs text-neutral-600 dark:text-neutral-500 hover:text-red-500"
+                    className="flex items-center gap-1 text-xs text-neutral-600 hover:text-red-500 dark:text-neutral-500 dark:hover:text-red-400"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                     Delete

@@ -2,6 +2,7 @@
 
 import type { LearningTopic } from "@vitals/shared";
 import { cn } from "@/lib/cn";
+import { fieldSelectClass } from "@/lib/fieldStyles";
 
 export function TopicSelect({
   topics,
@@ -20,10 +21,7 @@ export function TopicSelect({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className={cn(
-        "rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-2 py-2 text-sm text-neutral-700 dark:text-neutral-300 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20",
-        className,
-      )}
+      className={cn(fieldSelectClass, className)}
     >
       <option value="">{placeholder}</option>
       {topics.map((topic) => (

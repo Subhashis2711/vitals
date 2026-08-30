@@ -32,7 +32,7 @@ export function DeleteNoteButton({ id, title, redirectTo }: { id: string; title?
       type="button"
       onClick={handleDelete}
       disabled={loading}
-      className="flex shrink-0 items-center gap-1 rounded-md px-2 py-1 text-xs text-neutral-600 dark:text-neutral-500 transition-colors hover:bg-red-500/10 hover:text-red-400 disabled:opacity-50"
+      className="flex shrink-0 items-center gap-1 rounded-md px-2 py-1 text-xs text-neutral-600 dark:text-neutral-500 transition-colors hover:bg-red-500/10 hover:text-red-500 dark:hover:text-red-400 disabled:opacity-50"
     >
       {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
       Delete

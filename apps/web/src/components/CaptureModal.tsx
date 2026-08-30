@@ -7,6 +7,9 @@ import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { ContentTypeIcon } from "@/components/ContentTypeIcon";
 import { captureNote } from "@/lib/api-browser";
+import { cn } from "@/lib/cn";
+import { fieldInputClass } from "@/lib/fieldStyles";
+import { modalCloseButtonClass } from "@/lib/modalIconButton";
 import { useUI } from "@/lib/ui-context";
 
 // The same /notes/capture flow as the dashboard's inline QuickCapture, but
@@ -61,7 +64,7 @@ export function CaptureModal() {
             <Sparkles className="h-4 w-4 text-amber-400" />
             Quick capture
           </h2>
-          <button type="button" onClick={close} className="text-neutral-600 dark:text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200">
+          <button type="button" onClick={close} title="Close" className={modalCloseButtonClass}>
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -72,7 +75,7 @@ export function CaptureModal() {
             onChange={(e) => setRawContent(e.target.value)}
             placeholder="Paste an article, a thought, a URL..."
             rows={4}
-            className="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 transition-colors focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+            className={fieldInputClass}
           />
           <div className="relative">
             <Link2 className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-600 dark:text-neutral-500" />
@@ -80,7 +83,7 @@ export function CaptureModal() {
               value={sourceUrl}
               onChange={(e) => setSourceUrl(e.target.value)}
               placeholder="Source URL (optional)"
-              className="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 py-2 pl-9 pr-3 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 transition-colors focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+              className={cn(fieldInputClass, "pl-9 pr-3")}
             />
           </div>
           <button

@@ -5,6 +5,9 @@ import { Plus, X } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { createProject } from "@/lib/api-browser";
+import { cn } from "@/lib/cn";
+import { fieldInputClass } from "@/lib/fieldStyles";
+import { modalCloseButtonClass } from "@/lib/modalIconButton";
 
 export function NewProjectModal({
   onClose,
@@ -44,7 +47,7 @@ export function NewProjectModal({
       >
         <div className="mb-3 flex items-center justify-between">
           <h3 className="text-sm font-semibold text-neutral-800 dark:text-neutral-200">New project</h3>
-          <button type="button" onClick={onClose} className="text-neutral-600 dark:text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200">
+          <button type="button" onClick={onClose} title="Close" className={modalCloseButtonClass}>
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -55,7 +58,7 @@ export function NewProjectModal({
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Project name..."
-            className="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
+            className={fieldInputClass}
           />
 
           <label className="block text-xs text-neutral-600 dark:text-neutral-500">
@@ -65,7 +68,7 @@ export function NewProjectModal({
               onChange={(e) => setDescription(e.target.value)}
               rows={2}
               placeholder="Optional details..."
-              className="mt-1 w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
+              className={cn("mt-1", fieldInputClass)}
             />
           </label>
 

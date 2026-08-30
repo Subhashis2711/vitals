@@ -1,37 +1,22 @@
 "use client";
 
 import type { LearningTopic } from "@vitals/shared";
-import { BookOpen, Plus, Search, Trash2 } from "lucide-react";
+import { BookOpen, Search, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState, type FormEvent } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { createLearningTopic, deleteLearningTopic } from "@/lib/api-browser";
+import { deleteLearningTopic } from "@/lib/api-browser";
+import { cn } from "@/lib/cn";
+import { rowIconButtonClass } from "@/lib/rowIconButton";
 
 export function LearningTopicList({ initialTopics }: { initialTopics: LearningTopic[] }) {
   const [topics, setTopics] = useState(initialTopics);
-  const [title, setTitle] = useState("");
-  const [submitting, setSubmitting] = useState(false);
   const [search, setSearch] = useState("");
 
   const visibleTopics = useMemo(() => {
     const q = search.trim().toLowerCase();
     return q ? topics.filter((t) => t.title.toLowerCase().includes(q)) : topics;
   }, [topics, search]);
-
-  async function handleCreate(e: FormEvent) {
-    e.preventDefault();
-    if (!title.trim()) return;
-    setSubmitting(true);
-    try {
-      const { topic } = await createLearningTopic({ title: title.trim() });
-      setTopics((prev) => [topic, ...prev]);
-      setTitle("");
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Couldn't create topic");
-    } finally {
-      setSubmitting(false);
-    }
-  }
 
   async function handleDelete(id: string, topicTitle: string) {
     setTopics((prev) => prev.filter((t) => t.id !== id));
@@ -41,23 +26,6 @@ export function LearningTopicList({ initialTopics }: { initialTopics: LearningTo
 
   return (
     <div className="space-y-4">
-      <form onSubmit={handleCreate} className="flex gap-2">
-        <input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="New learning topic..."
-          className="min-w-0 flex-1 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
-        />
-        <button
-          type="submit"
-          disabled={submitting || !title.trim()}
-          className="flex items-center gap-1 rounded-lg bg-cyan-400 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-cyan-500 disabled:opacity-50"
-        >
-          <Plus className="h-4 w-4" />
-          Add
-        </button>
-      </form>
-
       <div className="relative">
         <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-neutral-600 dark:text-neutral-500" />
         <input
@@ -85,7 +53,7 @@ export function LearningTopicList({ initialTopics }: { initialTopics: LearningTo
             <button
               type="button"
               onClick={() => handleDelete(topic.id, topic.title)}
-              className="absolute right-1.5 top-1.5 p-1.5 text-neutral-400 dark:text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+              className={cn(rowIconButtonClass, "absolute right-1.5 top-1.5")}
             >
               <Trash2 className="h-3.5 w-3.5" />
             </button>

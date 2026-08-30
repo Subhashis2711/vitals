@@ -14,7 +14,7 @@ export const CURRENCIES = [
   { code: "CNY", label: "Chinese Yuan" },
 ] as const;
 
-export const DEFAULT_CURRENCY = "USD";
+export const DEFAULT_CURRENCY = "INR";
 
 export function currencySymbol(code: string): string {
   const part = new Intl.NumberFormat("en-US", { style: "currency", currency: code }).formatToParts(0).find((p) => p.type === "currency");

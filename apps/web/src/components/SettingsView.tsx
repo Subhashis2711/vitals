@@ -5,7 +5,9 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { cn } from "@/lib/cn";
 import { CURRENCIES, DEFAULT_CURRENCY } from "@/lib/currency";
+import { fieldInputClass, fieldSelectClass } from "@/lib/fieldStyles";
 import { createClient } from "@/lib/supabase/client";
 
 export function SettingsView() {
@@ -79,7 +81,7 @@ export function SettingsView() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="What should we call you?"
-              className="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
+              className={fieldInputClass}
             />
             <button
               type="button"
@@ -116,7 +118,7 @@ export function SettingsView() {
             value={currency}
             onChange={(e) => handleCurrencyChange(e.target.value)}
             disabled={savingCurrency}
-            className="mt-1 w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 focus:border-cyan-400/60 focus:outline-none disabled:opacity-50"
+            className={cn("mt-1 w-full", fieldSelectClass, "disabled:opacity-50")}
           >
             {CURRENCIES.map((c) => (
               <option key={c.code} value={c.code}>

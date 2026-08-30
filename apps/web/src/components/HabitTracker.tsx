@@ -4,9 +4,13 @@ import type { Habit, HabitFrequency, HabitLog } from "@vitals/shared";
 import { Check, Flame, Plus, Search, Trash2 } from "lucide-react";
 import { useMemo, useState, type FormEvent } from "react";
 import { toast } from "sonner";
+import { EmptyState } from "@/components/EmptyState";
+import { HabitDetailModal } from "@/components/HabitDetailModal";
 import { HabitFrequencyPicker } from "@/components/HabitFrequencyPicker";
 import { createHabit, deleteHabit, toggleHabitLog } from "@/lib/api-browser";
 import { cn } from "@/lib/cn";
+import { fieldInputClass } from "@/lib/fieldStyles";
+import { rowIconButtonClass } from "@/lib/rowIconButton";
 
 const DAYS_TO_SHOW = 7;
 
@@ -77,6 +81,9 @@ export function HabitTracker({ initialHabits, initialLogs }: { initialHabits: Ha
   const [submitting, setSubmitting] = useState(false);
   const [pendingKey, setPendingKey] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [detailHabitId, setDetailHabitId] = useState<string | null>(null);
+
+  const detailHabit = detailHabitId ? (habits.find((h) => h.id === detailHabitId) ?? null) : null;
 
   const visibleHabits = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -119,6 +126,10 @@ export function HabitTracker({ initialHabits, initialLogs }: { initialHabits: Ha
     toast(`Deleted "${habitName}"`);
   }
 
+  function handleHabitChange(updated: Habit) {
+    setHabits((prev) => prev.map((h) => (h.id === updated.id ? updated : h)));
+  }
+
   async function handleToggle(habitId: string, date: string) {
     const key = `${habitId}:${date}`;
     setPendingKey(key);
@@ -143,7 +154,7 @@ export function HabitTracker({ initialHabits, initialLogs }: { initialHabits: Ha
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="New habit..."
-            className="flex-1 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 transition-colors focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+            className={cn(fieldInputClass, "flex-1")}
           />
           <button
             type="submit"
@@ -199,14 +210,19 @@ export function HabitTracker({ initialHabits, initialLogs }: { initialHabits: Ha
               const loggedDateThisMonth = habit.frequency === "monthly" ? [...habitDates].find((d) => d.startsWith(monthPrefix)) : undefined;
               return (
                 <tr key={habit.id} className="group border-b border-neutral-200/60 dark:border-neutral-800/60 last:border-0">
-                  <td className="p-3 font-medium text-neutral-800 dark:text-neutral-200">
-                    <span className="flex items-center gap-2">
+                  <td className="max-w-[200px] p-3 font-medium text-neutral-800 dark:text-neutral-200">
+                    <button
+                      type="button"
+                      onClick={() => setDetailHabitId(habit.id)}
+                      title={habit.name}
+                      className="flex min-w-0 items-center gap-2 text-left hover:underline"
+                    >
                       <span
                         className="h-2 w-2 shrink-0 rounded-full"
                         style={{ backgroundColor: habit.color ?? "#a3a3a3" }}
                       />
-                      {habit.name}
-                    </span>
+                      <span className="truncate">{habit.name}</span>
+                    </button>
                   </td>
                   {habit.frequency === "monthly" ? (
                     <td colSpan={DAYS_TO_SHOW} className="p-2 text-center">
@@ -262,7 +278,7 @@ export function HabitTracker({ initialHabits, initialLogs }: { initialHabits: Ha
                     <button
                       type="button"
                       onClick={() => handleDelete(habit.id, habit.name)}
-                      className="-m-1.5 p-1.5 text-neutral-400 dark:text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+                      className={cn(rowIconButtonClass, "-m-1.5")}
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
@@ -272,14 +288,27 @@ export function HabitTracker({ initialHabits, initialLogs }: { initialHabits: Ha
             })}
             {visibleHabits.length === 0 && (
               <tr>
-                <td colSpan={DAYS_TO_SHOW + 3} className="p-8 text-center text-sm text-neutral-600 dark:text-neutral-500">
-                  {habits.length === 0 ? "No habits yet. Add one above." : "No habits match your search."}
+                <td colSpan={DAYS_TO_SHOW + 3} className="p-3">
+                  <EmptyState
+                    icon={Flame}
+                    variant="plain"
+                    message={habits.length === 0 ? "No habits yet. Add one above." : "No habits match your search."}
+                  />
                 </td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
+
+      {detailHabit && (
+        <HabitDetailModal
+          habit={detailHabit}
+          onClose={() => setDetailHabitId(null)}
+          onChange={handleHabitChange}
+          onDelete={handleDelete}
+        />
+      )}
     </div>
   );
 }

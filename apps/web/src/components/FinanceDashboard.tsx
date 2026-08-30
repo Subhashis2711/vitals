@@ -4,10 +4,13 @@ import type { SavingsGoal, Transaction } from "@vitals/shared";
 import { ArrowDownRight, ArrowUpRight, Plus, Target, Trash2, Wallet } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
 import { toast } from "sonner";
+import { EmptyState } from "@/components/EmptyState";
 import { createSavingsGoal, createTransaction, deleteSavingsGoal, deleteTransaction } from "@/lib/api-browser";
 import { cn } from "@/lib/cn";
 import { currencySymbol, DEFAULT_CURRENCY, formatMoney } from "@/lib/currency";
 import { todayISO } from "@/lib/date";
+import { fieldInputClass, fieldInputCompactClass } from "@/lib/fieldStyles";
+import { rowIconButtonClass } from "@/lib/rowIconButton";
 import { createClient } from "@/lib/supabase/client";
 
 function last6Months(): { key: string; label: string }[] {
@@ -103,9 +106,10 @@ export function FinanceDashboard({
     }
   }
 
-  async function handleDeleteTransaction(id: string) {
+  async function handleDeleteTransaction(id: string, txnDescription: string) {
     setTransactions((prev) => prev.filter((t) => t.id !== id));
     await deleteTransaction(id);
+    toast(`Deleted "${txnDescription}"`);
   }
 
   async function handleAddSavingsGoal(e: FormEvent) {
@@ -118,9 +122,10 @@ export function FinanceDashboard({
     setGoalTarget("");
   }
 
-  async function handleDeleteSavingsGoal(id: string) {
+  async function handleDeleteSavingsGoal(id: string, goalName: string) {
     setSavingsGoals((prev) => prev.filter((g) => g.id !== id));
     await deleteSavingsGoal(id);
+    toast(`Deleted "${goalName}"`);
   }
 
   return (
@@ -187,16 +192,16 @@ export function FinanceDashboard({
                 goal.targetAmount > 0 ? Math.min(100, Math.round((goal.currentAmount / goal.targetAmount) * 100)) : 0;
               return (
                 <li key={goal.id} className="group">
-                  <div className="mb-1 flex items-center justify-between text-xs">
-                    <span className="text-neutral-800 dark:text-neutral-200">{goal.name}</span>
-                    <div className="flex items-center gap-2">
+                  <div className="mb-1 flex items-center justify-between gap-2 text-xs">
+                    <span className="min-w-0 flex-1 truncate text-neutral-800 dark:text-neutral-200">{goal.name}</span>
+                    <div className="flex shrink-0 items-center gap-2">
                       <span className="text-neutral-600 dark:text-neutral-500">{pct}%</span>
                       <button
                         type="button"
-                        onClick={() => handleDeleteSavingsGoal(goal.id)}
-                        className="-m-1.5 p-1.5 text-neutral-300 dark:text-neutral-700 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+                        onClick={() => handleDeleteSavingsGoal(goal.id, goal.name)}
+                        className={cn(rowIconButtonClass, "-m-1.5")}
                       >
-                        <Trash2 className="h-3 w-3" />
+                        <Trash2 className="h-3.5 w-3.5" />
                       </button>
                     </div>
                   </div>
@@ -209,14 +214,14 @@ export function FinanceDashboard({
                 </li>
               );
             })}
-            {savingsGoals.length === 0 && <li className="text-xs text-neutral-600 dark:text-neutral-500">No savings goals yet.</li>}
+            {savingsGoals.length === 0 && <EmptyState as="li" icon={Target} message="No savings goals yet." />}
           </ul>
           <form onSubmit={handleAddSavingsGoal} className="space-y-2">
             <input
               value={goalName}
               onChange={(e) => setGoalName(e.target.value)}
               placeholder="Goal name..."
-              className="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-1.5 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
+              className={fieldInputCompactClass}
             />
             <div className="flex gap-2">
               <input
@@ -224,7 +229,7 @@ export function FinanceDashboard({
                 value={goalTarget}
                 onChange={(e) => setGoalTarget(e.target.value)}
                 placeholder={`Target ${currencySymbol(currency)}`}
-                className="min-w-0 flex-1 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-1.5 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
+                className={cn(fieldInputCompactClass, "min-w-0 flex-1")}
               />
               <button
                 type="submit"
@@ -245,14 +250,14 @@ export function FinanceDashboard({
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Description..."
-            className="min-w-0 flex-1 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
+            className={cn(fieldInputClass, "min-w-0 flex-1")}
           />
           <input
             type="number"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             placeholder="Amount"
-            className="w-28 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
+            className="w-28 rounded-xl border border-neutral-300 bg-neutral-50 px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 shadow-inner shadow-black/5 transition-all duration-150 hover:border-neutral-400 focus:border-cyan-400/70 focus:outline-none focus:ring-4 focus:ring-cyan-400/10 dark:border-neutral-700/80 dark:bg-neutral-900/60 dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:shadow-black/20 dark:hover:border-neutral-600"
           />
           <div className="flex overflow-hidden rounded-lg border border-neutral-300 dark:border-neutral-700">
             <button
@@ -280,7 +285,7 @@ export function FinanceDashboard({
             value={category}
             onChange={(e) => setCategory(e.target.value)}
             placeholder="Category (optional)"
-            className="min-w-0 flex-1 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-cyan-400/60 focus:outline-none"
+            className={cn(fieldInputClass, "min-w-0 flex-1")}
           />
           <button
             type="submit"
@@ -297,7 +302,7 @@ export function FinanceDashboard({
               key={t.id}
               className="group flex items-center justify-between rounded-lg border border-neutral-200 dark:border-neutral-800 bg-neutral-100/60 dark:bg-neutral-950/60 p-2 text-sm"
             >
-              <div className="flex min-w-0 items-center gap-2">
+              <div className="flex min-w-0 flex-1 items-center gap-2">
                 {t.amount >= 0 ? (
                   <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-emerald-500" />
                 ) : (
@@ -316,20 +321,15 @@ export function FinanceDashboard({
                 </span>
                 <button
                   type="button"
-                  onClick={() => handleDeleteTransaction(t.id)}
-                  className="-m-1.5 p-1.5 text-neutral-400 dark:text-neutral-600 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+                  onClick={() => handleDeleteTransaction(t.id, t.description)}
+                  className={cn(rowIconButtonClass, "-m-1.5")}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>
               </div>
             </li>
           ))}
-          {transactions.length === 0 && (
-            <li className="flex flex-col items-center gap-2 py-8 text-sm text-neutral-600 dark:text-neutral-500">
-              <Wallet className="h-6 w-6" />
-              No transactions yet.
-            </li>
-          )}
+          {transactions.length === 0 && <EmptyState as="li" icon={Wallet} message="No transactions yet." />}
         </ul>
       </div>
     </div>

@@ -68,12 +68,18 @@ export const projects = pgTable("projects", {
   workspaceId: uuid("workspace_id")
     .notNull()
     .references(() => workspaces.id, { onDelete: "cascade" }),
+  // Assigned by migration 0010 triggers; the empty default is replaced before insert.
+  // Immutable, human-readable project key (e.g. PREP). UUIDs remain the
+  // canonical identity; keys are for prompts, navigation, and MCP context.
+  key: text("key").notNull().default(""),
   name: text("name").notNull(),
   description: text("description"),
   color: text("color"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
-});
+}, (table) => ({
+  workspaceKeyIdx: uniqueIndex("projects_workspace_id_key_idx").on(table.workspaceId, table.key),
+}));
 
 // Goal progress is deliberately not a manually-typed field — it's computed
 // from linked todos (done / total) by the goals repository. Status matches
@@ -89,6 +95,8 @@ export const goals = pgTable("goals", {
   workspaceId: uuid("workspace_id")
     .notNull()
     .references(() => workspaces.id, { onDelete: "cascade" }),
+  // Immutable, human-readable goal reference (e.g. PREP-G02).
+  reference: text("reference").notNull().default(""),
   title: text("title").notNull(),
   description: text("description"),
   status: goalStatusEnum("status").notNull().default("todo"),
@@ -104,7 +112,9 @@ export const goals = pgTable("goals", {
   position: integer("position").notNull().default(0),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
-});
+}, (table) => ({
+  workspaceReferenceIdx: uniqueIndex("goals_workspace_id_reference_idx").on(table.workspaceId, table.reference),
+}));
 
 // `domain` classifies what a note is about; `domainId` points at the parent
 // row for "project"/"learning" domains. There's deliberately no FK on
@@ -123,6 +133,7 @@ export const notes = pgTable("notes", {
   workspaceId: uuid("workspace_id")
     .notNull()
     .references(() => workspaces.id, { onDelete: "cascade" }),
+  reference: text("reference").notNull().default(""),
   title: text("title"),
   content: text("content").notNull(),
   rawContent: text("raw_content").notNull(),
@@ -138,7 +149,9 @@ export const notes = pgTable("notes", {
   embedding: jsonb("embedding").$type<number[]>(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
-});
+}, (table) => ({
+  workspaceReferenceIdx: uniqueIndex("notes_workspace_id_reference_idx").on(table.workspaceId, table.reference),
+}));
 
 export const todos = pgTable("todos", {
   id: uuid("id")
@@ -150,6 +163,8 @@ export const todos = pgTable("todos", {
   workspaceId: uuid("workspace_id")
     .notNull()
     .references(() => workspaces.id, { onDelete: "cascade" }),
+  // Immutable, human-readable task reference (e.g. PREP-G02-T014).
+  reference: text("reference").notNull().default(""),
   title: text("title").notNull(),
   description: text("description"),
   status: todoStatusEnum("status").notNull().default("todo"),
@@ -172,7 +187,9 @@ export const todos = pgTable("todos", {
   recurrenceDaysOfWeek: integer("recurrence_days_of_week").array(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
-});
+}, (table) => ({
+  workspaceReferenceIdx: uniqueIndex("todos_workspace_id_reference_idx").on(table.workspaceId, table.reference),
+}));
 
 export const templates = pgTable("templates", {
   id: uuid("id")
@@ -427,3 +444,12 @@ export const savingsGoals = pgTable("savings_goals", {
   currentAmount: doublePrecision("current_amount").notNull().default(0),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+// Allocated atomically by database triggers; retained after entity deletion.
+export const referenceCounters = pgTable("reference_counters", {
+  workspaceId: uuid("workspace_id").notNull().references(() => workspaces.id, { onDelete: "cascade" }),
+  scope: text("scope").notNull(),
+  value: integer("value").notNull(),
+}, (table) => ({
+  workspaceScopeIdx: uniqueIndex("reference_counters_workspace_scope_idx").on(table.workspaceId, table.scope),
+})).enableRLS();

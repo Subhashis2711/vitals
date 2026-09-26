@@ -27,6 +27,7 @@ const recurrenceFieldsSchema = {
 
 export const todoSchema = z.object({
   id: z.string(),
+  reference: z.string(),
   title: z.string(),
   description: z.string().nullable(),
   status: z.enum(TODO_STATUSES),
@@ -45,6 +46,7 @@ export type Todo = z.infer<typeof todoSchema>;
 
 export const noteSchema = z.object({
   id: z.string(),
+  reference: z.string(),
   title: z.string().nullable(),
   content: z.string(),
   rawContent: z.string(),
@@ -159,6 +161,7 @@ export type MarkdownFromTextResponse = z.infer<typeof markdownFromTextResponseSc
 
 export const projectSchema = z.object({
   id: z.string(),
+  key: z.string(),
   name: z.string(),
   description: z.string().nullable(),
   color: z.string().nullable(),
@@ -231,6 +234,7 @@ export type ToggleHabitLogResponse = z.infer<typeof toggleHabitLogResponseSchema
 
 export const goalSchema = z.object({
   id: z.string(),
+  reference: z.string(),
   title: z.string(),
   description: z.string().nullable(),
   status: z.enum(GOAL_STATUSES),

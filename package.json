@@ -10,11 +10,13 @@
     "dev": "concurrently -n api,web -c blue,green \"npm run dev -w apps/api\" \"npm run dev -w apps/web\"",
     "dev:api": "npm run dev -w apps/api",
     "dev:web": "npm run dev -w apps/web",
-    "build": "npm run build -w packages/shared && npm run build -w packages/ai && npm run build -w packages/db && npm run build -w apps/api && npm run build -w apps/web",
+    "dev:mcp": "npm run dev -w apps/mcp",
+    "build": "npm run build -w packages/shared && npm run build -w packages/ai && npm run build -w packages/db && npm run build -w apps/api && npm run build -w apps/web && npm run build -w apps/mcp",
     "db:generate": "dotenv -e .env -- npm run generate -w packages/db",
     "db:migrate": "dotenv -e .env -- npm run migrate -w packages/db",
     "db:seed": "dotenv -e .env -- npm run seed -w packages/db",
-    "typecheck": "npm run typecheck -w packages/shared && npm run typecheck -w packages/ai && npm run typecheck -w packages/db && npm run typecheck -w apps/api && npm run typecheck -w apps/web"
+    "typecheck": "npm run typecheck -w packages/shared && npm run typecheck -w packages/ai && npm run typecheck -w packages/db && npm run typecheck -w apps/api && npm run typecheck -w apps/web && npm run typecheck -w apps/mcp",
+    "test:references": "node --import tsx --test packages/db/tests/references.test.ts"
   },
   "devDependencies": {
     "concurrently": "^9.1.2",

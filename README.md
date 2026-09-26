@@ -94,6 +94,96 @@ npm run dev
 
 Starts both the API (http://localhost:4000) and the web app (http://localhost:3000). Open http://localhost:3000 and sign in with Google.
 
+## MCP server
+
+`apps/mcp` is a local stdio [Model Context Protocol](https://modelcontextprotocol.io/)
+server. It uses the same database repositories as the API and is deliberately
+locked to one user and one workspace through environment variables. It does
+not expose a network endpoint or accept user/workspace identifiers from an AI
+client.
+
+Set `MCP_USER_ID` and `MCP_WORKSPACE_ID` in the root `.env` to the raw UUIDs
+for the user and workspace to authorize. Then start it with:
+
+```bash
+npm run dev:mcp
+```
+
+The initial tool set is:
+
+- `vitals_get_today` — open todos, today's calendar events, and habit progress
+- `vitals_search_notes` — searches notes in the configured workspace
+- `vitals_list_projects` / `vitals_create_project` / `vitals_project_status` — view, create, and summarize projects
+- `vitals_list_goals` / `vitals_create_goal` — view and create goals, optionally under a project
+- `vitals_list_tasks` / `vitals_create_todo` / `vitals_update_task` — view, create, and update tasks with project, goal, idea, and dependency links
+- `vitals_capture_idea` / `vitals_list_ideas` — capture ideas in Inbox and review them without turning them into implementation context
+- `vitals_record_decision` — record durable project decisions
+- `vitals_context_for_task` — minimal task-specific context: project, goal, task, acceptance criteria, decisions, promoted idea, and dependencies
+- `vitals_update_todo_links` / `vitals_update_goal_project` — link or unlink existing todos and goals
+- `vitals_complete_todo` — marks an explicitly confirmed todo as done
+
+Ideas and decisions use the existing project-note model: ideas have the `idea`
+content type and begin with the `inbox` tag; decisions have the `decision` tag.
+An idea becomes task context only when it is explicitly linked to a task as its
+source idea. Task dependencies are stored as validated `depends-on:<todo UUID>`
+tags until the data model gains a first-class dependency relation.
+
+Readable references are allocated atomically in PostgreSQL. Apply migration
+`0010_conscious_warbird` with `npm run db:migrate` before running this version;
+it backfills existing projects, goals, tasks, and notes in creation order.
+Database triggers also cover journal notes and recurring tasks. Use migrations,
+not schema push, to install these triggers.
+
+- Projects have workspace-unique keys derived from their names, such as `PREP`.
+- Goals use `PREP-G02`; tasks created under that goal use `PREP-G02-T014`.
+- Tasks without a goal use `PREP-T014`.
+- Ideas, decisions, and other notes use `PREP-I001`, `PREP-D001`, and `PREP-N001`.
+- Records without a project use the reserved `WS` prefix.
+
+Keys and references remain unchanged after renaming, relinking, or changing a
+note's type. Their prefixes describe their original allocation, not necessarily
+their current parent. Counters and project-key reservations survive deletions,
+so previously allocated identifiers are never reused within a workspace.
+Numbers grow beyond their minimum padding without truncation.
+
+MCP identifier fields (`projectId`, `goalId`, `ideaId`, task `id`, and
+`dependencyIds`) accept either UUIDs or readable identifiers, case-insensitively.
+Responses include both. Task context also accepts the `project` alias:
+
+```js
+vitals_context_for_task({ project: "PREP", task: "PREP-G02-T014" })
+```
+
+The existing `{ projectId: "<uuid>", task: "<uuid>" }` form still works. Exact
+task titles remain supported when unique within the selected project. All
+lookups are restricted to the configured user and workspace.
+
+Run the database/MCP integration test against a disposable PostgreSQL server
+with a role that can create databases:
+
+```bash
+TEST_DATABASE_URL=postgresql://user:password@localhost:5432/postgres npm run test:references
+```
+
+The test creates and drops its own database and checks migration backfills,
+concurrent allocation, deletion, recurrence, and MCP reference/UUID resolution.
+
+For an MCP client that accepts a stdio command configuration, point it at this
+repository and use:
+
+```json
+{
+  "command": "npm",
+  "args": ["run", "start", "-w", "apps/mcp"],
+  "cwd": "/absolute/path/to/vitals"
+}
+```
+
+The command loads the root `.env`; keep that file private because it contains
+the database connection string. Hosted MCP access and OAuth-based per-request
+authorization should be added separately before exposing this server outside a
+trusted local machine.
+
 ## Production migrations and deployment
 
 Production runs on Cloud Run in Google Cloud project `oscas-dev-second-brain`,

@@ -44,6 +44,17 @@ export async function getGoalById(id: string, userId: string, workspaceId: strin
   return withProg;
 }
 
+export async function getGoalByReference(reference: string, userId: string, workspaceId: string) {
+  const db = getDb();
+  const [row] = await db
+    .select()
+    .from(goals)
+    .where(and(eq(goals.reference, reference.toUpperCase()), eq(goals.userId, userId), eq(goals.workspaceId, workspaceId)));
+  if (!row) return null;
+  const [result] = await withProgress([row], workspaceId);
+  return result;
+}
+
 export async function listGoalTodos(goalId: string, userId: string, workspaceId: string) {
   const db = getDb();
   return db

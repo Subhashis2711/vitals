@@ -21,6 +21,15 @@ export async function getTodoById(id: string, userId: string, workspaceId: strin
   return row ?? null;
 }
 
+export async function getTodoByReference(reference: string, userId: string, workspaceId: string) {
+  const db = getDb();
+  const [row] = await db
+    .select()
+    .from(todos)
+    .where(and(eq(todos.reference, reference.toUpperCase()), eq(todos.userId, userId), eq(todos.workspaceId, workspaceId)));
+  return row ?? null;
+}
+
 export async function listTodosBySourceNoteId(sourceNoteId: string, userId: string, workspaceId: string) {
   const db = getDb();
   return db

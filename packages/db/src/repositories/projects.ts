@@ -22,6 +22,15 @@ export async function getProjectById(id: string, userId: string, workspaceId: st
   return row ?? null;
 }
 
+export async function getProjectByKey(key: string, userId: string, workspaceId: string) {
+  const db = getDb();
+  const [row] = await db
+    .select()
+    .from(projects)
+    .where(and(eq(projects.key, key.toUpperCase()), eq(projects.userId, userId), eq(projects.workspaceId, workspaceId)));
+  return row ?? null;
+}
+
 export async function createProject(input: CreateProjectInput, userId: string, workspaceId: string) {
   const db = getDb();
   const [row] = await db

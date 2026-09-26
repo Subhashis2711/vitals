@@ -93,3 +93,10 @@ export async function deleteNote(id: string, userId: string, workspaceId: string
     .returning();
   return row ?? null;
 }
+
+export async function getNoteByReference(reference: string, userId: string, workspaceId: string) {
+  const [row] = await getDb().select().from(notes).where(and(
+    eq(notes.reference, reference.toUpperCase()), eq(notes.userId, userId), eq(notes.workspaceId, workspaceId),
+  ));
+  return row ?? null;
+}

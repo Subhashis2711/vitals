@@ -1,8 +1,7 @@
 import type { CreateProjectInput, UpdateProjectInput } from "@vitals/shared";
 import { and, desc, eq } from "drizzle-orm";
 import { getDb } from "../client";
-import { projects } from "../schema";
-import { deleteNotesByDomain } from "./notes";
+import { notes, projects, referenceCounters } from "../schema";
 
 export async function listProjects(userId: string, workspaceId: string) {
   const db = getDb();
@@ -65,10 +64,23 @@ export async function updateProject(id: string, input: UpdateProjectInput, userI
 // a project must explicitly clean up notes pointing at it via domainId.
 export async function deleteProject(id: string, userId: string, workspaceId: string) {
   const db = getDb();
-  await deleteNotesByDomain("project", id, userId, workspaceId);
-  const [row] = await db
-    .delete(projects)
-    .where(and(eq(projects.id, id), eq(projects.userId, userId), eq(projects.workspaceId, workspaceId)))
-    .returning();
-  return row ?? null;
+  return db.transaction(async (tx) => {
+    const [project] = await tx
+      .select()
+      .from(projects)
+      .where(and(eq(projects.id, id), eq(projects.userId, userId), eq(projects.workspaceId, workspaceId)));
+    if (!project) return null;
+
+    await tx
+      .delete(notes)
+      .where(and(eq(notes.domain, "project"), eq(notes.domainId, id), eq(notes.userId, userId), eq(notes.workspaceId, workspaceId)));
+    const [deleted] = await tx
+      .delete(projects)
+      .where(and(eq(projects.id, id), eq(projects.userId, userId), eq(projects.workspaceId, workspaceId)))
+      .returning();
+    await tx
+      .delete(referenceCounters)
+      .where(and(eq(referenceCounters.workspaceId, workspaceId), eq(referenceCounters.scope, `key:${project.key}`)));
+    return deleted ?? null;
+  });
 }

@@ -445,7 +445,8 @@ export const savingsGoals = pgTable("savings_goals", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
-// Allocated atomically by database triggers; retained after entity deletion.
+// Allocated atomically by database triggers. Reference counters are retained
+// after entity deletion; project-key reservations are released with projects.
 export const referenceCounters = pgTable("reference_counters", {
   workspaceId: uuid("workspace_id").notNull().references(() => workspaces.id, { onDelete: "cascade" }),
   scope: text("scope").notNull(),

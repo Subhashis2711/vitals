@@ -118,8 +118,9 @@ test("reference migration, allocation, and MCP resolution", { skip: !process.env
     assert.ok(ambiguous.isError);
     const denied = await client.callTool({name:'vitals_context_for_task',arguments:{project:otherProject.id,task:context.task.reference}});
     assert.ok(denied.isError);
+    const releasedKey = duplicates[0].key;
     await projectsRepo.deleteProject(duplicates[0].id,user,workspace);
-    assert.ok(!duplicates.map(p=>p.key).includes((await projectsRepo.createProject({name:'Prep'},user,workspace)).key));
+    assert.equal((await projectsRepo.createProject({name:'Prep'},user,workspace)).key,releasedKey);
   } finally {
     await client?.close();
     await transport?.close();

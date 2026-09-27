@@ -600,7 +600,7 @@ async function main() {
   const accessToken = process.env.MCP_ACCESS_TOKEN;
   if (!accessToken) throw new Error("MCP_ACCESS_TOKEN is required for the HTTP transport.");
 
-  const app = createMcpExpressApp();
+  const app = createMcpExpressApp({ host: "0.0.0.0" });
   app.get("/health", (_request, response) => response.json({ status: "ok" }));
 
   app.use("/mcp", (request, response, next) => {

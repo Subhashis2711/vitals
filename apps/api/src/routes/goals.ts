@@ -40,9 +40,9 @@ export async function goalsRoutes(app: FastifyInstance) {
   app.post("/reorder", async (req, reply) => {
     const parsed = reorderGoalsInputSchema.safeParse(req.body);
     if (!parsed.success) return reply.code(400).send({ error: parsed.error.flatten() });
-    const firstId = fromGid(parsed.data.firstId).id;
-    const secondId = fromGid(parsed.data.secondId).id;
-    const result = await goalsRepo.swapGoalPositions(firstId, secondId, req.userId, req.workspaceId);
+    // gidSchema already validates and transforms these IDs to UUIDs. Parsing
+    // them a second time treats the UUID as a GID and causes a 500.
+    const result = await goalsRepo.swapGoalPositions(parsed.data.firstId, parsed.data.secondId, req.userId, req.workspaceId);
     if (!result) return reply.code(404).send({ error: "Goal not found" });
     return { goals: result.map(serializeGoal) };
   });

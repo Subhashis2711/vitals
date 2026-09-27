@@ -1,5 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { createMcpExpressApp } from "@modelcontextprotocol/sdk/server/express.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { calendarRepo, closeDb, goalsRepo, habitsRepo, notesRepo, projectsRepo, todosRepo, workspacesRepo } from "@vitals/db";
 import { z } from "zod";
 
@@ -79,8 +81,7 @@ async function dependencyTags(context: Context, dependencyIds: string[]) {
   return dependencyIds.map((id) => `depends-on:${id}`);
 }
 
-async function main() {
-  const context = await loadContext();
+async function createServer(context: Context) {
   const server = new McpServer({ name: "vitals", version: "0.1.0" });
 
   server.registerTool(
@@ -584,8 +585,58 @@ async function main() {
     },
   );
 
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
+  return server;
+}
+
+async function main() {
+  const context = await loadContext();
+  if (process.env.MCP_TRANSPORT !== "http") {
+    const server = await createServer(context);
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+    return;
+  }
+
+  const accessToken = process.env.MCP_ACCESS_TOKEN;
+  if (!accessToken) throw new Error("MCP_ACCESS_TOKEN is required for the HTTP transport.");
+
+  const app = createMcpExpressApp();
+  app.get("/health", (_request, response) => response.json({ status: "ok" }));
+
+  app.use("/mcp", (request, response, next) => {
+    if (request.headers.authorization !== `Bearer ${accessToken}`) {
+      response.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+    next();
+  });
+
+  app.post("/mcp", async (request, response) => {
+    const server = await createServer(context);
+    const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
+    response.on("close", () => {
+      void transport.close();
+      void server.close();
+    });
+    try {
+      await server.connect(transport);
+      await transport.handleRequest(request, response, request.body);
+    } catch (error) {
+      console.error("MCP request failed", error);
+      if (!response.headersSent) {
+        response.status(500).json({ jsonrpc: "2.0", error: { code: -32603, message: "Internal server error" }, id: null });
+      }
+    }
+  });
+
+  const methodNotAllowed = (_request: unknown, response: { status: (code: number) => { json: (body: unknown) => void } }) => {
+    response.status(405).json({ jsonrpc: "2.0", error: { code: -32000, message: "Method not allowed" }, id: null });
+  };
+  app.get("/mcp", methodNotAllowed);
+  app.delete("/mcp", methodNotAllowed);
+
+  const port = Number(process.env.PORT ?? 8080);
+  app.listen(port, () => console.log(`Vitals MCP listening on port ${port}`));
 }
 
 main()

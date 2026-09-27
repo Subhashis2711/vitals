@@ -134,10 +134,11 @@ it backfills existing projects, goals, tasks, and notes in creation order.
 Database triggers also cover journal notes and recurring tasks. Use migrations,
 not schema push, to install these triggers.
 
-- Projects have workspace-unique keys derived from their names, such as `PREP`.
-- Goals use `PREP-G02`; tasks created under that goal use `PREP-G02-T014`.
-- Tasks without a goal use `PREP-T014`.
-- Ideas, decisions, and other notes use `PREP-I001`, `PREP-D001`, and `PREP-N001`.
+- Projects have workspace-unique, three-character keys derived from readable
+  initials and consonants, such as `PVT` for Prep Vitals or `SHP` for Shopify.
+- Goals use `PVT-G02`; tasks created under that goal use `PVT-G02-T014`.
+- Tasks without a goal use `PVT-T014`.
+- Ideas, decisions, and other notes use `PVT-I001`, `PVT-D001`, and `PVT-N001`.
 - Records without a project use the reserved `WS` prefix.
 
 Keys and references remain unchanged after renaming, relinking, or changing a
@@ -151,7 +152,7 @@ MCP identifier fields (`projectId`, `goalId`, `ideaId`, task `id`, and
 Responses include both. Task context also accepts the `project` alias:
 
 ```js
-vitals_context_for_task({ project: "PREP", task: "PREP-G02-T014" })
+vitals_context_for_task({ project: "PVT", task: "PVT-G02-T014" })
 ```
 
 The existing `{ projectId: "<uuid>", task: "<uuid>" }` form still works. Exact

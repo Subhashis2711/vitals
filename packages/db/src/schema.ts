@@ -69,7 +69,7 @@ export const projects = pgTable("projects", {
     .notNull()
     .references(() => workspaces.id, { onDelete: "cascade" }),
   // Assigned by migration 0010 triggers; the empty default is replaced before insert.
-  // Immutable, human-readable project key (e.g. PREP). UUIDs remain the
+  // Immutable, human-readable project key (e.g. PVT). UUIDs remain the
   // canonical identity; keys are for prompts, navigation, and MCP context.
   key: text("key").notNull().default(""),
   name: text("name").notNull(),
@@ -95,7 +95,7 @@ export const goals = pgTable("goals", {
   workspaceId: uuid("workspace_id")
     .notNull()
     .references(() => workspaces.id, { onDelete: "cascade" }),
-  // Immutable, human-readable goal reference (e.g. PREP-G02).
+  // Immutable, human-readable goal reference (e.g. PVT-G02).
   reference: text("reference").notNull().default(""),
   title: text("title").notNull(),
   description: text("description"),
@@ -163,7 +163,7 @@ export const todos = pgTable("todos", {
   workspaceId: uuid("workspace_id")
     .notNull()
     .references(() => workspaces.id, { onDelete: "cascade" }),
-  // Immutable, human-readable task reference (e.g. PREP-G02-T014).
+  // Immutable, human-readable task reference (e.g. PVT-G02-T014).
   reference: text("reference").notNull().default(""),
   title: text("title").notNull(),
   description: text("description"),

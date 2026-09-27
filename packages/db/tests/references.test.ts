@@ -54,6 +54,9 @@ test("reference migration, allocation, and MCP resolution", { skip: !process.env
     const last = tasks.find(t=>t.reference === 'PVT-G02-T020')!;
     await todosRepo.deleteTodo(last.id,user,workspace);
     assert.equal((await todosRepo.createTodo({title:'After delete',projectId,goalId:goal.id},user,workspace)).reference,'PVT-G02-T021');
+    const inheritedProjectTask = await todosRepo.createTodo({title:'Inherited project task',goalId:goal.id},user,workspace);
+    assert.equal(inheritedProjectTask.projectId,null);
+    assert.ok((await todosRepo.listTodosByProjectId(projectId,user,workspace)).some(todo=>todo.id === inheritedProjectTask.id));
     await projectsRepo.updateProject(projectId,{name:'Renamed'},user,workspace);
     assert.equal((await projectsRepo.getProjectById(projectId,user,workspace))!.key,'PVT');
     const disposableGoal = await goalsRepo.createGoal({title:'Temporary',projectId},user,workspace);

@@ -1,7 +1,7 @@
 import type { CreateTodoInput, RecurrenceFreq, TodoStatus, UpdateTodoInput } from "@vitals/shared";
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, inArray, or } from "drizzle-orm";
 import { getDb } from "../client";
-import { todos } from "../schema";
+import { goals, todos } from "../schema";
 
 export async function listTodos(userId: string, workspaceId: string) {
   const db = getDb();
@@ -41,10 +41,20 @@ export async function listTodosBySourceNoteId(sourceNoteId: string, userId: stri
 
 export async function listTodosByProjectId(projectId: string, userId: string, workspaceId: string) {
   const db = getDb();
+  const projectGoalIds = db
+    .select({ id: goals.id })
+    .from(goals)
+    .where(and(eq(goals.projectId, projectId), eq(goals.userId, userId), eq(goals.workspaceId, workspaceId)));
   return db
     .select()
     .from(todos)
-    .where(and(eq(todos.projectId, projectId), eq(todos.userId, userId), eq(todos.workspaceId, workspaceId)))
+    .where(
+      and(
+        or(eq(todos.projectId, projectId), inArray(todos.goalId, projectGoalIds)),
+        eq(todos.userId, userId),
+        eq(todos.workspaceId, workspaceId),
+      ),
+    )
     .orderBy(desc(todos.createdAt));
 }
 

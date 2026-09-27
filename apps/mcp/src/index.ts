@@ -359,8 +359,11 @@ async function createServer(context: Context) {
       if (projectId) projectId = await resolveId(context, "project", projectId);
       if (goalId) goalId = await resolveId(context, "goal", goalId);
       await validateLinks(context, { projectId, goalId });
-      const tasks = (await todosRepo.listTodos(context.userId, context.workspaceId))
-        .filter((todo) => (!projectId || todo.projectId === projectId) && (!goalId || todo.goalId === goalId) && (includeDone || todo.status !== "done"))
+      const candidateTasks = projectId
+        ? await todosRepo.listTodosByProjectId(projectId, context.userId, context.workspaceId)
+        : await todosRepo.listTodos(context.userId, context.workspaceId);
+      const tasks = candidateTasks
+        .filter((todo) => (!goalId || todo.goalId === goalId) && (includeDone || todo.status !== "done"))
         .map((todo) => ({
           id: todo.id, reference: todo.reference,
           title: todo.title,
@@ -549,13 +552,15 @@ async function createServer(context: Context) {
       const selector = task.trim();
       let selectedTask = await (z.string().uuid().safeParse(selector).success
         ? todosRepo.getTodoById : todosRepo.getTodoByReference)(selector, context.userId, context.workspaceId);
+      const projectTasks = await todosRepo.listTodosByProjectId(projectId, context.userId, context.workspaceId);
       if (!selectedTask) {
-        const tasks = await todosRepo.listTodosByProjectId(projectId, context.userId, context.workspaceId);
-        const matches = tasks.filter((candidate) => candidate.title.toLocaleLowerCase() === selector.toLocaleLowerCase());
+        const matches = projectTasks.filter((candidate) => candidate.title.toLocaleLowerCase() === selector.toLocaleLowerCase());
         if (matches.length > 1) throw new Error("Task title is ambiguous; use its reference or UUID.");
         selectedTask = matches[0] ?? null;
       }
-      if (!selectedTask || selectedTask.projectId !== projectId) return result({ error: "Task not found in the selected project." });
+      if (!selectedTask || !projectTasks.some((candidate) => candidate.id === selectedTask!.id)) {
+        return result({ error: "Task not found in the selected project." });
+      }
 
       const [projectGoals, projectNotes] = await Promise.all([
         goalsRepo.listGoalsByProjectId(projectId, context.userId, context.workspaceId),

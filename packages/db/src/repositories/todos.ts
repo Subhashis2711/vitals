@@ -1,5 +1,5 @@
 import type { CreateTodoInput, RecurrenceFreq, TodoStatus, UpdateTodoInput } from "@vitals/shared";
-import { and, desc, eq, inArray, or } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, or } from "drizzle-orm";
 import { getDb } from "../client";
 import { goals, todos } from "../schema";
 
@@ -9,7 +9,12 @@ export async function listTodos(userId: string, workspaceId: string) {
     .select()
     .from(todos)
     .where(and(eq(todos.userId, userId), eq(todos.workspaceId, workspaceId)))
-    .orderBy(desc(todos.createdAt));
+    .orderBy(asc(todos.position), asc(todos.createdAt));
+}
+
+export async function getNextTodoByProjectId(projectId: string, userId: string, workspaceId: string) {
+  const projectTodos = await listTodosByProjectId(projectId, userId, workspaceId);
+  return projectTodos.find((todo) => todo.status !== "done") ?? null;
 }
 
 export async function getTodoById(id: string, userId: string, workspaceId: string) {
@@ -55,7 +60,7 @@ export async function listTodosByProjectId(projectId: string, userId: string, wo
         eq(todos.workspaceId, workspaceId),
       ),
     )
-    .orderBy(desc(todos.createdAt));
+    .orderBy(asc(todos.position), asc(todos.createdAt));
 }
 
 async function nextPositionForStatus(status: TodoStatus, userId: string, workspaceId: string): Promise<number> {

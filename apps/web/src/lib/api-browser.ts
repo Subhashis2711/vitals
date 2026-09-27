@@ -54,6 +54,7 @@ export const {
   createGoal,
   updateGoal,
   deleteGoal,
+  reorderGoals,
   getCalendarEvents,
   createCalendarEvent,
   updateCalendarEvent,

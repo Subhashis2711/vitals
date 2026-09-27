@@ -1,5 +1,5 @@
 import { goalsRepo, learningRepo } from "@vitals/db";
-import { createGoalInputSchema, fromGid, updateGoalInputSchema } from "@vitals/shared";
+import { createGoalInputSchema, fromGid, reorderGoalsInputSchema, updateGoalInputSchema } from "@vitals/shared";
 import type { FastifyInstance } from "fastify";
 import { serializeGoal, serializeTodo } from "../serializers";
 
@@ -35,6 +35,16 @@ export async function goalsRoutes(app: FastifyInstance) {
     const goal = await goalsRepo.createGoal(parsed.data, req.userId, req.workspaceId);
     if (goal.topicId) await learningRepo.touchTopic(goal.topicId, req.userId, req.workspaceId);
     return reply.code(201).send({ goal: serializeGoal(goal) });
+  });
+
+  app.post("/reorder", async (req, reply) => {
+    const parsed = reorderGoalsInputSchema.safeParse(req.body);
+    if (!parsed.success) return reply.code(400).send({ error: parsed.error.flatten() });
+    const firstId = fromGid(parsed.data.firstId).id;
+    const secondId = fromGid(parsed.data.secondId).id;
+    const result = await goalsRepo.swapGoalPositions(firstId, secondId, req.userId, req.workspaceId);
+    if (!result) return reply.code(404).send({ error: "Goal not found" });
+    return { goals: result.map(serializeGoal) };
   });
 
   app.patch<{ Params: { id: string } }>("/:id", async (req, reply) => {

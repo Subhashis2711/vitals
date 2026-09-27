@@ -90,6 +90,7 @@ async function createServer(context: Context) {
       title: "Get today's Vitals overview",
       description: "Returns open todos, calendar events, and habit progress for the configured workspace.",
       inputSchema: {},
+      annotations: { readOnlyHint: true, destructiveHint: false },
     },
     async () => {
       const today = new Date().toLocaleDateString("en-CA");
@@ -122,6 +123,7 @@ async function createServer(context: Context) {
       title: "Search Vitals notes",
       description: "Searches note titles, content, and tags in the configured workspace.",
       inputSchema: { query: z.string().min(1).max(200), limit: z.number().int().min(1).max(20).optional() },
+      annotations: { readOnlyHint: true, destructiveHint: false },
     },
     async ({ query, limit = 10 }) => {
 
@@ -147,6 +149,7 @@ async function createServer(context: Context) {
       title: "List Vitals projects",
       description: "Lists projects in the configured workspace, including readable keys and UUIDs used to link todos and goals.",
       inputSchema: {},
+      annotations: { readOnlyHint: true, destructiveHint: false },
     },
     async () => {
       const projects = await projectsRepo.listProjects(context.userId, context.workspaceId);
@@ -167,6 +170,7 @@ async function createServer(context: Context) {
         description: z.string().max(5_000).optional(),
         color: z.string().max(40).optional(),
       },
+      annotations: { readOnlyHint: false, destructiveHint: false },
     },
     async ({ name, description, color }) => {
 
@@ -185,6 +189,7 @@ async function createServer(context: Context) {
       title: "List Vitals goals",
       description: "Lists goals in the configured workspace, including project links and progress.",
       inputSchema: { projectId: identifier.optional() },
+      annotations: { readOnlyHint: true, destructiveHint: false },
     },
     async ({ projectId }) => {
       if (projectId) projectId = await resolveId(context, "project", projectId);
@@ -218,6 +223,7 @@ async function createServer(context: Context) {
         targetDate: z.string().date().optional(),
         projectId: identifier.optional(),
       },
+      annotations: { readOnlyHint: false, destructiveHint: false },
     },
     async ({ title, description, startDate, targetDate, projectId }) => {
       if (projectId) projectId = await resolveId(context, "project", projectId);
@@ -252,6 +258,7 @@ async function createServer(context: Context) {
         ideaId: identifier.optional(),
         dependencyIds: z.array(identifier).max(20).optional(),
       },
+      annotations: { readOnlyHint: false, destructiveHint: false },
     },
     async ({ title, description, dueDate, tags, projectId, goalId, ideaId, dependencyIds = [] }) => {
       if (projectId) projectId = await resolveId(context, "project", projectId);
@@ -300,6 +307,7 @@ async function createServer(context: Context) {
         projectId: identifier.nullable().optional(),
         goalId: identifier.nullable().optional(),
       },
+      annotations: { readOnlyHint: false, destructiveHint: false },
     },
     async ({ id, projectId, goalId }) => {
       if (projectId) projectId = await resolveId(context, "project", projectId);
@@ -322,6 +330,7 @@ async function createServer(context: Context) {
       title: "Link a goal to a project",
       description: "Links or unlinks an existing goal to a project in the configured workspace. Set projectId to null to remove the link.",
       inputSchema: { id: identifier, projectId: identifier.nullable() },
+      annotations: { readOnlyHint: false, destructiveHint: false },
     },
     async ({ id, projectId }) => {
       if (projectId) projectId = await resolveId(context, "project", projectId);
@@ -339,6 +348,7 @@ async function createServer(context: Context) {
       title: "Complete a Vitals todo",
       description: "Marks a todo in the configured workspace as done. Use only after the user has clearly confirmed it.",
       inputSchema: { id: identifier },
+      annotations: { readOnlyHint: false, destructiveHint: false },
     },
     async ({ id }) => {
       id = await resolveId(context, "task", id);
@@ -354,6 +364,7 @@ async function createServer(context: Context) {
       title: "List Vitals tasks",
       description: "Lists tasks in the configured workspace, optionally narrowed to a project or goal.",
       inputSchema: { projectId: identifier.optional(), goalId: identifier.optional(), includeDone: z.boolean().optional() },
+      annotations: { readOnlyHint: true, destructiveHint: false },
     },
     async ({ projectId, goalId, includeDone = false }) => {
       if (projectId) projectId = await resolveId(context, "project", projectId);
@@ -379,6 +390,38 @@ async function createServer(context: Context) {
   );
 
   server.registerTool(
+    "vitals_get_next_task",
+    {
+      title: "Get the next Vitals task",
+      description: "Returns the first incomplete task in a project according to its manual task ordering.",
+      inputSchema: { projectId: identifier },
+      annotations: { readOnlyHint: true, destructiveHint: false },
+    },
+    async ({ projectId }) => {
+      projectId = await resolveId(context, "project", projectId);
+      const project = await projectsRepo.getProjectById(projectId, context.userId, context.workspaceId);
+      if (!project) return result({ error: "Project not found in the configured workspace." });
+      const task = await todosRepo.getNextTodoByProjectId(projectId, context.userId, context.workspaceId);
+      return result({
+        workspace: context.workspaceName,
+        project: { id: project.id, key: project.key, name: project.name },
+        task: task
+          ? {
+              id: task.id,
+              reference: task.reference,
+              title: task.title,
+              description: task.description,
+              status: task.status,
+              dueDate: task.dueDate ? isoDate(task.dueDate) : null,
+              position: task.position,
+              goalId: task.goalId,
+            }
+          : null,
+      });
+    },
+  );
+
+  server.registerTool(
     "vitals_update_task",
     {
       title: "Update a Vitals task",
@@ -395,6 +438,7 @@ async function createServer(context: Context) {
         ideaId: identifier.nullable().optional(),
         dependencyIds: z.array(identifier).max(20).optional(),
       },
+      annotations: { readOnlyHint: false, destructiveHint: false },
     },
     async ({ id, title, description, status, dueDate, tags, projectId, goalId, ideaId, dependencyIds }) => {
       if (projectId) projectId = await resolveId(context, "project", projectId);
@@ -437,6 +481,7 @@ async function createServer(context: Context) {
       title: "Capture a Vitals idea",
       description: "Captures an idea in Inbox status, optionally under a project. An idea is only included in task context after it is promoted by linking it to a task.",
       inputSchema: { title: z.string().min(1).max(500), description: z.string().min(1).max(10_000), projectId: identifier.optional() },
+      annotations: { readOnlyHint: false, destructiveHint: false },
     },
     async ({ title, description, projectId }) => {
       if (projectId) projectId = await resolveId(context, "project", projectId);
@@ -464,6 +509,7 @@ async function createServer(context: Context) {
       title: "List Vitals ideas",
       description: "Lists captured ideas, optionally for a project. Inbox ideas remain separate from task context until promoted.",
       inputSchema: { projectId: identifier.optional(), includePromoted: z.boolean().optional() },
+      annotations: { readOnlyHint: true, destructiveHint: false },
     },
     async ({ projectId, includePromoted = true }) => {
       if (projectId) projectId = await resolveId(context, "project", projectId);
@@ -482,6 +528,7 @@ async function createServer(context: Context) {
       title: "Record a Vitals decision",
       description: "Records a durable decision note, optionally linked to a project.",
       inputSchema: { title: z.string().min(1).max(500), rationale: z.string().min(1).max(10_000), projectId: identifier.optional() },
+      annotations: { readOnlyHint: false, destructiveHint: false },
     },
     async ({ title, rationale, projectId }) => {
       if (projectId) projectId = await resolveId(context, "project", projectId);
@@ -509,6 +556,7 @@ async function createServer(context: Context) {
       title: "Get Vitals project status",
       description: "Returns a compact project-status view with goals and task counts, without unrelated workspace data.",
       inputSchema: { projectId: identifier },
+      annotations: { readOnlyHint: true, destructiveHint: false },
     },
     async ({ projectId }) => {
       if (projectId) projectId = await resolveId(context, "project", projectId);
@@ -537,6 +585,7 @@ async function createServer(context: Context) {
       title: "Get just-in-time coding context for a task",
       description: "Returns only the selected project's goal, task, acceptance criteria, related decisions, promoted idea, and validated dependencies.",
       inputSchema: { project: identifier.optional(), projectId: identifier.optional(), task: z.string().min(1).max(500) },
+      annotations: { readOnlyHint: true, destructiveHint: false },
     },
     async ({ project: projectSelector, projectId, task }) => {
       if (!projectSelector && !projectId) throw new Error("Provide project or projectId.");

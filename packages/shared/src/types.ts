@@ -266,6 +266,13 @@ export type CreateGoalInput = z.infer<typeof createGoalInputSchema>;
 export const updateGoalInputSchema = createGoalInputSchema.partial();
 export type UpdateGoalInput = z.infer<typeof updateGoalInputSchema>;
 
+// Swaps the `position` of two goals — used by goal-list reorder controls.
+export const reorderGoalsInputSchema = z.object({
+  firstId: gidSchema("goal"),
+  secondId: gidSchema("goal"),
+});
+export type ReorderGoalsInput = z.infer<typeof reorderGoalsInputSchema>;
+
 // --- Calendar ---
 
 export const calendarEventSchema = z.object({

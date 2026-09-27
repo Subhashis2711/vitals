@@ -1,7 +1,7 @@
 "use client";
 
 import type { Goal, Note, Project, Todo } from "@vitals/shared";
-import { ListTodo, Plus, StickyNote, Target, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronUp, ListTodo, Plus, StickyNote, Target, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
@@ -10,7 +10,7 @@ import { CircularProgress } from "@/components/CircularProgress";
 import { ContentTypeIcon } from "@/components/ContentTypeIcon";
 import { EditableTodoList } from "@/components/EditableTodoList";
 import { ReferenceBadge } from "@/components/ReferenceBadge";
-import { createTodo, updateProject, deleteProject } from "@/lib/api-browser";
+import { createTodo, updateProject, deleteProject, reorderGoals } from "@/lib/api-browser";
 import { cn } from "@/lib/cn";
 import { fieldInputClass, fieldInputCompactClass, fieldLabelClass } from "@/lib/fieldStyles";
 
@@ -18,7 +18,7 @@ export function ProjectDetail({
   project: initialProject,
   notes,
   todos: initialTodos,
-  goals,
+  goals: initialGoals,
 }: {
   project: Project;
   notes: Note[];
@@ -32,6 +32,7 @@ export function ProjectDetail({
   const [saving, setSaving] = useState(false);
 
   const [todos, setTodos] = useState(initialTodos);
+  const [goals, setGoals] = useState(initialGoals);
   const [newTodoTitle, setNewTodoTitle] = useState("");
   const [addingTodo, setAddingTodo] = useState(false);
 
@@ -74,6 +75,32 @@ export function ProjectDetail({
   }
 
   const openTodos = todos.filter((t) => t.status !== "done").length;
+  const sortedGoals = [...goals].sort((a, b) => a.position - b.position);
+
+  async function moveGoal(goal: Goal, direction: "up" | "down") {
+    const index = sortedGoals.findIndex((item) => item.id === goal.id);
+    const neighbor = direction === "up" ? sortedGoals[index - 1] : sortedGoals[index + 1];
+    if (!neighbor) return;
+
+    const goalPosition = goal.position;
+    const neighborPosition = neighbor.position;
+    setGoals((prev) => prev.map((item) => {
+      if (item.id === goal.id) return { ...item, position: neighborPosition };
+      if (item.id === neighbor.id) return { ...item, position: goalPosition };
+      return item;
+    }));
+    try {
+      const { goals: updated } = await reorderGoals(goal.id, neighbor.id);
+      setGoals((prev) => prev.map((item) => updated.find((next) => next.id === item.id) ?? item));
+    } catch (err) {
+      setGoals((prev) => prev.map((item) => {
+        if (item.id === goal.id) return { ...item, position: goalPosition };
+        if (item.id === neighbor.id) return { ...item, position: neighborPosition };
+        return item;
+      }));
+      toast.error(err instanceof Error ? err.message : "Couldn't reorder goal");
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -119,11 +146,11 @@ export function ProjectDetail({
             Goals <span className="text-neutral-600 dark:text-neutral-500">({goals.length})</span>
           </h3>
           <ul className="space-y-1.5">
-            {goals.map((goal) => (
-              <li key={goal.id}>
+            {sortedGoals.map((goal, index) => (
+              <li key={goal.id} className="group flex items-center gap-1">
                 <Link
                   href={`/goals/${encodeURIComponent(goal.reference)}`}
-                  className="flex items-center gap-2 rounded-lg p-1.5 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                  className="min-w-0 flex-1 flex items-center gap-2 rounded-lg p-1.5 hover:bg-neutral-100 dark:hover:bg-neutral-800"
                 >
                   <CircularProgress value={goal.progress} size={28} strokeWidth={3} />
                   <span className="truncate text-sm text-neutral-800 dark:text-neutral-200">
@@ -131,6 +158,14 @@ export function ProjectDetail({
                     {goal.title}
                   </span>
                 </Link>
+                <div className="flex shrink-0 flex-col opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
+                  <button type="button" onClick={() => moveGoal(goal, "up")} disabled={index === 0} title="Move goal up" className="-m-1.5 p-1.5 text-neutral-400 hover:text-cyan-600 disabled:pointer-events-none disabled:opacity-30 dark:text-neutral-600 dark:hover:text-cyan-300">
+                    <ChevronUp className="h-3.5 w-3.5" />
+                  </button>
+                  <button type="button" onClick={() => moveGoal(goal, "down")} disabled={index === sortedGoals.length - 1} title="Move goal down" className="-m-1.5 p-1.5 text-neutral-400 hover:text-cyan-600 disabled:pointer-events-none disabled:opacity-30 dark:text-neutral-600 dark:hover:text-cyan-300">
+                    <ChevronDown className="h-3.5 w-3.5" />
+                  </button>
+                </div>
               </li>
             ))}
             {goals.length === 0 && <li className="text-xs text-neutral-600 dark:text-neutral-500">No goals linked yet.</li>}
@@ -157,7 +192,7 @@ export function ProjectDetail({
               <Plus className="h-4 w-4" />
             </button>
           </form>
-          <EditableTodoList todos={todos} onChange={setTodos} emptyMessage="No todos linked yet." />
+          <EditableTodoList todos={todos} onChange={setTodos} projects={[project]} goals={goals} emptyMessage="No todos linked yet." />
           {todos.length > 0 && (
             <Link href="/todos" className="mt-2 inline-block text-xs text-neutral-600 dark:text-neutral-500 hover:text-cyan-600 dark:text-cyan-300">
               View all todos →

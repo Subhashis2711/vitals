@@ -25,11 +25,13 @@ export function GoalDetail({
   todos: initialTodos,
   projects,
   topics,
+  goals,
 }: {
   goal: Goal;
   todos: Todo[];
   projects: Project[];
   topics: LearningTopic[];
+  goals: Goal[];
 }) {
   const router = useRouter();
   const [goal, setGoal] = useState(initialGoal);
@@ -42,6 +44,8 @@ export function GoalDetail({
   const [topicId, setTopicId] = useState(goal.topicId ?? "");
   const [goalTitle, setGoalTitle] = useState(goal.title);
   const [goalDescription, setGoalDescription] = useState(goal.description ?? "");
+  const [startDate, setStartDate] = useState(goal.startDate ?? "");
+  const [targetDate, setTargetDate] = useState(goal.targetDate ?? "");
   const [saving, setSaving] = useState(false);
 
   const progress =
@@ -52,7 +56,9 @@ export function GoalDetail({
     projectId !== (goal.projectId ?? "") ||
     topicId !== (goal.topicId ?? "") ||
     goalTitle.trim() !== goal.title ||
-    goalDescription.trim() !== (goal.description ?? "");
+    goalDescription.trim() !== (goal.description ?? "") ||
+    startDate !== (goal.startDate ?? "") ||
+    targetDate !== (goal.targetDate ?? "");
 
   async function handleSave() {
     if (!dirty || !goalTitle.trim()) return;
@@ -64,6 +70,8 @@ export function GoalDetail({
         topicId: topicId || null,
         title: goalTitle.trim(),
         description: goalDescription.trim() || null,
+        startDate: startDate || null,
+        targetDate: targetDate || null,
       });
       setGoal((prev) => ({ ...prev, ...updated }));
       toast.success("Goal saved");
@@ -115,10 +123,16 @@ export function GoalDetail({
                 className={fieldInputCompactClass}
               />
             </div>
-            <p className="text-xs text-neutral-600 dark:text-neutral-500">
-              {goal.startDate ? `${goal.startDate} – ` : ""}
-              {goal.targetDate ?? "No target date"}
-            </p>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              <label className={fieldLabelClass}>
+                Start date
+                <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className={fieldInputCompactClass} />
+              </label>
+              <label className={fieldLabelClass}>
+                Due date
+                <input type="date" value={targetDate} onChange={(e) => setTargetDate(e.target.value)} className={fieldInputCompactClass} />
+              </label>
+            </div>
           </div>
         </div>
         <div className="flex flex-col items-end gap-2">
@@ -172,8 +186,8 @@ export function GoalDetail({
             <Plus className="h-4 w-4" />
           </button>
         </form>
-        <p className="mb-2 text-xs text-neutral-400 dark:text-neutral-600">Double-click a task to rename it · use the arrows to reorder.</p>
-        <EditableTodoList todos={todos} onChange={setTodos} emptyMessage="No tasks linked yet." />
+        <p className="mb-2 text-xs text-neutral-400 dark:text-neutral-600">Click a task for details · use the arrows to reorder.</p>
+        <EditableTodoList todos={todos} onChange={setTodos} projects={projects} goals={goals} emptyMessage="No tasks linked yet." />
       </div>
     </div>
   );

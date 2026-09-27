@@ -49,7 +49,9 @@ export async function todosRoutes(app: FastifyInstance) {
   app.post("/reorder", async (req, reply) => {
     const parsed = reorderTodosInputSchema.safeParse(req.body);
     if (!parsed.success) return reply.code(400).send({ error: parsed.error.flatten() });
-    const result = await todosRepo.swapTodoPositions(parsed.data.firstId, parsed.data.secondId, req.userId, req.workspaceId);
+    const firstId = fromGid(parsed.data.firstId).id;
+    const secondId = fromGid(parsed.data.secondId).id;
+    const result = await todosRepo.swapTodoPositions(firstId, secondId, req.userId, req.workspaceId);
     if (!result) return reply.code(404).send({ error: "Todo not found" });
     return { todos: result.map(serializeTodo) };
   });

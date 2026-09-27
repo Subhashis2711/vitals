@@ -260,6 +260,13 @@ export function createApiClient(
       return request<{ goal: Goal }>(`/goals/${encodeURIComponent(id)}`, { method: "DELETE" });
     },
 
+    reorderGoals(firstId: string, secondId: string) {
+      return request<{ goals: Goal[] }>("/goals/reorder", {
+        method: "POST",
+        body: JSON.stringify({ firstId, secondId }),
+      });
+    },
+
     // --- Calendar ---
 
     getCalendarEvents(dates: string[]) {

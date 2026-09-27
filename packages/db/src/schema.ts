@@ -107,8 +107,8 @@ export const goals = pgTable("goals", {
   // items live here now, scoped by topicId) — real FK, unlike notes.domainId
   // below, since a goal only ever has these two possible parents.
   topicId: uuid("topic_id").references(() => learningTopics.id, { onDelete: "set null" }),
-  // Manual ordering, same shape as todos.position — used for topic-scoped
-  // (former roadmap) goals; general goals don't rely on it.
+  // Manual ordering, same shape as todos.position. It is used by the main
+  // goals list and by project/topic-filtered goal lists.
   position: integer("position").notNull().default(0),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),

@@ -29,7 +29,7 @@ export async function listGoals(userId: string, workspaceId: string) {
     .select()
     .from(goals)
     .where(and(eq(goals.userId, userId), eq(goals.workspaceId, workspaceId)))
-    .orderBy(desc(goals.createdAt));
+    .orderBy(asc(goals.position), asc(goals.createdAt));
   return withProgress(rows, workspaceId);
 }
 
@@ -60,7 +60,8 @@ export async function listGoalTodos(goalId: string, userId: string, workspaceId:
   return db
     .select()
     .from(todos)
-    .where(and(eq(todos.goalId, goalId), eq(todos.userId, userId), eq(todos.workspaceId, workspaceId)));
+    .where(and(eq(todos.goalId, goalId), eq(todos.userId, userId), eq(todos.workspaceId, workspaceId)))
+    .orderBy(asc(todos.position), asc(todos.createdAt));
 }
 
 export async function listGoalsByProjectId(projectId: string, userId: string, workspaceId: string) {
@@ -69,7 +70,7 @@ export async function listGoalsByProjectId(projectId: string, userId: string, wo
     .select()
     .from(goals)
     .where(and(eq(goals.projectId, projectId), eq(goals.userId, userId), eq(goals.workspaceId, workspaceId)))
-    .orderBy(desc(goals.createdAt));
+    .orderBy(asc(goals.position), asc(goals.createdAt));
   return withProgress(rows, workspaceId);
 }
 
@@ -88,12 +89,14 @@ export async function listGoalsByTopicId(topicId: string, userId: string, worksp
 export async function createGoal(input: CreateGoalInput, userId: string, workspaceId: string) {
   const db = getDb();
   let position = input.position;
-  if (position === undefined && input.topicId) {
-    const existing = await db
-      .select()
+  if (position === undefined) {
+    const [last] = await db
+      .select({ position: goals.position })
       .from(goals)
-      .where(and(eq(goals.topicId, input.topicId), eq(goals.userId, userId), eq(goals.workspaceId, workspaceId)));
-    position = existing.length;
+      .where(and(eq(goals.userId, userId), eq(goals.workspaceId, workspaceId)))
+      .orderBy(desc(goals.position))
+      .limit(1);
+    position = last ? last.position + 1 : 0;
   }
   const [row] = await db
     .insert(goals)
@@ -143,4 +146,46 @@ export async function deleteGoal(id: string, userId: string, workspaceId: string
     .where(and(eq(goals.id, id), eq(goals.userId, userId), eq(goals.workspaceId, workspaceId)))
     .returning();
   return row ?? null;
+}
+
+// The caller chooses adjacent goals from the currently displayed scope
+// (all goals, a project, or a topic). Swapping their positions preserves that
+// visible order without coupling the repository to a particular screen.
+export async function swapGoalPositions(firstId: string, secondId: string, userId: string, workspaceId: string) {
+  const db = getDb();
+  const [a] = await db
+    .select()
+    .from(goals)
+    .where(and(eq(goals.id, firstId), eq(goals.userId, userId), eq(goals.workspaceId, workspaceId)));
+  const [b] = await db
+    .select()
+    .from(goals)
+    .where(and(eq(goals.id, secondId), eq(goals.userId, userId), eq(goals.workspaceId, workspaceId)));
+  if (!a || !b) return null;
+
+  // Older rows predate manual goal ordering and can all have position 0.
+  // A literal swap would be a no-op in that case, so give the moved goal a
+  // neighbouring position based on the stable creation-order fallback.
+  if (a.position === b.position) {
+    const aComesFirst = a.createdAt.getTime() < b.createdAt.getTime() ||
+      (a.createdAt.getTime() === b.createdAt.getTime() && a.id < b.id);
+    const [updatedA] = await db
+      .update(goals)
+      .set({ position: a.position + (aComesFirst ? 1 : -1), updatedAt: new Date() })
+      .where(eq(goals.id, a.id))
+      .returning();
+    return withProgress([updatedA, b], workspaceId);
+  }
+
+  const [updatedA] = await db
+    .update(goals)
+    .set({ position: b.position, updatedAt: new Date() })
+    .where(eq(goals.id, a.id))
+    .returning();
+  const [updatedB] = await db
+    .update(goals)
+    .set({ position: a.position, updatedAt: new Date() })
+    .where(eq(goals.id, b.id))
+    .returning();
+  return withProgress([updatedA, updatedB], workspaceId);
 }

@@ -1,9 +1,10 @@
 "use client";
 
-import type { Todo } from "@vitals/shared";
+import type { Goal, Project, Todo } from "@vitals/shared";
 import { CheckCircle2, ChevronDown, ChevronUp, Circle, Trash2 } from "lucide-react";
-import { useRef, useState, type KeyboardEvent } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
+import { TodoDetailModal } from "@/components/TodoDetailModal";
 import { deleteTodo, reorderTodos, updateTodo } from "@/lib/api-browser";
 import { cn } from "@/lib/cn";
 import { rowIconButtonClass } from "@/lib/rowIconButton";
@@ -17,47 +18,19 @@ import { ReferenceBadge } from "@/components/ReferenceBadge";
 export function EditableTodoList({
   todos,
   onChange,
+  projects = [],
+  goals = [],
   emptyMessage = "No todos yet.",
 }: {
   todos: Todo[];
   onChange: (todos: Todo[]) => void;
+  projects?: Project[];
+  goals?: Goal[];
   emptyMessage?: string;
 }) {
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editingTitle, setEditingTitle] = useState("");
-  const editingInputRef = useRef<HTMLInputElement>(null);
+  const [detailTodoId, setDetailTodoId] = useState<string | null>(null);
 
   const sorted = [...todos].sort((a, b) => a.position - b.position);
-
-  function startEditing(todo: Todo) {
-    setEditingId(todo.id);
-    setEditingTitle(todo.title);
-    requestAnimationFrame(() => editingInputRef.current?.select());
-  }
-
-  async function commitEdit() {
-    const id = editingId;
-    const nextTitle = editingTitle.trim();
-    setEditingId(null);
-    if (!id || !nextTitle) return;
-    const original = todos.find((t) => t.id === id);
-    if (!original || original.title === nextTitle) return;
-    onChange(todos.map((t) => (t.id === id ? { ...t, title: nextTitle } : t)));
-    try {
-      await updateTodo(id, { title: nextTitle });
-    } catch (err) {
-      onChange(todos.map((t) => (t.id === id ? { ...t, title: original.title } : t)));
-      toast.error(err instanceof Error ? err.message : "Couldn't rename todo");
-    }
-  }
-
-  function handleEditKeyDown(e: KeyboardEvent<HTMLInputElement>) {
-    if (e.key === "Enter") {
-      e.currentTarget.blur();
-    } else if (e.key === "Escape") {
-      setEditingId(null);
-    }
-  }
 
   async function toggleTodo(todo: Todo) {
     const nextStatus = todo.status === "done" ? "todo" : "done";
@@ -68,6 +41,11 @@ export function EditableTodoList({
   async function handleDelete(id: string) {
     onChange(todos.filter((t) => t.id !== id));
     await deleteTodo(id);
+  }
+
+  function applyTodoUpdate(updated: Todo, nextTodo?: Todo | null) {
+    const next = todos.map((todo) => (todo.id === updated.id ? updated : todo));
+    onChange(nextTodo ? [nextTodo, ...next] : next);
   }
 
   async function move(todo: Todo, direction: "up" | "down") {
@@ -99,9 +77,9 @@ export function EditableTodoList({
   }
 
   return (
-    <ul className="space-y-1.5">
+    <>
+      <ul className="space-y-1.5">
       {sorted.map((todo, i) => {
-        const isEditing = editingId === todo.id;
         return (
           <li
             key={todo.id}
@@ -119,29 +97,18 @@ export function EditableTodoList({
               )}
             </button>
             <div className="min-w-0 flex-1">
-              {isEditing ? (
-                <input
-                  ref={editingInputRef}
-                  value={editingTitle}
-                  onChange={(e) => setEditingTitle(e.target.value)}
-                  onBlur={commitEdit}
-                  onKeyDown={handleEditKeyDown}
-                  autoFocus
-                  className="w-full rounded border border-cyan-400/60 bg-white dark:bg-neutral-900 px-1.5 py-0.5 text-sm text-neutral-900 dark:text-neutral-100 focus:outline-none"
-                />
-              ) : (
-                <p
-                  onDoubleClick={() => startEditing(todo)}
-                  title="Double-click to rename"
-                  className={cn(
-                    "cursor-text truncate text-neutral-800 dark:text-neutral-200",
-                    todo.status === "done" && "text-neutral-600 dark:text-neutral-500 line-through",
-                  )}
-                >
-                  <ReferenceBadge reference={todo.reference} className="mr-2" />
-                  {todo.title}
-                </p>
-              )}
+              <button
+                type="button"
+                onClick={() => setDetailTodoId(todo.id)}
+                title="View task details"
+                className={cn(
+                  "block w-full truncate text-left text-neutral-800 hover:text-cyan-700 dark:text-neutral-200 dark:hover:text-cyan-200",
+                  todo.status === "done" && "text-neutral-600 dark:text-neutral-500 line-through",
+                )}
+              >
+                <ReferenceBadge reference={todo.reference} className="mr-2" />
+                {todo.title}
+              </button>
             </div>
             <div className="flex shrink-0 flex-col opacity-0 transition-opacity group-hover:opacity-100">
               <button
@@ -173,7 +140,18 @@ export function EditableTodoList({
           </li>
         );
       })}
-      {sorted.length === 0 && <li className="text-xs text-neutral-600 dark:text-neutral-500">{emptyMessage}</li>}
-    </ul>
+        {sorted.length === 0 && <li className="text-xs text-neutral-600 dark:text-neutral-500">{emptyMessage}</li>}
+      </ul>
+      {detailTodoId && todos.some((todo) => todo.id === detailTodoId) && (
+        <TodoDetailModal
+          todo={todos.find((todo) => todo.id === detailTodoId)!}
+          projects={projects}
+          goals={goals}
+          onClose={() => setDetailTodoId(null)}
+          onChange={applyTodoUpdate}
+          onDelete={(id) => void handleDelete(id)}
+        />
+      )}
+    </>
   );
 }

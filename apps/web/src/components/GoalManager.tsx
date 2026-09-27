@@ -1,7 +1,7 @@
 "use client";
 
 import { GOAL_STATUSES, type Goal, type LearningTopic, type Project } from "@vitals/shared";
-import { Plus, Search, Target, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Plus, Search, Target, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -10,7 +10,7 @@ import { NewGoalModal } from "@/components/NewGoalModal";
 import { ProjectBadge } from "@/components/ProjectBadge";
 import { ProjectSelect } from "@/components/ProjectSelect";
 import { ReferenceBadge } from "@/components/ReferenceBadge";
-import { deleteGoal } from "@/lib/api-browser";
+import { deleteGoal, reorderGoals } from "@/lib/api-browser";
 import { cn } from "@/lib/cn";
 import { rowIconButtonClass } from "@/lib/rowIconButton";
 
@@ -57,6 +57,31 @@ export function GoalManager({
     setGoals((prev) => prev.filter((g) => g.id !== id));
     await deleteGoal(id);
     toast(`Deleted "${goalTitle}"`);
+  }
+
+  async function moveGoal(goal: Goal, direction: "up" | "down") {
+    const index = visibleGoals.findIndex((item) => item.id === goal.id);
+    const neighbor = direction === "up" ? visibleGoals[index - 1] : visibleGoals[index + 1];
+    if (!neighbor) return;
+
+    const goalPosition = goal.position;
+    const neighborPosition = neighbor.position;
+    setGoals((prev) => prev.map((item) => {
+      if (item.id === goal.id) return { ...item, position: neighborPosition };
+      if (item.id === neighbor.id) return { ...item, position: goalPosition };
+      return item;
+    }));
+    try {
+      const { goals: updated } = await reorderGoals(goal.id, neighbor.id);
+      setGoals((prev) => prev.map((item) => updated.find((next) => next.id === item.id) ?? item));
+    } catch (err) {
+      setGoals((prev) => prev.map((item) => {
+        if (item.id === goal.id) return { ...item, position: goalPosition };
+        if (item.id === neighbor.id) return { ...item, position: neighborPosition };
+        return item;
+      }));
+      toast.error(err instanceof Error ? err.message : "Couldn't reorder goal");
+    }
   }
 
   return (
@@ -117,7 +142,7 @@ export function GoalManager({
       </div>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {visibleGoals.map((goal) => (
+        {visibleGoals.map((goal, index) => (
           <div key={goal.id} className="group relative rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4">
             <Link href={`/goals/${encodeURIComponent(goal.reference)}`} className="flex items-center gap-3">
               <CircularProgress value={goal.progress} />
@@ -149,6 +174,26 @@ export function GoalManager({
             >
               <Trash2 className="h-3.5 w-3.5" />
             </button>
+            <div className="absolute bottom-1.5 right-1.5 flex flex-col opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
+              <button
+                type="button"
+                onClick={() => moveGoal(goal, "up")}
+                disabled={index === 0}
+                title="Move goal up"
+                className="-m-1.5 p-1.5 text-neutral-400 hover:text-cyan-600 disabled:pointer-events-none disabled:opacity-30 dark:text-neutral-600 dark:hover:text-cyan-300"
+              >
+                <ChevronUp className="h-3.5 w-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => moveGoal(goal, "down")}
+                disabled={index === visibleGoals.length - 1}
+                title="Move goal down"
+                className="-m-1.5 p-1.5 text-neutral-400 hover:text-cyan-600 disabled:pointer-events-none disabled:opacity-30 dark:text-neutral-600 dark:hover:text-cyan-300"
+              >
+                <ChevronDown className="h-3.5 w-3.5" />
+              </button>
+            </div>
           </div>
         ))}
         {visibleGoals.length === 0 && (

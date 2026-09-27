@@ -26,7 +26,7 @@ export function GoalSelect({
       <option value="">{placeholder}</option>
       {goals.map((goal) => (
         <option key={goal.id} value={goal.id}>
-          {goal.title}
+          {goal.reference} · {goal.title}
         </option>
       ))}
     </select>

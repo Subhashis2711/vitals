@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-// Shopify-style global IDs: `brain/<type>/<uuid>`. The DB primary key stays a
+// Shopify-style global IDs: `vitals/<type>/<uuid>`. The DB primary key stays a
 // plain uuid (see packages/db/src/schema.ts) — encoding only happens at the
 // API boundary (route handlers), on the way out to and in from the frontend.
 export const RESOURCE_TYPES = [
@@ -15,7 +15,8 @@ export const RESOURCE_TYPES = [
 ] as const;
 export type ResourceType = (typeof RESOURCE_TYPES)[number];
 
-const GID_PREFIX = "brain";
+const GID_PREFIX = "vitals";
+const LEGACY_GID_PREFIX = "brain";
 
 export function toGid(type: ResourceType, id: string): string {
   return `${GID_PREFIX}/${type}/${id}`;
@@ -24,7 +25,12 @@ export function toGid(type: ResourceType, id: string): string {
 export function fromGid(gid: string): { type: ResourceType; id: string } {
   const parts = gid.split("/");
   const [prefix, type, id] = parts;
-  if (parts.length !== 3 || prefix !== GID_PREFIX || !RESOURCE_TYPES.includes(type as ResourceType) || !id) {
+  if (
+    parts.length !== 3 ||
+    (prefix !== GID_PREFIX && prefix !== LEGACY_GID_PREFIX) ||
+    !RESOURCE_TYPES.includes(type as ResourceType) ||
+    !id
+  ) {
     throw new Error(`Invalid GID: ${gid}`);
   }
   return { type: type as ResourceType, id };

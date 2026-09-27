@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { GoalSelect } from "@/components/GoalSelect";
 import { ProjectSelect } from "@/components/ProjectSelect";
 import { RecurrencePicker } from "@/components/RecurrencePicker";
+import { ReferenceBadge } from "@/components/ReferenceBadge";
 import { updateTodo } from "@/lib/api-browser";
 import { cn } from "@/lib/cn";
 import { fieldInputClass } from "@/lib/fieldStyles";
@@ -159,6 +160,7 @@ export function TodoDetailModal({
         </div>
 
         <div className="space-y-3">
+          <ReferenceBadge reference={todo.reference} className="block text-xs" />
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}

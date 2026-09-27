@@ -17,10 +17,15 @@ export async function goalsRoutes(app: FastifyInstance) {
   });
 
   app.get<{ Params: { id: string } }>("/:id", async (req, reply) => {
-    const { id } = fromGid(req.params.id);
-    const goal = await goalsRepo.getGoalById(id, req.userId, req.workspaceId);
+    let goal;
+    try {
+      const { id } = fromGid(req.params.id);
+      goal = await goalsRepo.getGoalById(id, req.userId, req.workspaceId);
+    } catch {
+      goal = await goalsRepo.getGoalByReference(req.params.id, req.userId, req.workspaceId);
+    }
     if (!goal) return reply.code(404).send({ error: "Goal not found" });
-    const todos = await goalsRepo.listGoalTodos(id, req.userId, req.workspaceId);
+    const todos = await goalsRepo.listGoalTodos(goal.id, req.userId, req.workspaceId);
     return { goal: serializeGoal(goal), todos: todos.map(serializeTodo) };
   });
 

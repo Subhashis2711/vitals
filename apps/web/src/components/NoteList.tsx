@@ -78,7 +78,7 @@ export function NoteList({ initialNotes, projects }: { initialNotes: Note[]; pro
           >
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
-                <Link href={`/notes/${encodeURIComponent(note.id)}`} className="block truncate font-medium text-neutral-900 dark:text-neutral-100 hover:text-cyan-600 dark:text-cyan-300">
+                <Link href={`/notes/${encodeURIComponent(note.reference)}`} className="block truncate font-medium text-neutral-900 dark:text-neutral-100 hover:text-cyan-600 dark:text-cyan-300">
                   {note.title ?? "Untitled"}
                 </Link>
                 <p className="mt-1 flex items-center gap-1 text-xs uppercase tracking-wide text-neutral-600 dark:text-neutral-500">

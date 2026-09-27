@@ -5,10 +5,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { getGoal, getLearningTopics, getProjects } from "@/lib/api";
 
 export default async function GoalDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id: rawId } = await params;
-  // Next.js doesn't decode a %2F inside a dynamic segment back into a
-  // literal "/", so a GID (brain/goal/<uuid>) arrives here still encoded.
-  const id = decodeURIComponent(rawId);
+  const { id } = await params;
 
   let goal: Goal;
   let todos: Todo[];
@@ -22,7 +19,7 @@ export default async function GoalDetailPage({ params }: { params: Promise<{ id:
 
   return (
     <div>
-      <PageHeader title={goal.title} subtitle="Goal" />
+      <PageHeader title={`${goal.reference} · ${goal.title}`} subtitle="Goal" />
       <GoalDetail goal={goal} todos={todos} projects={projects} topics={topics} />
     </div>
   );

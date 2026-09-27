@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { CircularProgress } from "@/components/CircularProgress";
 import { ContentTypeIcon } from "@/components/ContentTypeIcon";
 import { EditableTodoList } from "@/components/EditableTodoList";
+import { ReferenceBadge } from "@/components/ReferenceBadge";
 import { createTodo, updateProject, deleteProject } from "@/lib/api-browser";
 import { cn } from "@/lib/cn";
 import { fieldInputClass, fieldInputCompactClass, fieldLabelClass } from "@/lib/fieldStyles";
@@ -121,11 +122,14 @@ export function ProjectDetail({
             {goals.map((goal) => (
               <li key={goal.id}>
                 <Link
-                  href={`/goals/${encodeURIComponent(goal.id)}`}
+                  href={`/goals/${encodeURIComponent(goal.reference)}`}
                   className="flex items-center gap-2 rounded-lg p-1.5 hover:bg-neutral-100 dark:hover:bg-neutral-800"
                 >
                   <CircularProgress value={goal.progress} size={28} strokeWidth={3} />
-                  <span className="truncate text-sm text-neutral-800 dark:text-neutral-200">{goal.title}</span>
+                  <span className="truncate text-sm text-neutral-800 dark:text-neutral-200">
+                    <ReferenceBadge reference={goal.reference} className="mr-2" />
+                    {goal.title}
+                  </span>
                 </Link>
               </li>
             ))}
@@ -170,7 +174,7 @@ export function ProjectDetail({
             {notes.map((note) => (
               <li key={note.id}>
                 <Link
-                  href={`/notes/${encodeURIComponent(note.id)}`}
+                  href={`/notes/${encodeURIComponent(note.reference)}`}
                   className="flex items-center gap-2 rounded-lg p-1.5 hover:bg-neutral-100 dark:hover:bg-neutral-800"
                 >
                   <ContentTypeIcon type={note.contentType} className="h-3.5 w-3.5 shrink-0 text-neutral-600 dark:text-neutral-500" />

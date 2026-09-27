@@ -80,10 +80,10 @@ export function CommandPalette() {
     if (!q) return { pages, todos: [], notes: [], projects: [], goals: [] };
     return {
       pages,
-      todos: todos.filter((t) => t.title.toLowerCase().includes(q)).slice(0, 5),
+      todos: todos.filter((t) => t.reference.toLowerCase().includes(q) || t.title.toLowerCase().includes(q)).slice(0, 5),
       notes: notes.filter((n) => (n.title ?? "").toLowerCase().includes(q)).slice(0, 5),
-      projects: projects.filter((p) => p.name.toLowerCase().includes(q)).slice(0, 5),
-      goals: goals.filter((g) => g.title.toLowerCase().includes(q)).slice(0, 5),
+      projects: projects.filter((p) => p.key.toLowerCase().includes(q) || p.name.toLowerCase().includes(q)).slice(0, 5),
+      goals: goals.filter((g) => g.reference.toLowerCase().includes(q) || g.title.toLowerCase().includes(q)).slice(0, 5),
     };
   }, [query, todos, notes, projects, goals]);
 
@@ -132,14 +132,14 @@ export function CommandPalette() {
           {results.goals.length > 0 && (
             <ResultGroup label="Goals">
               {results.goals.map((g) => (
-                <ResultRow key={g.id} icon={Target} label={g.title} onClick={() => go(`/goals/${encodeURIComponent(g.id)}`)} />
+                <ResultRow key={g.id} icon={Target} label={`${g.reference} · ${g.title}`} onClick={() => go(`/goals/${encodeURIComponent(g.reference)}`)} />
               ))}
             </ResultGroup>
           )}
           {results.projects.length > 0 && (
             <ResultGroup label="Projects">
               {results.projects.map((p) => (
-                <ResultRow key={p.id} icon={Folder} label={p.name} onClick={() => go("/projects")} />
+                <ResultRow key={p.id} icon={Folder} label={`${p.key} · ${p.name}`} onClick={() => go(`/projects/${encodeURIComponent(p.key)}`)} />
               ))}
             </ResultGroup>
           )}
@@ -150,7 +150,7 @@ export function CommandPalette() {
                   key={n.id}
                   icon={StickyNote}
                   label={n.title ?? "Untitled"}
-                  onClick={() => go(`/notes/${encodeURIComponent(n.id)}`)}
+                  onClick={() => go(`/notes/${encodeURIComponent(n.reference)}`)}
                 />
               ))}
             </ResultGroup>
@@ -158,7 +158,7 @@ export function CommandPalette() {
           {results.todos.length > 0 && (
             <ResultGroup label="Todos">
               {results.todos.map((t) => (
-                <ResultRow key={t.id} icon={ListTodo} label={t.title} onClick={() => go("/todos")} />
+                <ResultRow key={t.id} icon={ListTodo} label={`${t.reference} · ${t.title}`} onClick={() => go("/todos")} />
               ))}
             </ResultGroup>
           )}

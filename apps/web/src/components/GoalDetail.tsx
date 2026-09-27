@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { CircularProgress } from "@/components/CircularProgress";
 import { EditableTodoList } from "@/components/EditableTodoList";
 import { ProjectSelect } from "@/components/ProjectSelect";
+import { ReferenceBadge } from "@/components/ReferenceBadge";
 import { TopicSelect } from "@/components/TopicSelect";
 import { createTodo, deleteGoal, updateGoal } from "@/lib/api-browser";
 import { cn } from "@/lib/cn";
@@ -101,6 +102,7 @@ export function GoalDetail({
           <div className="min-w-0 flex-1 space-y-2">
             <div>
               <label className={fieldLabelClass}>Title</label>
+              <ReferenceBadge reference={goal.reference} className="mb-1 block text-xs" />
               <input value={goalTitle} onChange={(e) => setGoalTitle(e.target.value)} className={fieldInputCompactClass} />
             </div>
             <div>

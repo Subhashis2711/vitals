@@ -124,6 +124,7 @@ export function LearningTopicDetail({
                 )}
               </button>
               <span className={cn("flex-1 text-neutral-800 dark:text-neutral-200", item.status === "done" && "text-neutral-600 dark:text-neutral-500 line-through")}>
+                <span className="mr-2 font-mono text-[10px] font-semibold text-cyan-700 dark:text-cyan-300">{item.reference}</span>
                 {item.title}
               </span>
               <button

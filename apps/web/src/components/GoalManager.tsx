@@ -9,6 +9,7 @@ import { CircularProgress } from "@/components/CircularProgress";
 import { NewGoalModal } from "@/components/NewGoalModal";
 import { ProjectBadge } from "@/components/ProjectBadge";
 import { ProjectSelect } from "@/components/ProjectSelect";
+import { ReferenceBadge } from "@/components/ReferenceBadge";
 import { deleteGoal } from "@/lib/api-browser";
 import { cn } from "@/lib/cn";
 import { rowIconButtonClass } from "@/lib/rowIconButton";
@@ -47,7 +48,7 @@ export function GoalManager({
     return goals.filter((g) => {
       if (statusFilter !== "all" && g.status !== statusFilter) return false;
       if (filterProjectId && g.projectId !== filterProjectId) return false;
-      if (q && !g.title.toLowerCase().includes(q)) return false;
+      if (q && !g.reference.toLowerCase().includes(q) && !g.title.toLowerCase().includes(q)) return false;
       return true;
     });
   }, [goals, search, statusFilter, filterProjectId]);
@@ -118,11 +119,14 @@ export function GoalManager({
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {visibleGoals.map((goal) => (
           <div key={goal.id} className="group relative rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4">
-            <Link href={`/goals/${encodeURIComponent(goal.id)}`} className="flex items-center gap-3">
+            <Link href={`/goals/${encodeURIComponent(goal.reference)}`} className="flex items-center gap-3">
               <CircularProgress value={goal.progress} />
               <div className="min-w-0 flex-1">
                 <div className="flex flex-nowrap items-center gap-2 overflow-hidden">
-                  <p className="min-w-0 flex-1 truncate font-medium text-neutral-900 dark:text-neutral-100">{goal.title}</p>
+                  <p className="min-w-0 flex-1 truncate font-medium text-neutral-900 dark:text-neutral-100">
+                    <ReferenceBadge reference={goal.reference} className="mr-2" />
+                    {goal.title}
+                  </p>
                   <span
                     className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ${STATUS_STYLES[goal.status]}`}
                   >

@@ -111,7 +111,7 @@ export function CaptureModal() {
                 <p className="text-xs font-semibold text-neutral-600 dark:text-neutral-500">Extracted todos</p>
                 <ul className="mt-1 list-inside list-disc text-neutral-700 dark:text-neutral-300">
                   {result.todos.map((todo) => (
-                    <li key={todo.id}>{todo.title}</li>
+                    <li key={todo.id}>{todo.reference} · {todo.title}</li>
                   ))}
                 </ul>
               </div>

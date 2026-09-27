@@ -310,7 +310,7 @@ export function NoteEditor({ mode, projects, note, initialLinkedTodos, onSaved, 
           domainId: projectId || undefined,
         });
         toast.success(`Saved "${created.title}"`);
-        router.push(`/notes/${encodeURIComponent(created.id)}`);
+        router.push(`/notes/${encodeURIComponent(created.reference)}`);
       } else if (note) {
         const { note: updated } = await updateNote(note.id, {
           title: title.trim(),
@@ -667,6 +667,7 @@ export function NoteEditor({ mode, projects, note, initialLinkedTodos, onSaved, 
                   )}
                 </button>
                 <span className={cn("flex-1 text-neutral-800 dark:text-neutral-200", todo.status === "done" && "text-neutral-600 dark:text-neutral-500 line-through")}>
+                  <span className="mr-2 font-mono text-[10px] font-semibold text-cyan-700 dark:text-cyan-300">{todo.reference}</span>
                   {todo.title}
                 </span>
                 <button

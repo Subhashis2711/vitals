@@ -21,7 +21,7 @@ const recurrenceFieldsSchema = {
 };
 
 // --- Entities (mirror the DB shape returned by the API) ---
-// id/FK fields are Shopify-style GIDs (`brain/<type>/<uuid>`) as returned by
+// id/FK fields are Shopify-style GIDs (`vitals/<type>/<uuid>`) as returned by
 // the API — see gid.ts. They're plain `z.string()`, not `.uuid()`, since a
 // GID isn't uuid-shaped; the raw uuid only exists in packages/db.
 

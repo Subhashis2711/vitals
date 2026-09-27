@@ -237,7 +237,7 @@ export function WeekCalendar({
                         )}
                       >
                         <StatusIcon className="h-3 w-3 shrink-0" />
-                        <span className="truncate">{todo.title}</span>
+                        <span className="truncate">{todo.reference} · {todo.title}</span>
                       </button>
                     );
                   })}

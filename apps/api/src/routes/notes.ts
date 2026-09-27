@@ -35,8 +35,13 @@ export async function notesRoutes(app: FastifyInstance) {
   });
 
   app.get<{ Params: { id: string } }>("/:id", async (req, reply) => {
-    const { id } = fromGid(req.params.id);
-    const note = await notesRepo.getNoteById(id, req.userId, req.workspaceId);
+    let note;
+    try {
+      const { id } = fromGid(req.params.id);
+      note = await notesRepo.getNoteById(id, req.userId, req.workspaceId);
+    } catch {
+      note = await notesRepo.getNoteByReference(req.params.id, req.userId, req.workspaceId);
+    }
     if (!note) return reply.code(404).send({ error: "Note not found" });
     return { note: serializeNote(note) };
   });

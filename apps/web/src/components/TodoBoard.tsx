@@ -21,6 +21,7 @@ import { NewTodoModal } from "@/components/NewTodoModal";
 import { ProjectBadge } from "@/components/ProjectBadge";
 import { ProjectSelect } from "@/components/ProjectSelect";
 import { TodoDetailModal } from "@/components/TodoDetailModal";
+import { ReferenceBadge } from "@/components/ReferenceBadge";
 import { deleteTodo, reorderTodos, updateTodo } from "@/lib/api-browser";
 import { cn } from "@/lib/cn";
 import { toISODate } from "@/lib/date";
@@ -248,6 +249,7 @@ export function TodoBoard({
                             todo.status === "done" && "text-neutral-600 line-through dark:text-neutral-500",
                           )}
                         >
+                          <ReferenceBadge reference={todo.reference} className="mr-2" />
                           {todo.title}
                         </p>
                         <div className="flex shrink-0 items-center">

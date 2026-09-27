@@ -10,8 +10,13 @@ export async function projectsRoutes(app: FastifyInstance) {
   });
 
   app.get<{ Params: { id: string } }>("/:id", async (req, reply) => {
-    const { id } = fromGid(req.params.id);
-    const project = await projectsRepo.getProjectById(id, req.userId, req.workspaceId);
+    let project;
+    try {
+      const { id } = fromGid(req.params.id);
+      project = await projectsRepo.getProjectById(id, req.userId, req.workspaceId);
+    } catch {
+      project = await projectsRepo.getProjectByKey(req.params.id, req.userId, req.workspaceId);
+    }
     if (!project) return reply.code(404).send({ error: "Project not found" });
     return { project: serializeProject(project) };
   });

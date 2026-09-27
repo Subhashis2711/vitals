@@ -40,6 +40,7 @@ export default async function DashboardPage() {
     ...notes.map((n) => ({
       kind: "note" as const,
       id: n.id,
+      reference: n.reference,
       title: n.title ?? "Untitled",
       createdAt: n.createdAt,
       contentType: n.contentType,
@@ -48,6 +49,7 @@ export default async function DashboardPage() {
     ...todos.map((t) => ({
       kind: "todo" as const,
       id: t.id,
+      reference: t.reference,
       title: t.title,
       createdAt: t.createdAt,
       contentType: undefined,
@@ -99,7 +101,7 @@ export default async function DashboardPage() {
               {recentItems.map((item) => (
                 <li key={`${item.kind}-${item.id}`}>
                   <Link
-                    href={item.kind === "note" ? `/notes/${encodeURIComponent(item.id)}` : "/todos"}
+                    href={item.kind === "note" ? `/notes/${encodeURIComponent(item.reference)}` : "/todos"}
                     className="flex items-start gap-2.5 rounded-lg p-1.5 transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800"
                   >
                     <span
@@ -114,7 +116,10 @@ export default async function DashboardPage() {
                       )}
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-medium text-neutral-800 dark:text-neutral-200">{item.title}</span>
+                      <span className="block truncate text-sm font-medium text-neutral-800 dark:text-neutral-200">
+                        <span className="mr-2 font-mono text-[10px] font-semibold text-cyan-700 dark:text-cyan-300">{item.reference}</span>
+                        {item.title}
+                      </span>
                       <span className="flex items-center gap-1.5 text-[11px] text-neutral-600 dark:text-neutral-500">
                         {timeAgo(item.createdAt)}
                         <ProjectBadge project={item.projectId ? projectById.get(item.projectId) : undefined} />

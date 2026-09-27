@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { deleteTodo, reorderTodos, updateTodo } from "@/lib/api-browser";
 import { cn } from "@/lib/cn";
 import { rowIconButtonClass } from "@/lib/rowIconButton";
+import { ReferenceBadge } from "@/components/ReferenceBadge";
 
 // Shared list rendering for any flat (non-Kanban) todo list — Goal and
 // Project detail pages both use this so rename/reorder/toggle/delete stay in
@@ -137,6 +138,7 @@ export function EditableTodoList({
                     todo.status === "done" && "text-neutral-600 dark:text-neutral-500 line-through",
                   )}
                 >
+                  <ReferenceBadge reference={todo.reference} className="mr-2" />
                   {todo.title}
                 </p>
               )}

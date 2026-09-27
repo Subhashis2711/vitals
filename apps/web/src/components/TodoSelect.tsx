@@ -26,7 +26,7 @@ export function TodoSelect({
       <option value="">{placeholder}</option>
       {todos.map((todo) => (
         <option key={todo.id} value={todo.id}>
-          {todo.title}
+          {todo.reference} · {todo.title}
         </option>
       ))}
     </select>

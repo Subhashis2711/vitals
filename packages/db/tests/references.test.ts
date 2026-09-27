@@ -37,7 +37,7 @@ test("reference migration, allocation, and MCP resolution", { skip: !process.env
     const projectId = randomUUID(), goalId = randomUUID();
     await pool.query('INSERT INTO auth.users VALUES ($1)', [user]);
     await pool.query("INSERT INTO workspaces(id,user_id,name) VALUES ($1,$3,'test'),($2,$3,'other')", [workspace,otherWorkspace,user]);
-    await pool.query("INSERT INTO projects(id,user_id,workspace_id,name) VALUES ($1,$2,$3,'Prep Vitals')", [projectId,user,workspace]);
+    await pool.query("INSERT INTO projects(id,user_id,workspace_id,name) VALUES ($1,$2,$3,'PrepVitals')", [projectId,user,workspace]);
     await pool.query("INSERT INTO goals(id,user_id,workspace_id,title,project_id) VALUES ($1,$2,$3,'Legacy goal',$4)", [goalId,user,workspace,projectId]);
     await pool.query("INSERT INTO todos(id,user_id,workspace_id,title,project_id,goal_id) VALUES ($1,$2,$3,'Legacy task',$4,$5)", [randomUUID(),user,workspace,projectId,goalId]);
     await pool.query("INSERT INTO notes(id,user_id,workspace_id,content,raw_content,domain,domain_id,content_type) VALUES ($1,$2,$3,'Idea','Idea','project',$4,'idea')", [randomUUID(),user,workspace,projectId]);
